@@ -1,0 +1,26 @@
+{
+  "name": "@ai-anywhere/context-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rm -rf dist *.tsbuildinfo",
+    "test": "node --test dist/budget.test.js"
+  },
+  "dependencies": {
+    "@ai-anywhere/shared": "workspace:*",
+    "@ai-anywhere/platform": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

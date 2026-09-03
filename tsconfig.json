@@ -1,0 +1,13 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/shared" },
+    { "path": "./packages/prompts" },
+    { "path": "./packages/platform" },
+    { "path": "./packages/providers" },
+    { "path": "./packages/database" },
+    { "path": "./packages/context-engine" },
+    { "path": "./packages/ui" },
+    { "path": "./apps/desktop" }
+  ]
+}

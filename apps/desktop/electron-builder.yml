@@ -1,0 +1,43 @@
+appId: com.aianywhere.app
+productName: AI Anywhere
+copyright: Copyright © 2026 AI Anywhere
+directories:
+  output: release
+  buildResources: build
+files:
+  - out/**/*
+  - package.json
+# better-sqlite3 ships a .node binary; dlopen cannot read it from inside asar.
+asarUnpack:
+  - '**/node_modules/better-sqlite3/**'
+npmRebuild: true
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+    - target: portable
+      arch: [x64]
+  artifactName: ${productName}-${version}-win-${arch}.${ext}
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+linux:
+  category: Utility
+  synopsis: AI writing assistant available anywhere via a global hotkey
+  target:
+    - target: AppImage
+      arch: [x64]
+    - target: deb
+      arch: [x64]
+  desktop:
+    entry:
+      StartupWMClass: ai-anywhere
+  artifactName: ${productName}-${version}-linux-${arch}.${ext}
+deb:
+  # xdotool is the X11 active-window/keystroke path; recommended, not required.
+  recommends:
+    - xdotool
+    - libsecret-1-0
+publish: null
