@@ -34,6 +34,7 @@ export function createHistoryRepository(db: DatabaseHandle): HistoryRepository {
   );
   const listStmt = db.prepare('SELECT * FROM history ORDER BY created_at DESC LIMIT ? OFFSET ?');
   const purgeStmt = db.prepare('DELETE FROM history WHERE created_at < ?');
+  const deleteStmt = db.prepare('DELETE FROM history WHERE id = ?');
 
   return {
     insert(entry) {
@@ -57,6 +58,14 @@ export function createHistoryRepository(db: DatabaseHandle): HistoryRepository {
         return ok(purgeStmt.run(timestamp).changes);
       } catch (cause) {
         return err(appError('UNKNOWN', 'Failed to purge history', cause));
+      }
+    },
+    delete(id) {
+      try {
+        deleteStmt.run(id);
+        return ok(undefined);
+      } catch (cause) {
+        return err(appError('UNKNOWN', 'Failed to delete history entry', cause));
       }
     },
     clear() {

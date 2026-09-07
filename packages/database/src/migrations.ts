@@ -30,6 +30,48 @@ export const MIGRATIONS: readonly Migration[] = [
       CREATE INDEX IF NOT EXISTS idx_history_created_at ON history (created_at DESC);
     `,
   },
+  {
+    version: 2,
+    name: 'custom-prompts',
+    up: `
+      CREATE TABLE IF NOT EXISTS prompts (
+        id         TEXT PRIMARY KEY,
+        label      TEXT NOT NULL,
+        "group"    TEXT NOT NULL,
+        template   TEXT NOT NULL,
+        app_id     TEXT,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_prompts_app_id ON prompts (app_id);
+    `,
+  },
+  {
+    version: 3,
+    name: 'provider-overrides-clipboard-favorites',
+    up: `
+      CREATE TABLE IF NOT EXISTS providers (
+        provider_id   TEXT PRIMARY KEY,
+        enabled       INTEGER NOT NULL DEFAULT 1,
+        base_url      TEXT,
+        default_model TEXT,
+        updated_at    INTEGER NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS clipboard (
+        id         TEXT PRIMARY KEY,
+        text       TEXT NOT NULL,
+        app_name   TEXT,
+        created_at INTEGER NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_clipboard_created_at ON clipboard (created_at DESC);
+      CREATE TABLE IF NOT EXISTS favorites (
+        kind       TEXT NOT NULL,
+        item_id    TEXT NOT NULL,
+        created_at INTEGER NOT NULL,
+        PRIMARY KEY (kind, item_id)
+      );
+    `,
+  },
 ];
 
 /** Runs pending migrations in one transaction each; returns how many ran. */

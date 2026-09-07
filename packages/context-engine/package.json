@@ -13,8 +13,7 @@
   },
   "scripts": {
     "build": "tsc -b",
-    "clean": "rm -rf dist *.tsbuildinfo",
-    "test": "node --test dist/budget.test.js"
+    "clean": "rm -rf dist *.tsbuildinfo"
   },
   "dependencies": {
     "@ai-anywhere/shared": "workspace:*",

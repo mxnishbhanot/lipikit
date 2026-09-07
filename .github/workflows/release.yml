@@ -1,0 +1,91 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  # Lets a failed upload be retried without moving the tag.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to build and publish
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libsecret-1-dev
+
+      - run: pnpm install --frozen-lockfile
+
+      # The tag is the source of truth for the version; a tag that disagrees
+      # with apps/desktop/package.json would ship artifacts named after the
+      # wrong release.
+      - name: Check the tag matches the app version
+        shell: bash
+        run: |
+          tag="${{ inputs.tag || github.ref_name }}"
+          version=$(node -p "require('./apps/desktop/package.json').version")
+          if [ "$tag" != "v$version" ]; then
+            echo "tag $tag does not match apps/desktop version $version" >&2
+            exit 1
+          fi
+
+      - run: pnpm build
+      - name: Build installers
+        run: pnpm --filter @ai-anywhere/desktop dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ runner.os }}
+          path: |
+            apps/desktop/release/*.exe
+            apps/desktop/release/*.AppImage
+            apps/desktop/release/*.deb
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: artifacts
+
+      # A draft, not a live release: someone should install one artifact and
+      # press the hotkey before the download link is public.
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          gh release create "$TAG" artifacts/* \
+            --draft \
+            --title "AI Anywhere $TAG" \
+            --generate-notes

@@ -4,13 +4,57 @@ import type { SettingsRepository } from '../contracts.js';
 
 export const DEFAULT_SETTINGS: AppSettings = {
   theme: 'system',
-  globalHotkey: 'Control+Shift+Space',
+  globalHotkey: 'Control+Space',
+  clientReplyHotkey: 'Control+Shift+R',
   defaultProvider: 'openai',
-  defaultModel: 'gpt-4o-mini',
+  defaultModel: 'gpt-5-mini',
   defaultTone: 'neutral',
+  temperature: 0.7,
+  maxTokens: 1_024,
+  requestTimeoutMs: 60_000,
+  streamingEnabled: true,
   launchAtLogin: false,
   historyEnabled: true,
   historyRetentionDays: 30,
+  clipboardHistoryEnabled: false,
+  clipboardHistoryLimit: 50,
+  conversationMemoryEnabled: false,
+};
+
+const clamp = (value: number | undefined, min: number, max: number, round: boolean): number | undefined => {
+  if (value === undefined || !Number.isFinite(value)) return undefined;
+  const bounded = Math.min(Math.max(value, min), max);
+  return round ? Math.round(bounded) : bounded;
+};
+
+/**
+ * The renderer is a trust boundary: a bad temperature or a zero timeout means
+ * a provider 400 or a popup that hangs forever, so numbers are clamped on the
+ * way in rather than guarded at every read. An unusable value is dropped from
+ * the patch, which leaves the previous (or default) value in place.
+ */
+const sanitize = (patch: Partial<AppSettings>): Partial<AppSettings> => {
+  const { temperature, maxTokens, requestTimeoutMs, historyRetentionDays, clipboardHistoryLimit, ...rest } =
+    patch;
+  const bounded = {
+    temperature: clamp(temperature, 0, 2, false),
+    maxTokens: clamp(maxTokens, 16, 32_000, true),
+    requestTimeoutMs: clamp(requestTimeoutMs, 1_000, 600_000, true),
+    historyRetentionDays: clamp(historyRetentionDays, 1, 3_650, true),
+    clipboardHistoryLimit: clamp(clipboardHistoryLimit, 1, 1_000, true),
+  };
+  return {
+    ...rest,
+    ...(bounded.temperature === undefined ? {} : { temperature: bounded.temperature }),
+    ...(bounded.maxTokens === undefined ? {} : { maxTokens: bounded.maxTokens }),
+    ...(bounded.requestTimeoutMs === undefined ? {} : { requestTimeoutMs: bounded.requestTimeoutMs }),
+    ...(bounded.historyRetentionDays === undefined
+      ? {}
+      : { historyRetentionDays: bounded.historyRetentionDays }),
+    ...(bounded.clipboardHistoryLimit === undefined
+      ? {}
+      : { clipboardHistoryLimit: bounded.clipboardHistoryLimit }),
+  };
 };
 
 /**
@@ -44,8 +88,9 @@ export function createSettingsRepository(db: DatabaseHandle): SettingsRepository
         return err(appError('UNKNOWN', 'Failed to read settings', cause));
       }
     },
-    update(patch) {
+    update(rawPatch) {
       try {
+        const patch = sanitize(rawPatch);
         const next = { ...read(), ...patch };
         db.transaction(() => {
           for (const [key, value] of Object.entries(patch)) {

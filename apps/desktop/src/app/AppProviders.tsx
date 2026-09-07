@@ -3,6 +3,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { IPC_EVENTS } from '@ai-anywhere/shared';
 import { ipcOn } from '../lib/ipc-client.js';
 import { queryKeys } from '../lib/query-keys.js';
+import { useTheme } from '../lib/use-theme.js';
 
 export function AppProviders({ children }: { readonly children: ReactNode }): JSX.Element {
   // One client per app instance; created lazily so StrictMode's double render
@@ -29,5 +30,15 @@ export function AppProviders({ children }: { readonly children: ReactNode }): JS
     });
   }, [queryClient]);
 
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemedShell>{children}</ThemedShell>
+    </QueryClientProvider>
+  );
+}
+
+/** Inside the provider, because the theme comes from the settings query. */
+function ThemedShell({ children }: { readonly children: ReactNode }): JSX.Element {
+  useTheme();
+  return <>{children}</>;
 }

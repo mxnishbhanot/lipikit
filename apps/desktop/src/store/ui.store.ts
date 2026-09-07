@@ -7,7 +7,7 @@ import type { ActionId, Tone } from '@ai-anywhere/shared';
  * same data is how stale UI bugs are born.
  */
 interface UiState {
-  readonly activeView: 'home' | 'settings' | 'history';
+  readonly activeView: 'home' | 'settings';
   readonly draftAction: ActionId;
   readonly draftTone: Tone;
   setActiveView(view: UiState['activeView']): void;

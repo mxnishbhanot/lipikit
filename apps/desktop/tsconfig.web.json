@@ -7,8 +7,20 @@
     "types": ["vite/client"],
     "emitDeclarationOnly": true,
     "baseUrl": ".",
-    "paths": { "@/*": ["./src/*"] }
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": ["src/**/*"],
-  "references": [{ "path": "../../packages/shared" }, { "path": "../../packages/ui" }]
+  "references": [
+    {
+      "path": "../../packages/shared"
+    },
+    {
+      "path": "../../packages/ui"
+    },
+    {
+      "path": "../../packages/prompts"
+    }
+  ]
 }

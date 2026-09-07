@@ -17,7 +17,7 @@ export function createClipboardCaptureStrategy(deps: {
       return true;
     },
     async capture() {
-      const text = deps.clipboard.readText();
+      const text = await deps.clipboard.readText();
       if (text.trim().length === 0) {
         return err(appError('VALIDATION', 'Clipboard is empty — copy some text first'));
       }

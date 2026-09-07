@@ -16,3 +16,11 @@ export const useClearHistory = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['history'] }),
   });
 };
+
+export const useDeleteHistoryEntry = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => ipcInvoke(IPC.history.delete, { id }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['history'] }),
+  });
+};

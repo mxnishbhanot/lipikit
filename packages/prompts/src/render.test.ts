@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { test } from 'vitest';
 import { renderPrompt } from './render.js';
 
 test('renderPrompt substitutes placeholders and validates input', () => {

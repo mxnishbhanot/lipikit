@@ -4,13 +4,128 @@ Desktop AI writing assistant for **Windows and Ubuntu/Linux**. Select or copy te
 anywhere on the machine, press a global hotkey, get a rewrite. macOS/iOS are
 explicitly out of scope.
 
-**Status: Phase 1 — project foundation only. No AI calls are implemented.**
+**Status: 1.0.0 — released. Press the hotkey, pick an action, watch the
+rewrite stream into the popup, and replace the original selection. Seven
+providers are wired up; OpenAI is the fully-featured one. Settings has nine
+pages, SQLite holds settings, provider overrides, history, clipboard history,
+favourites and prompts, and the whole configuration exports to (and imports
+from) one JSON file. Windows ships an NSIS installer and a portable .exe;
+Linux ships an AppImage and a .deb.**
+
+## Install
+
+Download the artifact for your platform from the
+[latest release](https://github.com/mxnish-bhanot/ai-anywhere/releases/latest).
+
+| Platform | Artifact                                  | Notes                                                                              |
+| -------- | ----------------------------------------- | ---------------------------------------------------------------------------------- |
+| Windows  | `AI-Anywhere-1.0.0-win-x64.exe`           | NSIS installer. Per-user by default, so no admin prompt; install path is settable. |
+| Windows  | `AI-Anywhere-1.0.0-win-x64-portable.exe`  | Single file, no installer, no registry writes. Launch at login is unavailable.     |
+| Linux    | `AI-Anywhere-1.0.0-linux-x86_64.AppImage` | `chmod +x` it and run. No package manager, no root.                                |
+| Linux    | `AI-Anywhere-1.0.0-linux-amd64.deb`       | `sudo apt install ./AI-Anywhere-1.0.0-linux-amd64.deb` — pulls the recommends in.  |
+
+The installers are unsigned. Windows SmartScreen will warn on first run
+("More info" → "Run anyway"), and that is expected until there is a code
+signing certificate to attach.
+
+Uninstalling never deletes your data. Settings, history and the encrypted API
+keys live in Electron's userData directory — `%APPDATA%\AI Anywhere` on
+Windows, `~/.config/AI Anywhere` on Linux — and a reinstall finds them again.
+Delete that directory by hand for a clean slate.
+
+### First run: set up a provider
+
+1. Open **settings → Providers** and pick a vendor.
+2. Paste its API key. The key is validated against the provider _before_ it is
+   stored, so a typo is rejected rather than saved.
+3. **settings → Models** picks the model, temperature, max tokens and timeout.
+4. Select text anywhere, press `Ctrl+Space`, pick an action.
+
+Ollama needs no key: point `OLLAMA_BASE_URL` at your daemon (default
+`http://127.0.0.1:11434`) and pick it under Providers.
+
+Keys are encrypted by the OS keyring and never written to the database, the
+settings export, or the renderer. If the keyring is unavailable, storing a key
+**fails** — there is no plaintext fallback.
+
+## Keyboard shortcuts
+
+Both global hotkeys are rebindable under **settings → Shortcuts**; a
+combination another app already owns is refused, with the previous binding left
+working.
+
+| Shortcut        | Scope         | Action                                                |
+| --------------- | ------------- | ----------------------------------------------------- |
+| `Ctrl+Space`    | global        | Capture the selection and open the command palette    |
+| `Ctrl+Shift+R`  | global        | Capture the selection and open client reply           |
+| `↓` / `Ctrl+N`  | palette       | Next command                                          |
+| `↑` / `Ctrl+P`  | palette       | Previous command                                      |
+| `Home` / `End`  | palette       | First / last command                                  |
+| `Enter`         | palette       | Run the highlighted command                           |
+| `Ctrl+D`        | palette       | Toggle the highlighted command as a favourite         |
+| `Enter`         | command input | Run a command that asks for extra input               |
+| `Esc`           | command input | Back to the command list                              |
+| `←` `→` `↑` `↓` | client reply  | Move through the reply-style grid (2 columns, wraps)  |
+| `Ctrl+Enter`    | result        | Replace the original selection with the result        |
+| `Esc`           | result        | Back to the palette (the request is cancelled)        |
+| `Esc`           | palette       | Close the popup; the clipboard is restored either way |
+
+Copying the result and appending it below the original are buttons in the
+result view, not shortcuts. A global shortcut needs at least one modifier: the
+recorder refuses a bare letter, because registering one swallows that key in
+every application.
 
 ## Requirements
 
 - Node.js >= 20
 - pnpm 9 (`corepack enable pnpm`)
-- Linux only: `libsecret-1-0` (API-key encryption), `xdotool` (X11 active-window detection)
+- Linux only: `libsecret-1-0` (API-key encryption), plus one keystroke injector:
+  - X11: `xdotool` — `sudo apt install xdotool`
+  - Wayland: `ydotool` + a running `ydotoold`, and your user in the `input` group
+  - without either, capture degrades to "copy the text yourself first" and
+    replacement is unavailable; the popup says so
+- Windows: nothing to install. PowerShell `SendKeys` is used out of the box.
+  Optionally `pnpm add -w @nut-tree-fork/nut-js` for faster, more reliable
+  injection — it is detected at runtime and is not a declared dependency
+  because it is a native module needing a per-Electron-version rebuild.
+
+### Linux permissions
+
+Nothing needs root, but the keystroke injector needs access the desktop session
+does not grant by default:
+
+- **X11 (`xdotool`)** — no permission setup. It talks to the X server as your
+  user. Works out of the box once installed.
+- **Wayland (`ydotool`)** — needs the `ydotoold` daemon running and write
+  access to `/dev/uinput`:
+
+  ```bash
+  sudo apt install ydotool
+  sudo systemctl enable --now ydotoold
+  sudo usermod -aG input "$USER"   # log out and back in for it to take effect
+  ```
+
+  Without this, capture and replacement fail with
+  `ydotool failed — is ydotoold running and is your user in the input group?`
+
+- **API keys (`libsecret-1-0`)** — the deb pulls it in automatically; on the
+  AppImage install it yourself. The keyring also needs an unlocked keyring
+  daemon in the session (gnome-keyring or kwallet). Without one, storing a key
+  fails outright — there is no plaintext fallback.
+- **Launch at login** writes `~/.config/autostart/ai-anywhere.desktop`. It only
+  works from an installed build, not a dev checkout.
+
+### Windows permissions
+
+- No installer prompt, no elevation, nothing to grant. `SendKeys` and the
+  `user32` focus calls run in your own session.
+- **Do not run the app as administrator** unless the app you are typing into is
+  elevated too: Windows blocks synthetic input from a lower-integrity process
+  to a higher-integrity window, so replacement silently does nothing.
+- **Launch at login** writes an `HKCU\...\Run` value — per-user, no admin
+  rights.
+- SmartScreen will warn on first run of an unsigned build; the releases are not
+  code-signed yet.
 
 ## Getting started
 
@@ -23,14 +138,17 @@ pnpm dev                                # electron-vite: main + preload + render
 
 Other scripts:
 
-| Command                       | Purpose                                         |
-| ----------------------------- | ----------------------------------------------- |
-| `pnpm typecheck`              | `tsc -b` across the whole project graph         |
-| `pnpm lint` / `pnpm lint:fix` | ESLint (type-aware)                             |
-| `pnpm format`                 | Prettier                                        |
-| `pnpm -r test`                | Node's built-in test runner over built packages |
-| `pnpm dist:win`               | NSIS installer + portable .exe                  |
-| `pnpm dist:linux`             | AppImage + .deb                                 |
+| Command                       | Purpose                                        |
+| ----------------------------- | ---------------------------------------------- |
+| `pnpm typecheck`              | `tsc -b` across the whole project graph        |
+| `pnpm lint` / `pnpm lint:fix` | ESLint (type-aware)                            |
+| `pnpm format`                 | Prettier                                       |
+| `pnpm test`                   | Vitest — packages and renderer components      |
+| `pnpm test:db`                | SQLite suite (needs `pnpm build` first)        |
+| `pnpm test:e2e`               | Playwright Electron (needs `pnpm build` first) |
+| `pnpm dist:win`               | NSIS installer + portable .exe                 |
+| `pnpm dist:linux`             | AppImage + .deb                                |
+| `pnpm dist`                   | Every target for the host platform             |
 
 ## Layout
 
@@ -44,11 +162,173 @@ packages/
   shared/             types, Result, DI container, IPC contract, env loader
   ui/                 shadcn/ui primitives + Tailwind preset (design tokens)
   platform/           Windows/Linux capability adapters behind one interface set
-  providers/          AI provider abstraction, registry, static model catalog
+  providers/          AI provider interface, registry, adapters, model catalog
   context-engine/     text capture strategies + token budgeting
   database/           SQLite connection, migrations, repositories
   prompts/            prompt templates + renderer
 ```
+
+## How capture and replacement work
+
+Press the hotkey (`Ctrl+Space` by default) with text selected in any app:
+
+1. `SelectionService` snapshots the clipboard, **clears** it, injects `Ctrl+C`,
+   then polls for content. Clearing first is what makes "nothing was selected"
+   distinguishable from "the user had already copied this same text".
+2. `WindowContextService` records the foreground window — title, process name
+   and native window id — concurrently, so the extra process spawn does not
+   add to the latency the user feels.
+3. The user's clipboard is restored before the popup even opens. It is restored
+   on every failure path too; losing a clipboard is never an acceptable outcome.
+4. The popup opens next to the cursor, clamped to the work area of whichever
+   display the cursor is on.
+5. `TextReplacementService` hides the popup (which is what returns focus),
+   refocuses the recorded window where the platform allows it, puts the new
+   text on the clipboard, injects `Ctrl+V`, and restores the clipboard again.
+
+### Platform backends
+
+| Capability        | Windows                                   | Linux/X11                       | Linux/Wayland                   |
+| ----------------- | ----------------------------------------- | ------------------------------- | ------------------------------- |
+| Clipboard         | Electron                                  | Electron → `xclip`              | Electron → `wl-copy`/`wl-paste` |
+| Keystrokes        | nut.js (optional) → PowerShell `SendKeys` | `xdotool`                       | `ydotool`                       |
+| Foreground window | user32 `GetForegroundWindow`              | `xdotool`                       | not available — nulls           |
+| Window refocus    | user32 `SetForegroundWindow`              | `xdotool windowactivate --sync` | not possible for a client       |
+
+Feature detection is a cached probe at first use, never a `process.platform`
+branch in feature code: everything resolves one of the interfaces in
+`packages/platform/src/contracts.ts`. `IPC.context.capabilities` reports what
+actually resolved, so the UI can explain a degraded session instead of failing
+one action at a time.
+
+Wayland genuinely cannot report or raise another client's window, and this is
+not worked around: those fields are null and refocus returns
+`PLATFORM_UNSUPPORTED`, with replacement relying on focus returning when the
+popup hides.
+
+### Timing
+
+Synthetic input is a race against the target app, so
+`AI_ANYWHERE_INPUT_SETTLE_MS` (default 120) is a real calibration knob, not a
+constant to be tuned once. Capture polls up to four times, so a fast app is not
+made slow by a conservative setting.
+
+## AI providers
+
+Every provider implements one interface (`packages/providers/src/contracts.ts`):
+`generateText`, `streamText`, `listModels`, `validateKey`, `healthCheck`. The
+registry instantiates a provider lazily on first use, so an unconfigured vendor
+costs nothing.
+
+| Provider   | Transport                            | Notes                                          |
+| ---------- | ------------------------------------ | ---------------------------------------------- |
+| OpenAI     | official `openai` SDK, Responses API | gpt-5, gpt-5-mini, gpt-5-nano                  |
+| Anthropic  | `fetch` — Messages API + SSE         | `anthropic-version: 2023-06-01`                |
+| Gemini     | `fetch` — `generateContent` + SSE    | key sent as `x-goog-api-key`, never in the URL |
+| OpenRouter | `openai` SDK, chat completions       | OpenAI-compatible, different base URL          |
+| Groq       | `openai` SDK, chat completions       | OpenAI-compatible                              |
+| DeepSeek   | `openai` SDK, chat completions       | OpenAI-compatible                              |
+| Ollama     | `openai` SDK, chat completions       | local, no key; host from `OLLAMA_BASE_URL`     |
+
+Four of the seven speak the OpenAI chat-completions API verbatim, so they are
+one adapter with a different base URL rather than four near-identical files.
+OpenAI itself gets its own adapter because only it speaks the newer Responses
+API that the gpt-5 family expects — and because gpt-5 rejects any `temperature`
+but the default, the adapter drops that parameter for reasoning models instead
+of letting the request 400.
+
+Anthropic and Gemini use plain `fetch`: the surface used here is one POST and
+one GET each, and a vendor SDK apiece would mean three more HTTP stacks in the
+bundle. SSE framing is parsed once in `http.ts`; only the JSON inside differs.
+
+`streamText` throws rather than returning a `Result` — an async iterable has no
+other way to report a mid-stream failure. `mapProviderError` turns whatever
+comes out (SDK error, `HttpError`, abort) into an `AppError`, so HTTP 401
+becomes `PROVIDER_AUTH` and 429 becomes `PROVIDER_RATE_LIMIT` regardless of
+which vendor produced it.
+
+### Settings
+
+Nine pages — General, Appearance, Providers, Models, Shortcuts, History,
+Privacy, Prompt Templates, About — over one settings table. Provider, model,
+temperature, max tokens, request timeout and the streaming toggle apply to
+every call. Numbers are clamped in the settings repository, not in the UI: the
+renderer is a trust boundary, and a zero timeout or a temperature of 9 is a
+hung popup or a provider 400. The model list comes from `listModels()` when the
+vendor answers and falls back to the static catalog when it does not, so an
+offline provider never leaves the user unable to pick a model.
+
+Settings rows are key/value, so adding a setting needs no migration and an
+unknown key from an older build is ignored rather than fatal. Saving a
+shortcut re-registers it with the OS immediately, and a combination another
+app already owns is reported as an error with the previous shortcut left
+working — a silent save would look like the hotkey simply stopped working.
+
+### Tables
+
+`settings`, `providers`, `history`, `clipboard`, `favorites`, `prompts` and
+`schema_migrations`. Migrations are append-only and run in a transaction each
+at startup. `providers` holds only what the user changed (enabled, endpoint
+override, default model); a provider with no row uses the catalog defaults. An
+endpoint override must parse as an http(s) URL — it becomes the base URL of
+every request for that provider, so anything else is refused rather than
+normalised. Adapters read the live override record on each call, so applying a
+new endpoint needs no registry rebuild.
+
+`favorites` replaced the popup's localStorage: the popup and the settings
+window are separate renderers with separate storage, so a star set in one was
+invisible in the other. Recents stayed in localStorage — only the popup reads
+them.
+
+### Privacy
+
+Conversation history is on by default and can be switched off, retained for a
+configurable number of days (swept at startup), deleted per entry, or deleted
+wholesale. Clipboard history is **off** by default: while it is on, a 1.5s poll
+in the main process records everything copied in any app, which includes what
+a password manager puts on the clipboard — so it is a deliberate opt-in, the
+interval only runs while it is enabled, and the entries are per-row deletable.
+Conversation memory (replaying stored interactions back to the provider) is a
+separate opt-in again, because keeping a local log and sending that log to a
+vendor are different decisions.
+
+### Export and import
+
+`Export settings` writes settings, prompts and provider overrides as one JSON
+file; `Import settings` merges one back — prompts upsert by id and provider
+rows by provider id, so re-importing your own export is a no-op instead of
+duplicating everything. History and clipboard rows are never exported or
+touched by an import: they are a log, not configuration. **API keys are never
+exported.** An import file is untrusted input, so unknown keys and wrong types
+are dropped rather than stored, and a file from a newer version is refused.
+
+### API keys
+
+Keys are encrypted by the OS keyring — DPAPI on Windows, libsecret/kwallet on
+Linux — through Electron's `safeStorage`, and written to a separate 0600 file
+outside SQLite. `keytar` is deliberately not used: `safeStorage` reaches the
+same libsecret backend without a native module that needs rebuilding for every
+Electron version. If the keyring is unavailable, storing a key **fails**; there
+is no plaintext fallback. The renderer can only ask _whether_ a key exists, and
+a key is validated against the provider before it is stored, so a typo never
+becomes the saved credential. Keys are excluded from settings exports for the
+same reason the store exists: a plaintext key in a JSON file the user emails
+themselves is exactly the leak it prevents.
+
+## Troubleshooting
+
+| Symptom                                     | Cause                                                                                              | Fix                                                                                                           |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| The global hotkey does nothing              | Another app owns the combination; Electron's `globalShortcut` registration failed                  | Rebind under settings → Shortcuts. The old binding keeps working until a new one registers                    |
+| "Nothing captured" every time               | No keystroke injector resolved, so the selection cannot be copied                                  | Install `xdotool` (X11) or set up `ydotool` (Wayland). See [Linux permissions](#linux-permissions)            |
+| Capture works, replacement does nothing     | The target window regained focus too slowly, or on Windows the app is elevated and this one is not | Raise `AI_ANYWHERE_INPUT_SETTLE_MS` (default 120); on Windows run both at the same integrity level            |
+| Capture returns the _previous_ selection    | The target app is slower than the capture poll window                                              | Raise `AI_ANYWHERE_INPUT_SETTLE_MS`                                                                           |
+| Storing an API key fails                    | No keyring, or the keyring is locked                                                               | Install and unlock gnome-keyring/kwallet (Linux). There is no plaintext fallback by design                    |
+| Settings say "degraded session"             | A platform capability probe failed                                                                 | `IPC.context.capabilities` lists what resolved; on Wayland foreground-window and refocus are permanently null |
+| `PROVIDER_AUTH` on every request            | Wrong or revoked key                                                                               | Re-enter it under Providers; **Validate key** checks it without spending a request                            |
+| `PROVIDER_UNAVAILABLE` with Ollama          | `ollama serve` not running, or a wrong base URL                                                    | Confirm `curl http://127.0.0.1:11434/api/tags` answers                                                        |
+| `pnpm test:db` fails to load better-sqlite3 | It is built for Electron's ABI, not Node's                                                         | Run `pnpm build` first; the suite runs under `electron --test`, not Vitest                                    |
+| Launch at login does nothing                | Enabled from a dev checkout                                                                        | Only installed builds autostart — a checkout would relaunch the bare `electron` binary                        |
 
 ## Architecture decisions
 
@@ -100,10 +380,12 @@ identically on both OSes; only active-window detection genuinely diverges
 nulls rather than pretending. Unsupported platforms fail at startup, in
 `detectPlatformInfo`.
 
-**Provider abstraction before any provider.** `AiProvider` (health check,
-complete, stream) plus a lazy registry means adding a vendor is one new file and
-no switch statement. Phase 1 registers none and serves a static model catalog, so
-the settings UI is buildable today.
+**One provider interface, seven implementations, no switch statement.**
+Features depend on `AiProvider`; only the composition root knows which vendors
+exist. The AI orchestration (settings, prompt template, provider call, history
+write) sits in `apps/desktop/electron/main/services/ai-service.ts` because it
+is the only thing that needs the registry, the database and the renderer push
+channel at once — the adapters themselves know about none of the three.
 
 **SQLite via repositories, credentials via the OS keyring.** better-sqlite3 is
 synchronous, which suits a single-user local app and avoids a connection pool.
@@ -124,7 +406,35 @@ targets. Workspace packages are bundled into the main/preload output; only real
 `node_modules` (notably better-sqlite3, which must keep its `.node` binary) stay
 external and get `asarUnpack`ed by electron-builder.
 
-## Phase 1 deliberately excludes
+## Not in 1.0
 
-Provider implementations, streaming UI, keystroke-injection capture, Linux
-autostart (`.desktop` file), tray icon, auto-update, and telemetry.
+Token counting before the call, per-provider model pricing, a tray icon,
+auto-update, telemetry, and cloud sync of settings. Launch at login does work
+on both platforms (Run registry key on Windows, an XDG `.desktop` file on
+Linux) but only from an installed build — from a dev checkout the executable is
+the `electron` binary, which would relaunch Electron with no app.
+
+## Roadmap
+
+Nothing here is committed to a date; the order is roughly the order of
+usefulness.
+
+1. **Code signing and notarisation** — an unsigned build trips SmartScreen on
+   Windows and has no verifiable provenance on Linux. This blocks auto-update,
+   so it comes first.
+2. **Auto-update** — `electron-updater` against GitHub Releases, opt-in, once
+   the artifacts are signed.
+3. **Tray icon** — show/hide, quit, and a session-degraded indicator without
+   opening settings.
+4. **Token counting and cost estimates** — count before the call and show the
+   spend per action; the budgeting half already lives in
+   `packages/context-engine`.
+5. **macOS support** — the platform interfaces are already the seam
+   (`packages/platform/src/contracts.ts`); it needs a backend using Accessibility
+   APIs plus the permission prompts that come with them.
+6. **User-defined commands** — the palette is fed from `packages/prompts`
+   templates; letting users add and edit their own is mostly UI.
+7. **Streaming into the result view** — providers already implement
+   `streamText`; the overlay still waits for the whole answer.
+8. **Wayland foreground window** — needs a portal or per-compositor protocol,
+   and cannot be solved in this codebase alone.

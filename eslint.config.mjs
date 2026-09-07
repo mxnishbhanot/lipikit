@@ -23,7 +23,8 @@ export default tseslint.config(
     languageOptions: {
       parserOptions: {
         // Build/config files sit outside the tsconfig graph.
-        projectService: { allowDefaultProject: ['*.config.ts'] },
+        // Build, test and config files sit outside the tsconfig graph.
+        projectService: { allowDefaultProject: ['*.config.ts', 'apps/desktop/e2e/*.ts'] },
         tsconfigRootDir: import.meta.dirname,
       },
       globals: { ...globals.node, ...globals.es2023 },
@@ -80,8 +81,8 @@ export default tseslint.config(
     rules: { '@typescript-eslint/explicit-module-boundary-types': 'off' },
   },
   {
-    // node:test's top-level test() returns a promise nobody awaits by design.
-    files: ['**/*.test.ts', '**/*.test.tsx'],
+    // A top-level test() returns a promise nobody awaits, by design.
+    files: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts'],
     rules: { '@typescript-eslint/no-floating-promises': 'off' },
   },
   prettier,

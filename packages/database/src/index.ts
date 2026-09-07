@@ -4,3 +4,8 @@ export * from './connection.js';
 export * from './migrations.js';
 export * from './repositories/settings.repository.js';
 export * from './repositories/history.repository.js';
+export * from './repositories/prompt.repository.js';
+export * from './repositories/clipboard.repository.js';
+export * from './repositories/favorites.repository.js';
+export * from './repositories/provider-settings.repository.js';
+export * from './backup.js';

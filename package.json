@@ -1,6 +1,6 @@
 {
   "name": "ai-anywhere",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Cross-platform (Windows + Linux) desktop AI writing assistant",
   "packageManager": "pnpm@9.12.3",
@@ -18,21 +18,30 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky",
-    "test": "pnpm -r test"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:db": "pnpm --filter @ai-anywhere/database test",
+    "test:e2e": "playwright test",
+    "dist": "pnpm build && pnpm --filter @ai-anywhere/desktop dist"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
+    "@playwright/test": "^1.62.1",
+    "@testing-library/react": "^16.3.3",
     "@types/node": "^22.8.0",
+    "@vitejs/plugin-react": "^4.3.3",
     "eslint": "^9.13.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",
     "globals": "^15.11.0",
     "husky": "^9.1.6",
+    "jsdom": "^30.0.1",
     "lint-staged": "^15.2.10",
     "prettier": "^3.3.3",
     "typescript": "^5.6.3",
-    "typescript-eslint": "^8.11.0"
+    "typescript-eslint": "^8.11.0",
+    "vitest": "^2.1.9"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -42,5 +51,12 @@
     "*.{json,md,css,yaml,yml}": [
       "prettier --write"
     ]
+  },
+  "author": "mxnish-bhanot",
+  "license": "MIT",
+  "homepage": "https://github.com/mxnish-bhanot/ai-anywhere",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mxnish-bhanot/ai-anywhere.git"
   }
 }

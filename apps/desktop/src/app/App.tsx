@@ -1,13 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@ai-anywhere/ui';
 import { IPC } from '@ai-anywhere/shared';
-import { HistoryList } from '../features/history/components/HistoryList.js';
-import { SettingsPanel } from '../features/settings/components/SettingsPanel.js';
+import { SettingsLayout } from '../features/settings/components/SettingsLayout.js';
 import { ipcInvoke } from '../lib/ipc-client.js';
 import { queryKeys } from '../lib/query-keys.js';
 import { useUiStore } from '../store/ui.store.js';
 
-const VIEWS = ['home', 'settings', 'history'] as const;
+// History, prompts and providers all live inside settings now: two places to
+// edit the same rows is how a stale UI bug starts.
+const VIEWS = ['home', 'settings'] as const;
 
 export function App(): JSX.Element {
   const activeView = useUiStore((state) => state.activeView);
@@ -41,11 +42,11 @@ export function App(): JSX.Element {
         </nav>
       </header>
       <main className="flex-1 overflow-y-auto p-6">
-        {activeView === 'settings' ? <SettingsPanel /> : null}
-        {activeView === 'history' ? <HistoryList /> : null}
+        {activeView === 'settings' ? <SettingsLayout /> : null}
         {activeView === 'home' ? (
           <p className="text-sm text-muted-foreground">
-            Foundation only — AI actions land in the next phase.
+            Select text in any app, press the global hotkey, pick an action. Choose a provider and enter its
+            API key under <strong>settings</strong> first.
           </p>
         ) : null}
       </main>

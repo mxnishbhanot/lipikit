@@ -1,11 +1,12 @@
 import { app, BrowserWindow } from 'electron';
-import { IPC_EVENTS, loadEnv } from '@ai-anywhere/shared';
+import { loadEnv } from '@ai-anywhere/shared';
 import { HOTKEY_SERVICE } from '@ai-anywhere/platform';
-import { SETTINGS_REPOSITORY } from '@ai-anywhere/database';
+import { HISTORY_REPOSITORY, SETTINGS_REPOSITORY } from '@ai-anywhere/database';
 import { buildContainer } from './composition-root.js';
 import { createIpcHandlers } from './ipc/handlers.js';
 import { registerIpcHandlers } from './ipc/typed-ipc.js';
-import { LOGGER, WINDOW_MANAGER } from './tokens.js';
+import { bindGlobalHotkey, resetHotkeyBinding } from './services/hotkey-binding.js';
+import { CLIPBOARD_MONITOR, LOGGER, WINDOW_MANAGER } from './tokens.js';
 
 // A packaged build never trusts an inherited NODE_ENV: it would try to load
 // the renderer from a dev server that isn't there.
@@ -36,13 +37,17 @@ if (!app.requestSingleInstanceLock()) {
 
     const settings = container.resolve(SETTINGS_REPOSITORY).get();
     if (settings.ok) {
-      const accelerator = settings.value.globalHotkey;
-      const registered = container.resolve(HOTKEY_SERVICE).register(accelerator, () => {
-        windows.broadcast(IPC_EVENTS.hotkeyTriggered, { accelerator });
-        windows.showOverlay();
-      });
-      if (!registered.ok)
-        logger.warn('hotkey unavailable', { accelerator, reason: registered.error.message });
+      bindGlobalHotkey(container, settings.value.globalHotkey, 'palette');
+      bindGlobalHotkey(container, settings.value.clientReplyHotkey, 'client-reply');
+      // Retention is enforced at startup rather than on a timer: the app is
+      // long-lived but the window the user cares about is "what is in the DB
+      // now", and a sweep on boot is one query instead of a scheduler.
+      const cutoff = Date.now() - settings.value.historyRetentionDays * 24 * 60 * 60 * 1_000;
+      const purged = container.resolve(HISTORY_REPOSITORY).purgeOlderThan(cutoff);
+      if (purged.ok && purged.value > 0) logger.info('history purged', { rows: purged.value });
+      container.resolve(CLIPBOARD_MONITOR).sync();
+    } else {
+      logger.error('settings unreadable; no hotkey bound', { reason: settings.error.message });
     }
   });
 
@@ -52,7 +57,9 @@ if (!app.requestSingleInstanceLock()) {
 
   app.on('will-quit', () => {
     disposeIpc?.();
+    container.resolve(CLIPBOARD_MONITOR).stop();
     container.resolve(HOTKEY_SERVICE).unregisterAll();
+    resetHotkeyBinding();
   });
 
   app.on('web-contents-created', (_event, contents) => {

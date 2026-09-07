@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { test } from 'vitest';
 import { estimateTokens, fitToBudget } from './budget.js';
 
 test('fitToBudget keeps head and tail within the char budget', () => {
