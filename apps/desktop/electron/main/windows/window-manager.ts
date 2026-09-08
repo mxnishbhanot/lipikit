@@ -1,6 +1,13 @@
 import { join } from 'node:path';
 import { app, BrowserWindow, screen, shell } from 'electron';
-import type { AppEnv, CursorPoint, IpcEventContract, IpcEventName, Logger } from '@ai-anywhere/shared';
+import {
+  BRANDING,
+  type AppEnv,
+  type CursorPoint,
+  type IpcEventContract,
+  type IpcEventName,
+  type Logger,
+} from '@ai-anywhere/shared';
 import type { SettingsRepository } from '@ai-anywhere/database';
 import { isTrayActive } from '../services/tray.js';
 import { notify } from '../services/notify.js';
@@ -115,7 +122,10 @@ export function createWindowManager(
     window.hide();
     if (!trayHintShown) {
       trayHintShown = true;
-      notify('AI Anywhere is still running', 'The window is in the tray and your hotkey still works.');
+      notify(
+        `${BRANDING.shortName} is still running`,
+        'The window is in the tray and your hotkey still works.',
+      );
     }
     return true;
   };
@@ -206,7 +216,7 @@ export function createWindowManager(
         // and the GNOME/Adwaita header on Ubuntu, with the platform's own
         // window controls, snap layouts and double-click-to-maximize for
         // free. A custom title bar would reimplement all three, worse, twice.
-        title: 'AI Anywhere',
+        title: BRANDING.appName,
         ...restoredBounds(),
       });
       mainWindow = window;

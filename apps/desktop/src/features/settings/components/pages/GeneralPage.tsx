@@ -1,4 +1,4 @@
-import type { AppSettings, Tone } from '@ai-anywhere/shared';
+import { BRANDING, type AppSettings, type Tone } from '@ai-anywhere/shared';
 import { Button } from '@ai-anywhere/ui';
 import { Group, MutationStatus, NumberRow, Row, SelectRow, SettingsPage, ToggleRow } from '../fields.js';
 import { useExportSettings, useImportSettings } from '../../api/settings.queries.js';
@@ -18,7 +18,10 @@ export function GeneralPage({
   const importSettings = useImportSettings();
 
   return (
-    <SettingsPage title="General" description="How AI Anywhere behaves by default, and where it starts.">
+    <SettingsPage
+      title="General"
+      description={`How ${BRANDING.shortName} behaves by default, and where it starts.`}
+    >
       <Group title="Behaviour">
         <SelectRow
           label="Default tone"
@@ -47,7 +50,7 @@ export function GeneralPage({
       <Group title="Window">
         <ToggleRow
           label="Keep running in the tray"
-          hint="Closing or minimizing the window leaves AI Anywhere in the tray so the hotkey keeps working. Off means closing the window quits the app."
+          hint={`Closing or minimizing the window leaves ${BRANDING.shortName} in the tray so the hotkey keeps working. Off means closing the window quits the app.`}
           checked={settings.minimizeToTray}
           onChange={(minimizeToTray) => patch({ minimizeToTray })}
         />
@@ -56,7 +59,7 @@ export function GeneralPage({
       <Group title="Startup">
         <ToggleRow
           label="Launch at login"
-          hint="Starts AI Anywhere in the background so the hotkey works after a reboot. Installed builds only."
+          hint={`Starts ${BRANDING.shortName} in the background so the hotkey works after a reboot. Installed builds only.`}
           checked={settings.launchAtLogin}
           onChange={(launchAtLogin) => patch({ launchAtLogin })}
         />

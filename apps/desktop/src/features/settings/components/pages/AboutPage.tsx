@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { IPC } from '@ai-anywhere/shared';
-import { Badge, Button } from '@ai-anywhere/ui';
+import { BRANDING, IPC } from '@ai-anywhere/shared';
+import { AppIcon, Badge, Button } from '@ai-anywhere/ui';
 import { Power } from 'lucide-react';
 import { ipcInvoke } from '../../../../lib/ipc-client.js';
 import { queryKeys } from '../../../../lib/query-keys.js';
@@ -23,15 +23,38 @@ export function AboutPage(): JSX.Element {
   );
 
   return (
-    <SettingsPage title="About" description="Select text in any app, press the hotkey, pick an action.">
-      <Group title="AI Anywhere">
+    <SettingsPage title="About" description={BRANDING.tagline}>
+      <Group title={BRANDING.appName} description="The name is a placeholder until branding is finalised.">
+        <Row label="Application">
+          <span className="flex items-center gap-2 text-body text-fg-secondary">
+            <AppIcon className="h-5 w-5 text-fg-muted" />
+            {BRANDING.appName}
+          </span>
+        </Row>
         <Row label="Version">
-          <span className="text-body tabular-nums text-fg-secondary">{appInfo.data?.version ?? '…'}</span>
+          <span className="text-body tabular-nums text-fg-secondary">
+            {appInfo.data?.version ?? BRANDING.version}
+          </span>
         </Row>
         <Row label="Build">
           <Badge tone={appInfo.data?.isPackaged ? 'neutral' : 'accent'}>
             {appInfo.data ? (appInfo.data.isPackaged ? 'packaged' : 'development') : '…'}
           </Badge>
+        </Row>
+        <Row label="Website">
+          <a
+            href={BRANDING.website}
+            target="_blank"
+            rel="noreferrer"
+            className="text-body text-accent hover:underline"
+          >
+            {BRANDING.website}
+          </a>
+        </Row>
+        <Row label="Support">
+          <a href={`mailto:${BRANDING.supportEmail}`} className="text-body text-accent hover:underline">
+            {BRANDING.supportEmail}
+          </a>
         </Row>
       </Group>
 
@@ -57,7 +80,10 @@ export function AboutPage(): JSX.Element {
       </Group>
 
       <Group title="Quit">
-        <Row label="Quit AI Anywhere" hint="Stops the background process; global shortcuts stop working.">
+        <Row
+          label={`Quit ${BRANDING.shortName}`}
+          hint="Stops the background process; global shortcuts stop working."
+        >
           <Button size="sm" variant="outline" onClick={() => void ipcInvoke(IPC.app.quit, undefined)}>
             <Power aria-hidden className="h-3.5 w-3.5" />
             Quit

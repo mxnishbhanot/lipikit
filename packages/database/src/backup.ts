@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import {
+  BRANDING,
   appError,
   err,
   ok,
@@ -105,7 +106,7 @@ export function parseBackup(json: string): Result<SettingsBackup> {
   if (!isRecord(raw)) return err(appError('VALIDATION', 'That file is not a settings export'));
   const version = raw['version'];
   if (typeof version !== 'number' || version > BACKUP_VERSION) {
-    return err(appError('VALIDATION', 'That export was written by a newer version of AI Anywhere'));
+    return err(appError('VALIDATION', `That export was written by a newer version of ${BRANDING.shortName}`));
   }
   const settings = pickSettings(raw['settings']);
   const prompts = pickPrompts(raw['prompts']);

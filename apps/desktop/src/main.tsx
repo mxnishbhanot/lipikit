@@ -1,5 +1,6 @@
 import { StrictMode, Suspense, lazy } from 'react';
 import { createRoot } from 'react-dom/client';
+import { BRANDING } from '@ai-anywhere/shared';
 import { AppProviders } from './app/AppProviders.js';
 // Bundled, not fetched: the renderer has no network access to a font CDN and
 // a missing webfont would fall back mid-session.
@@ -14,6 +15,10 @@ if (!container) throw new Error('#root missing from index.html');
  * a provider for a choice between exactly two screens that never navigate to
  * each other — main creates each window with the hash it wants.
  */
+// index.html ships no product name, so the tab/window title is set from the
+// branding config here — one string to change when the real name lands.
+document.title = BRANDING.appName;
+
 const isOverlay = window.location.hash.startsWith('#/overlay');
 // The overlay's BrowserWindow is transparent so its rounded corners show; an
 // opaque body would paint a square behind them.

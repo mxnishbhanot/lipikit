@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button, Spinner, cn, slideUp } from '@ai-anywhere/ui';
-import { IPC, type AppSettings, type Platform, type ProviderId } from '@ai-anywhere/shared';
+import { BRANDING, IPC, type AppSettings, type Platform, type ProviderId } from '@ai-anywhere/shared';
 import { ipcInvoke } from '../../../lib/ipc-client.js';
 import { queryKeys } from '../../../lib/query-keys.js';
 import { useProviders, useUpdateSettings } from '../../settings/api/settings.queries.js';
@@ -176,7 +176,11 @@ export function Onboarding({ settings }: { settings: AppSettings }): JSX.Element
           </Button>
           <Button size="lg" disabled={!canAdvance(step, draft) || update.isPending} onClick={next}>
             {update.isPending ? <Spinner /> : null}
-            {index === STEPS.length - 1 ? 'Launch AI Anywhere' : index === 0 ? 'Get started' : 'Continue'}
+            {index === STEPS.length - 1
+              ? `Launch ${BRANDING.shortName}`
+              : index === 0
+                ? 'Get started'
+                : 'Continue'}
             {index === STEPS.length - 1 ? null : <ArrowRight aria-hidden className="h-4 w-4" />}
           </Button>
         </div>

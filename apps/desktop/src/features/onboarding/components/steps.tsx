@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
+  AppIcon,
   Badge,
   Button,
   Input,
@@ -11,7 +12,7 @@ import {
   ThinkingIndicator,
   cn,
 } from '@ai-anywhere/ui';
-import type { Platform, ProviderDescriptor, ProviderId } from '@ai-anywhere/shared';
+import { BRANDING, type Platform, type ProviderDescriptor, type ProviderId } from '@ai-anywhere/shared';
 import {
   AlertTriangle,
   Check,
@@ -135,9 +136,9 @@ export function WelcomeStep(): JSX.Element {
       {/* The one gradient surface in the app, per the design system: hero and
           onboarding only. */}
       <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-card bg-gradient-to-br from-accent to-accent/60 shadow-lg">
-        <Sparkles aria-hidden className="h-10 w-10 text-accent-foreground" />
+        <AppIcon className="h-10 w-10 text-accent-foreground" />
       </div>
-      <h1 className="text-hero font-semibold tracking-tight text-fg-primary">AI Anywhere</h1>
+      <h1 className="text-hero font-semibold tracking-tight text-fg-primary">{BRANDING.appName}</h1>
       <p className="mt-3 max-w-md text-body-lg text-fg-muted">
         Select text in any app, press one shortcut, and let AI rewrite, reply or summarise it in place.
       </p>

@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { app } from 'electron';
-import { appError, err, ok } from '@ai-anywhere/shared';
+import { BRANDING, appError, err, ok } from '@ai-anywhere/shared';
 import type { AutostartService, PlatformInfo } from './contracts.js';
 
 /**
@@ -58,7 +58,7 @@ export function createElectronAutostartService(info: PlatformInfo): AutostartSer
           [
             '[Desktop Entry]',
             'Type=Application',
-            'Name=AI Anywhere',
+            `Name=${BRANDING.appName}`,
             `Exec=${command}`,
             'Terminal=false',
             'X-GNOME-Autostart-enabled=true',

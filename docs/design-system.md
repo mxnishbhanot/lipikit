@@ -1,4 +1,4 @@
-# AI Anywhere — Design System v1.0
+# Design System v1.0
 
 Premium, calm, minimal. Neutral UI, one emerald accent, keyboard-first,
 generous whitespace. Native-feeling on both Windows and Ubuntu, which mostly

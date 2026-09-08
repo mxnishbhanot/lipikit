@@ -1,5 +1,6 @@
 export * from './lib/cn.js';
 export * from './lib/motion.js';
+export * from './components/app-icon.js';
 export * from './components/badge.js';
 export * from './components/button.js';
 export * from './components/card.js';

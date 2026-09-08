@@ -5,3 +5,4 @@ export * from './domain/types.js';
 export * from './ipc/channels.js';
 export * from './ipc/contract.js';
 export * from './config/env.js';
+export * from './config/branding.js';

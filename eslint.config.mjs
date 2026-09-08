@@ -15,6 +15,9 @@ export default tseslint.config(
       '**/*.cjs',
       // This file: type-aware rules cannot resolve untyped plugin exports.
       'eslint.config.mjs',
+      // Hand-run build tooling, outside the tsconfig graph: type-aware rules
+      // see every Buffer helper as `any` and report nothing useful.
+      'apps/desktop/scripts/**',
     ],
   },
   js.configs.recommended,
@@ -22,7 +25,6 @@ export default tseslint.config(
   {
     languageOptions: {
       parserOptions: {
-        // Build/config files sit outside the tsconfig graph.
         // Build, test and config files sit outside the tsconfig graph.
         projectService: { allowDefaultProject: ['*.config.ts', 'apps/desktop/e2e/*.ts'] },
         tsconfigRootDir: import.meta.dirname,

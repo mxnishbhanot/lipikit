@@ -1,9 +1,15 @@
+# Packaging metadata. The two name fields below are the only branding strings
+# outside packages/shared/src/config/branding.ts — a YAML config cannot import
+# TypeScript — so keep them equal to BRANDING.appName / BRANDING.tagline.
+# appId is deliberately NOT renamed with the product: it keys the Windows
+# AppUserModelID and the installer's registry entry, and changing it orphans
+# every installed copy.
 appId: com.aianywhere.app
-productName: AI Anywhere
+productName: AI Anywhere (Temporary)
 # Without this the binary is named after the scoped package —
 # "@ai-anywheredesktop" — which also breaks the StartupWMClass match below.
 executableName: ai-anywhere
-copyright: Copyright © 2026 AI Anywhere
+copyright: Copyright © 2026 the authors
 directories:
   output: release
   buildResources: build

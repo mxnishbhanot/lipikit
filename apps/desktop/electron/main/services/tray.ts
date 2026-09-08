@@ -1,6 +1,6 @@
 import { join } from 'node:path';
 import { app, Menu, Tray, nativeImage } from 'electron';
-import type { Logger } from '@ai-anywhere/shared';
+import { BRANDING, type Logger } from '@ai-anywhere/shared';
 import type { WindowManager } from '../windows/window-manager.js';
 import type { SelectionFlow } from './selection-flow.js';
 
@@ -52,10 +52,10 @@ export function createTray(deps: TrayDeps): void {
     return;
   }
 
-  tray.setToolTip('AI Anywhere');
+  tray.setToolTip(BRANDING.appName);
   tray.setContextMenu(
     Menu.buildFromTemplate([
-      { label: 'Open AI Anywhere', click: () => deps.windows.showMain() },
+      { label: `Open ${BRANDING.shortName}`, click: () => deps.windows.showMain() },
       {
         // The way in when the compositor refuses the global shortcut, which is
         // the one failure the user cannot work around from inside the app.
@@ -68,7 +68,7 @@ export function createTray(deps: TrayDeps): void {
       { type: 'separator' },
       // The only real exit once closing the window means "hide": app.quit()
       // and not tray.destroy(), so the will-quit teardown still runs.
-      { label: 'Quit AI Anywhere', click: () => app.quit() },
+      { label: `Quit ${BRANDING.shortName}`, click: () => app.quit() },
     ]),
   );
   // Windows raises the window on a left click; on Linux the panel owns the

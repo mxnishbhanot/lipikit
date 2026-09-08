@@ -87,5 +87,5 @@ jobs:
         run: |
           gh release create "$TAG" artifacts/* \
             --draft \
-            --title "AI Anywhere $TAG" \
+            --title "$TAG" \
             --generate-notes

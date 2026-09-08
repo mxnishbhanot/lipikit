@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Button, EmptyState, Kbd } from '@ai-anywhere/ui';
-import { IPC, IPC_EVENTS } from '@ai-anywhere/shared';
+import { AppIcon, Button, EmptyState, Kbd } from '@ai-anywhere/ui';
+import { BRANDING, IPC, IPC_EVENTS } from '@ai-anywhere/shared';
 import { SettingsLayout } from '../features/settings/components/SettingsLayout.js';
 import { Onboarding } from '../features/onboarding/components/Onboarding.js';
+import { Splash } from './Splash.js';
 import { useHasApiKey, useProviders, useSettings } from '../features/settings/api/settings.queries.js';
 import { useOnline } from '../lib/use-online.js';
 import { ipcInvoke, ipcOn } from '../lib/ipc-client.js';
@@ -31,17 +32,20 @@ export function App(): JSX.Element {
   // main window and then swapping in onboarding a tick later is a flash of the
   // wrong app.
   const settings = useSettings();
-  if (settings.data === undefined) return <div className="h-screen bg-background" />;
+  if (settings.data === undefined) return <Splash version={appInfo.data?.version} />;
   if (!settings.data.onboardingCompleted) return <Onboarding settings={settings.data} />;
 
   return (
     <div className="flex h-screen flex-col">
       <header className="flex items-center justify-between border-b border-border px-6 py-3">
-        <div>
-          <h1 className="text-sm font-semibold">AI Anywhere</h1>
-          <p className="text-xs text-muted-foreground">
-            {appInfo.data ? `v${appInfo.data.version} · ${appInfo.data.platform}` : 'starting…'}
-          </p>
+        <div className="flex items-center gap-2.5">
+          <AppIcon className="h-5 w-5 shrink-0 text-fg-muted" />
+          <div>
+            <h1 className="text-sm font-semibold">{BRANDING.appName}</h1>
+            <p className="text-xs text-muted-foreground">
+              {appInfo.data ? `v${appInfo.data.version} · ${appInfo.data.platform}` : 'starting…'}
+            </p>
+          </div>
         </div>
         <nav className="flex gap-2">
           {VIEWS.map((view) => (
