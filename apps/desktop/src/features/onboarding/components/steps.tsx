@@ -12,15 +12,26 @@ import {
   ThinkingIndicator,
   cn,
 } from '@ai-anywhere/ui';
-import { BRANDING, type Platform, type ProviderDescriptor, type ProviderId } from '@ai-anywhere/shared';
+import type { Platform, ProviderDescriptor, ProviderId } from '@ai-anywhere/shared';
 import {
   AlertTriangle,
+  ArrowRight,
+  Braces,
   Check,
   ClipboardCheck,
   ExternalLink,
+  EyeOff,
+  GitPullRequest,
+  HardDrive,
+  KeyRound,
   Keyboard,
+  Layers,
+  MessageSquare,
   MonitorSmartphone,
+  ShieldCheck,
   Sparkles,
+  Ticket,
+  UserX,
   Wand2,
 } from 'lucide-react';
 import {
@@ -130,6 +141,39 @@ function ChoiceCard({
   );
 }
 
+/**
+ * The flow, drawn: the message you highlighted, the shortcut, the text that
+ * replaced it. A storyboard rather than a looping animation — three panels
+ * side by side can be read at a glance and re-read, and nothing here has to
+ * be waited out.
+ */
+function FlowStoryboard(): JSX.Element {
+  return (
+    <div className="grid gap-2 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+      <div className="rounded-card border border-border bg-surface p-3 text-left">
+        <p className="text-caption text-fg-muted">Slack · #team-payments</p>
+        <p className="mt-1.5 text-body text-fg-secondary">
+          <span className="rounded bg-accent/20 px-1 py-0.5 text-fg-primary">
+            pushed a fix, its draining the queue now, should be clear in an hour
+          </span>
+        </p>
+      </div>
+
+      <div className="flex items-center justify-center gap-1.5 py-1 sm:flex-col">
+        <Kbd combo="Ctrl+Space" />
+        <ArrowRight aria-hidden className="h-4 w-4 shrink-0 text-accent sm:rotate-90" />
+      </div>
+
+      <div className="rounded-card border border-accent/40 bg-accent-subtle/40 p-3 text-left">
+        <p className="text-caption font-medium text-accent">Replaced in place</p>
+        <p className="mt-1.5 text-body text-fg-primary">
+          A fix is deployed and the queue is draining now — expect it clear within the hour.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export function WelcomeStep(): JSX.Element {
   return (
     <div className="flex flex-col items-center text-center">
@@ -138,14 +182,131 @@ export function WelcomeStep(): JSX.Element {
       <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-card bg-gradient-to-br from-accent to-accent/60 shadow-lg">
         <AppIcon className="h-10 w-10 text-accent-foreground" />
       </div>
-      <h1 className="text-hero font-semibold tracking-tight text-fg-primary">{BRANDING.appName}</h1>
+      {/* The promise, not the product name: the name is above the window and
+          on the About page, and a first screen has one job. */}
+      <h1 className="text-hero font-semibold tracking-tight text-fg-primary">
+        Stop switching tabs. Start working.
+      </h1>
       <p className="mt-3 max-w-md text-body-lg text-fg-muted">
-        Select text in any app, press one shortcut, and let AI rewrite, reply or summarise it in place.
+        Highlight text in any application, press one shortcut, and the answer replaces it where you were
+        already typing.
       </p>
-      <p className="mt-6 flex items-center gap-1.5 text-caption text-fg-muted">
-        Takes about a minute. Your keys stay in the OS keyring.
+      <div className="mt-8 w-full">
+        <FlowStoryboard />
+      </div>
+      <p className="mt-6 text-caption text-fg-muted">
+        Setup takes about a minute: your provider, your key, your shortcut.
       </p>
     </div>
+  );
+}
+
+/** Four apps, four jobs. Every command named here ships in the palette. */
+const WORKFLOWS: readonly { app: string; icon: ReactNode; job: string; command: string }[] = [
+  {
+    app: 'Slack',
+    icon: <MessageSquare aria-hidden className="h-4 w-4" />,
+    job: 'A message you fired off at 11pm',
+    command: 'Slack Update',
+  },
+  {
+    app: 'Jira',
+    icon: <Ticket aria-hidden className="h-4 w-4" />,
+    job: 'Three comments that need one status',
+    command: 'Jira Comment',
+  },
+  {
+    app: 'GitHub',
+    icon: <GitPullRequest aria-hidden className="h-4 w-4" />,
+    job: 'A branch that needs a description',
+    command: 'PR Description',
+  },
+  {
+    app: 'VS Code',
+    icon: <Braces aria-hidden className="h-4 w-4" />,
+    job: 'A stack trace you have not read yet',
+    command: 'Explain',
+  },
+];
+
+export function WorkflowsStep(): JSX.Element {
+  return (
+    <StepShell
+      icon={<Layers aria-hidden className="h-7 w-7" />}
+      title="Works everywhere text works"
+      subtitle="The popup recognises the window it opened over and puts that app's command first. Nothing to install per app, no plugins, no browser extension."
+    >
+      <div className="grid gap-3 sm:grid-cols-2">
+        {WORKFLOWS.map((workflow) => (
+          <div key={workflow.app} className="rounded-card border border-border bg-surface p-4">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-control bg-accent-subtle text-accent">
+                {workflow.icon}
+              </span>
+              <p className="text-body font-medium text-fg-primary">{workflow.app}</p>
+              <Badge tone="accent" className="ml-auto">
+                {workflow.command}
+              </Badge>
+            </div>
+            <p className="mt-2.5 text-caption text-fg-muted">{workflow.job}</p>
+          </div>
+        ))}
+      </div>
+      <p className="mt-4 text-caption text-fg-muted">
+        Gmail, Outlook, Confluence, LinkedIn, Teams, Discord and any browser tab are recognised too — and
+        anything unrecognised still gets the full palette.
+      </p>
+    </StepShell>
+  );
+}
+
+/** The four privacy facts, each one checkable in the app itself. */
+const PRIVACY_FACTS: readonly { title: string; body: string; icon: ReactNode }[] = [
+  {
+    icon: <HardDrive aria-hidden className="h-4 w-4" />,
+    title: 'Everything is stored on this machine',
+    body: 'Settings, prompts, history and clipboard history live in a SQLite file in your own user directory. Nothing syncs anywhere.',
+  },
+  {
+    icon: <KeyRound aria-hidden className="h-4 w-4" />,
+    title: 'Your API key goes to the OS keyring',
+    body: 'DPAPI-backed on Windows, libsecret on Linux. It never reaches the database, the settings export, or this window.',
+  },
+  {
+    icon: <UserX aria-hidden className="h-4 w-4" />,
+    title: 'No account to create',
+    body: 'There is no server of ours to sign in to, so there is nothing of yours on it.',
+  },
+  {
+    icon: <EyeOff aria-hidden className="h-4 w-4" />,
+    title: 'No telemetry, off by default',
+    body: 'No analytics, no crash reporting, no usage pings. The only outbound call is to the provider you choose.',
+  },
+];
+
+export function PrivacyStep(): JSX.Element {
+  return (
+    <StepShell
+      icon={<ShieldCheck aria-hidden className="h-7 w-7" />}
+      title="Your text, your machine, your key"
+      subtitle="The selection goes to the provider you picked and nowhere else. Everything the app remembers, it remembers locally."
+    >
+      <div className="divide-y divide-border overflow-hidden rounded-card border border-border bg-surface">
+        {PRIVACY_FACTS.map((fact) => (
+          <div key={fact.title} className="flex items-start gap-3 px-4 py-3.5">
+            <span className="mt-0.5 shrink-0 text-accent">{fact.icon}</span>
+            <div className="min-w-0">
+              <p className="text-body font-medium text-fg-primary">{fact.title}</p>
+              <p className="mt-0.5 text-caption leading-relaxed text-fg-muted">{fact.body}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <p className="mt-4 text-caption text-fg-muted">
+        All of it is switchable later under settings → Privacy, including clearing history and the local
+        cache.
+      </p>
+    </StepShell>
   );
 }
 
@@ -198,8 +359,8 @@ export function ProviderStep({
   return (
     <StepShell
       icon={<Sparkles aria-hidden className="h-7 w-7" />}
-      title="Choose a provider"
-      subtitle="Whoever answers the prompts. You can add the others, and switch between them, from settings later."
+      title="Use your own AI account"
+      subtitle="Pick the vendor you already pay. There is no subscription to this app and no credits to buy — your key stays on this computer and the model bill goes straight to them."
     >
       <div role="radiogroup" aria-label="Provider" className="grid gap-3 sm:grid-cols-2">
         {offered.map((descriptor) => (
@@ -243,7 +404,7 @@ export function ApiKeyStep({
       title={`Connect ${descriptor.label}`}
       subtitle={
         descriptor.requiresApiKey
-          ? 'The key is checked against the provider before it is stored, so a typo fails here instead of on your first hotkey press.'
+          ? 'It is checked against the provider before being stored, so a typo fails here rather than on your first hotkey press — then it goes into the OS keyring and never leaves this machine.'
           : 'This provider runs locally and needs no key.'
       }
     >
@@ -377,8 +538,8 @@ export function PermissionsStep({
   return (
     <StepShell
       icon={<Keyboard aria-hidden className="h-7 w-7" />}
-      title="Shortcut and clipboard"
-      subtitle="The shortcut is registered with the desktop, so it works from any app. Capture and replace use the clipboard, which needs a backend the OS allows."
+      title="Learn one shortcut"
+      subtitle="Ctrl+Space is the whole interface: it is registered with the desktop, so it works from every application. Keep the default until it is muscle memory — you can rebind it here or in settings whenever you like."
     >
       <div className="divide-y divide-border overflow-hidden rounded-card border border-border bg-surface">
         <div className="flex flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">

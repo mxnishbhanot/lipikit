@@ -40,7 +40,12 @@ export const SETTINGS_PAGES = [
     icon: MessageSquareWarning,
     keywords: 'bug report feature request issue github logs diagnostics screenshot support beta',
   },
-  { name: 'About', icon: Info, keywords: 'version build platform capabilities quit' },
+  {
+    name: 'About',
+    icon: Info,
+    keywords:
+      'version build platform capabilities quit context engine detection recognised apps roadmap coming soon ocr voice dictation workflow automation pdf',
+  },
 ] as const satisfies readonly { name: string; icon: LucideIcon; keywords: string }[];
 
 export type SettingsPageName = (typeof SETTINGS_PAGES)[number]['name'];

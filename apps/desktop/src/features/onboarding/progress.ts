@@ -5,7 +5,17 @@ import type { Platform, ProviderId } from '@ai-anywhere/shared';
  * count `STEPS.length`, so adding a screen is one entry here rather than a
  * number repeated in three places.
  */
-export const STEPS = ['welcome', 'platform', 'provider', 'api-key', 'model', 'permissions', 'demo'] as const;
+export const STEPS = [
+  'welcome',
+  'workflows',
+  'platform',
+  'provider',
+  'api-key',
+  'model',
+  'privacy',
+  'permissions',
+  'demo',
+] as const;
 
 export type StepId = (typeof STEPS)[number];
 
@@ -28,6 +38,11 @@ export interface OnboardingDraft {
 export function canAdvance(step: StepId, draft: OnboardingDraft): boolean {
   switch (step) {
     case 'welcome':
+    case 'workflows':
+    case 'privacy':
+      // The three screens that only explain. A wizard that gates the pitch
+      // behind a checkbox is asking the user to agree to something they have
+      // not been shown yet.
       return true;
     case 'platform':
       return draft.platform !== null;

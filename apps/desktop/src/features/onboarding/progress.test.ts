@@ -20,6 +20,8 @@ const full: OnboardingDraft = {
 describe('canAdvance', () => {
   it('never blocks the screens that only inform', () => {
     expect(canAdvance('welcome', empty)).toBe(true);
+    expect(canAdvance('workflows', empty)).toBe(true);
+    expect(canAdvance('privacy', empty)).toBe(true);
     expect(canAdvance('demo', empty)).toBe(true);
   });
 

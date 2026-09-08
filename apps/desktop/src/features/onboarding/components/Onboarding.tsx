@@ -14,8 +14,10 @@ import {
   ModelStep,
   PermissionsStep,
   PlatformStep,
+  PrivacyStep,
   ProviderStep,
   WelcomeStep,
+  WorkflowsStep,
 } from './steps.js';
 
 /** One dot per step, the reached ones filled — the Linear-style position line. */
@@ -40,7 +42,7 @@ function ProgressDots({ index }: { index: number }): JSX.Element {
 }
 
 /**
- * The first-run wizard. Seven screens, one at a time, with the choices written
+ * The first-run wizard. Nine screens, one at a time, with the choices written
  * through the same mutations settings uses — so nothing here is a second
  * writer for the same rows, and quitting halfway leaves everything already
  * chosen in place.
@@ -101,6 +103,8 @@ export function Onboarding({ settings }: { settings: AppSettings }): JSX.Element
     switch (step) {
       case 'welcome':
         return <WelcomeStep />;
+      case 'workflows':
+        return <WorkflowsStep />;
       case 'platform':
         return <PlatformStep detected={detected} value={draft.platform} onChange={setPlatform} />;
       case 'provider':
@@ -124,6 +128,8 @@ export function Onboarding({ settings }: { settings: AppSettings }): JSX.Element
         return descriptor === null ? null : (
           <ModelStep descriptor={descriptor} value={model} onChange={setModel} />
         );
+      case 'privacy':
+        return <PrivacyStep />;
       case 'permissions':
         return (
           <PermissionsStep
