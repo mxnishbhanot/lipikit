@@ -27,7 +27,9 @@
      allowed to drop below body contrast. */
   --text-primary: 240 10% 8%;
   --text-secondary: 240 5% 34%;
-  --text-muted: 240 4% 55%;
+  /* 55% measured at 3.4:1 on the light surfaces — under AA for the 12px
+     captions and footer lines that use it most. */
+  --text-muted: 240 4% 45%;
 
   /* Emerald is the only chromatic colour in the neutral UI: selection,
      focus, primary action. Nothing else competes with it. */
@@ -92,7 +94,9 @@
 
   --text-primary: 0 0% 97%;
   --text-secondary: 240 5% 72%;
-  --text-muted: 240 5% 55%;
+  /* 55% measured at 4.4:1 against the dark surfaces — just under AA for the
+     12px captions that use it most. */
+  --text-muted: 240 5% 64%;
 
   /* Lifted for contrast against a near-black surface: the light-theme
      emerald fails WCAG AA here. */
