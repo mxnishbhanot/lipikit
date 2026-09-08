@@ -56,6 +56,8 @@ import {
 import { useOnline } from '../../../lib/use-online.js';
 import { useCustomPrompts } from '../../prompts/api/prompts.queries.js';
 import { useCommandPrefs } from '../use-command-prefs.js';
+import { isHelpKey } from '../../../app/shortcut-keys.js';
+import { ShortcutList } from '../../../app/shortcuts.js';
 import { CommandPalette } from './CommandPalette.js';
 import { AnalysisChips, ClientReply } from './ClientReply.js';
 // react-markdown + highlight.js are the heaviest thing the popup can show and
@@ -108,6 +110,11 @@ export function Overlay(): JSX.Element {
   const [pinned, setPinned] = useState(false);
   /** Non-null while the prompt is being re-worded for a re-run. */
   const [promptDraft, setPromptDraft] = useState<string | null>(null);
+  /**
+   * The cheatsheet is a body, not a modal: this window is sized to its content,
+   * so a fixed overlay would be clipped by the window rather than growing it.
+   */
+  const [help, setHelp] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   // Read from inside the IPC subscriptions, which are set up once; state would
   // make them resubscribe on every toggle.
@@ -281,6 +288,14 @@ export function Overlay(): JSX.Element {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
+      // F1 or Ctrl+/ from anywhere, including while an answer is streaming:
+      // the search field always holds focus here, so a bare `?` would only
+      // ever be a typed character.
+      if (isHelpKey(event)) {
+        event.preventDefault();
+        setHelp((current) => !current);
+        return;
+      }
       // Ctrl+K is the search gesture: focus the field and clear it, from
       // anywhere in the popup including the result view.
       if (event.key === 'k' && (event.ctrlKey || event.metaKey)) {
@@ -294,7 +309,8 @@ export function Overlay(): JSX.Element {
         event.preventDefault();
         // In the result view Escape steps back to the palette; only from the
         // palette itself does it dismiss the popup.
-        if (showResult) back();
+        if (help) setHelp(false);
+        else if (showResult) back();
         else void closeOverlay();
         return;
       }
@@ -306,7 +322,7 @@ export function Overlay(): JSX.Element {
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [showResult, back, write, ai.isPending]);
+  }, [showResult, back, write, ai.isPending, help]);
 
   const onRecapture = async (): Promise<void> => {
     const captured = await recapture.mutateAsync();
@@ -442,7 +458,18 @@ export function Overlay(): JSX.Element {
       </header>
 
       <AnimatePresence mode="wait" initial={false}>
-        {showResult ? (
+        {help ? (
+          <motion.div
+            key="help"
+            variants={slideUp}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="max-h-[26rem] overflow-y-auto px-3.5 py-3"
+          >
+            <ShortcutList scope="popup" />
+          </motion.div>
+        ) : showResult ? (
           <motion.div
             key="result"
             variants={slideUp}
@@ -573,7 +600,7 @@ export function Overlay(): JSX.Element {
               query={query}
               onToggleFavorite={prefs.toggleFavorite}
               onRun={(command, input) => void run(command, input)}
-              disabled={selection.trim().length === 0}
+              disabled={selection.trim().length === 0 || help}
             />
           </motion.div>
         )}
@@ -661,6 +688,10 @@ export function Overlay(): JSX.Element {
               <span className="flex min-w-0 items-center gap-1 truncate">
                 <Kbd combo="Ctrl+K" />
                 search
+              </span>
+              <span className="flex shrink-0 items-center gap-1">
+                <Kbd>F1</Kbd>
+                keys
               </span>
             </div>
             <Latency busy={busy} ms={latencyMs} />

@@ -5,6 +5,8 @@ import { BRANDING, IPC, IPC_EVENTS } from '@ai-anywhere/shared';
 import { SettingsLayout } from '../features/settings/components/SettingsLayout.js';
 import { Onboarding } from '../features/onboarding/components/Onboarding.js';
 import { Splash } from './Splash.js';
+import { ActionPalette } from './ActionPalette.js';
+import { ShortcutDialog } from './shortcuts.js';
 import { useHasApiKey, useProviders, useSettings } from '../features/settings/api/settings.queries.js';
 import { useOnline } from '../lib/use-online.js';
 import { ipcInvoke, ipcOn } from '../lib/ipc-client.js';
@@ -47,17 +49,24 @@ export function App(): JSX.Element {
             </p>
           </div>
         </div>
-        <nav className="flex gap-2">
+        <nav className="flex items-center gap-2" aria-label="Views">
           {VIEWS.map((view) => (
             <Button
               key={view}
               size="sm"
+              aria-current={view === activeView ? 'page' : undefined}
               variant={view === activeView ? 'default' : 'ghost'}
               onClick={() => setActiveView(view)}
             >
               {view}
             </Button>
           ))}
+          {/* The palette and the cheatsheet are keyboard-first, so they are
+              advertised as keys rather than given buttons of their own. */}
+          <span className="ml-2 flex items-center gap-1 text-caption text-fg-muted">
+            <Kbd combo="Ctrl+K" />
+            commands
+          </span>
         </nav>
       </header>
       {/* Settings owns its own scrolling and padding — it is a sidebar plus a
@@ -66,6 +75,10 @@ export function App(): JSX.Element {
         {activeView === 'settings' ? <SettingsLayout /> : null}
         {activeView === 'home' ? <Home onOpenSettings={() => setActiveView('settings')} /> : null}
       </main>
+      {/* Both are modal dialogs bound to their own keys, so they sit outside
+          the view switch: Ctrl+K and F1 work on every screen. */}
+      <ActionPalette />
+      <ShortcutDialog />
     </div>
   );
 }
@@ -101,6 +114,9 @@ function Home({ onOpenSettings }: { onOpenSettings: () => void }): JSX.Element {
       <p className="max-w-sm text-body text-fg-muted">
         Select text in any app, press <Kbd combo={settings.data?.globalHotkey ?? 'Control+Space'} />, then
         pick a command.
+      </p>
+      <p className="text-caption text-fg-muted">
+        In this window: <Kbd combo="Ctrl+K" /> for commands, <Kbd>F1</Kbd> for every shortcut.
       </p>
     </div>
   );

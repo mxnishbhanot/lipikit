@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, EmptyState, Input } from '@ai-anywhere/ui';
+import { Button, EmptyState, Input, Kbd } from '@ai-anywhere/ui';
 import { PROMPT_VARIABLES } from '@ai-anywhere/prompts';
 import { KNOWN_APP_IDS, type CustomPrompt, type KnownAppId } from '@ai-anywhere/shared';
 import { HotkeyRecorder } from '../../settings/components/HotkeyRecorder.js';
@@ -50,7 +50,22 @@ export function PromptBuilder(): JSX.Element {
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
-      <section className="flex flex-col gap-3">
+      {/* Ctrl+Enter saves and Escape abandons the draft from any field in the
+          editor, so the mouse is never the only way out of a long template.
+          On the section rather than each control: one handler, and it keeps
+          working when a field is added. */}
+      <section
+        className="flex flex-col gap-3"
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+            event.preventDefault();
+            if (!save.isPending) void submit();
+          } else if (event.key === 'Escape') {
+            event.preventDefault();
+            setDraft(EMPTY);
+          }
+        }}
+      >
         <div>
           <h2 className="text-sm font-semibold">{draft.id === undefined ? 'New prompt' : 'Edit prompt'}</h2>
           <p className="text-xs text-muted-foreground">
@@ -77,7 +92,7 @@ export function PromptBuilder(): JSX.Element {
               setDraft({ ...draft, appId: (event.target.value || null) as KnownAppId | null })
             }
             aria-label="Suggest for app"
-            className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+            className="h-9 rounded-control border border-border bg-surface px-2 text-body text-fg-primary"
           >
             <option value="">Any app</option>
             {KNOWN_APP_IDS.map((appId) => (
@@ -94,7 +109,7 @@ export function PromptBuilder(): JSX.Element {
           placeholder="Rewrite this for {{app}}:&#10;&#10;{{text}}"
           aria-label="Prompt template"
           rows={6}
-          className="resize-y rounded-md border border-input bg-background p-2 font-mono text-xs outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          className="resize-y rounded-card border border-border bg-surface p-2.5 font-mono text-caption text-fg-primary outline-none"
         />
 
         <div className="flex flex-col gap-1">
@@ -115,7 +130,7 @@ export function PromptBuilder(): JSX.Element {
               type="button"
               title={variable.description}
               onClick={() => setDraft({ ...draft, template: `${draft.template}{{${variable.name}}}` })}
-              className="rounded border border-border px-1.5 py-0.5 font-mono text-[11px] text-muted-foreground hover:bg-accent"
+              className="rounded border border-border px-1.5 py-0.5 font-mono text-[11px] text-fg-muted hover:bg-surface-hover hover:text-fg-primary"
             >
               {`{{${variable.name}}}`}
             </button>
@@ -128,7 +143,7 @@ export function PromptBuilder(): JSX.Element {
           </p>
         ) : null}
 
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Button size="sm" onClick={() => void submit()} disabled={save.isPending}>
             {save.isPending ? 'Saving…' : 'Save prompt'}
           </Button>
@@ -137,6 +152,10 @@ export function PromptBuilder(): JSX.Element {
               Cancel
             </Button>
           )}
+          <span className="flex items-center gap-1 text-caption text-fg-muted">
+            <Kbd combo="Ctrl+Enter" />
+            save
+          </span>
         </div>
       </section>
 

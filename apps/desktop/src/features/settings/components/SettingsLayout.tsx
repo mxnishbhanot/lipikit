@@ -1,20 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { AppSettings } from '@ai-anywhere/shared';
 import { Input, Skeleton, SkeletonText, cn } from '@ai-anywhere/ui';
-import {
-  Clock,
-  Cpu,
-  Info,
-  KeyRound,
-  Keyboard,
-  Palette,
-  Search,
-  Settings2,
-  ShieldCheck,
-  Sparkles,
-  type LucideIcon,
-} from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useSettings, useUpdateSettings } from '../api/settings.queries.js';
+import { filterSettingsPages } from '../pages.js';
+import { useUiStore } from '../../../store/ui.store.js';
 import { AboutPage } from './pages/AboutPage.js';
 import { AppearancePage } from './pages/AppearancePage.js';
 import { GeneralPage } from './pages/GeneralPage.js';
@@ -26,40 +16,24 @@ import { ProvidersPage } from './pages/ProvidersPage.js';
 import { ShortcutsPage } from './pages/ShortcutsPage.js';
 
 /**
- * `keywords` is what makes the search box worth having: someone looking for
- * "api key" or "telemetry" does not know which of nine pages owns it, and a
- * filter that only matched the nine titles would tell them nothing they cannot
- * already see in the sidebar.
+ * Arrow keys move real DOM focus between the sidebar buttons rather than a
+ * highlight index: the buttons are already in the tab order, so the browser
+ * keeps announcing them and the focus ring keeps working. Querying the nav for
+ * its buttons is also what makes this survive the search filter — the list it
+ * walks is whatever is on screen.
  */
-const PAGES = [
-  {
-    name: 'General',
-    icon: Settings2,
-    keywords: 'tone streaming timeout launch login startup backup import export',
-  },
-  { name: 'Appearance', icon: Palette, keywords: 'theme dark light accent colour color' },
-  { name: 'Providers', icon: KeyRound, keywords: 'api key openai anthropic endpoint keyring health' },
-  { name: 'Models', icon: Cpu, keywords: 'model temperature tokens default provider' },
-  { name: 'Shortcuts', icon: Keyboard, keywords: 'hotkey keybinding global accelerator' },
-  { name: 'Prompt Templates', icon: Sparkles, keywords: 'prompts custom template variables' },
-  { name: 'History', icon: Clock, keywords: 'history retention entries delete log' },
-  { name: 'Privacy', icon: ShieldCheck, keywords: 'clipboard telemetry memory delete data' },
-  { name: 'About', icon: Info, keywords: 'version build platform capabilities quit' },
-] as const satisfies readonly { name: string; icon: LucideIcon; keywords: string }[];
-
-type Page = (typeof PAGES)[number]['name'];
-
-/**
- * Which of the nine pages was open last. Same reasoning as the view in the UI
- * store: it belongs to this window, not to the settings the main process owns,
- * and a name no longer in PAGES falls back rather than rendering nothing.
- */
-const LAST_PAGE_KEY = 'ai-anywhere:last-settings-page';
-
-const storedPage = (): Page => {
-  const saved = localStorage.getItem(LAST_PAGE_KEY);
-  return PAGES.some((entry) => entry.name === saved) ? (saved as Page) : 'General';
-};
+function moveFocus(nav: HTMLElement | null, to: number | 'next' | 'previous'): void {
+  const buttons = [...(nav?.querySelectorAll('button') ?? [])];
+  if (buttons.length === 0) return;
+  const current = buttons.findIndex((button) => button === document.activeElement);
+  const index =
+    typeof to === 'number'
+      ? to
+      : to === 'next'
+        ? (current + 1 + buttons.length) % buttons.length
+        : (current - 1 + buttons.length) % buttons.length;
+  buttons[(index + buttons.length) % buttons.length]?.focus();
+}
 
 /**
  * Settings shell. Every page reads the same React Query cache entry, so the
@@ -68,16 +42,27 @@ const storedPage = (): Page => {
  * and error branches.
  */
 export function SettingsLayout(): JSX.Element {
-  const [page, setPage] = useState<Page>(storedPage);
+  const page = useUiStore((state) => state.settingsPage);
+  const setPage = useUiStore((state) => state.setSettingsPage);
   const [query, setQuery] = useState('');
+  const searchRef = useRef<HTMLInputElement>(null);
+  const navRef = useRef<HTMLElement>(null);
   const settings = useSettings();
   const update = useUpdateSettings();
 
-  const matches = useMemo(() => {
-    const needle = query.trim().toLowerCase();
-    if (needle.length === 0) return PAGES;
-    return PAGES.filter((entry) => `${entry.name} ${entry.keywords}`.toLowerCase().includes(needle));
-  }, [query]);
+  const matches = useMemo(() => filterSettingsPages(query), [query]);
+
+  // Ctrl+F is the search gesture for this window; the popup's own Ctrl+K is
+  // the palette, so the two never fight over the same chord.
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if (event.key !== 'f' || !(event.ctrlKey || event.metaKey)) return;
+      event.preventDefault();
+      searchRef.current?.select();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   const body = (current: AppSettings): JSX.Element => {
     // Optimistic writes are deliberately absent: a rejected hotkey or a failed
@@ -116,16 +101,40 @@ export function SettingsLayout(): JSX.Element {
             className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-fg-muted"
           />
           <Input
+            ref={searchRef}
             type="search"
             value={query}
             placeholder="Search settings"
             aria-label="Search settings"
             className="h-8 pl-8 text-caption"
             onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={(event) => {
+              // Down and Enter both hand off to the filtered list, so a search
+              // never needs the mouse or a walk back through Tab.
+              if (event.key === 'ArrowDown' || event.key === 'Enter') {
+                event.preventDefault();
+                moveFocus(navRef.current, 0);
+              } else if (event.key === 'Escape' && query.length > 0) {
+                event.preventDefault();
+                setQuery('');
+              }
+            }}
           />
         </div>
 
-        <nav className="min-h-0 flex-1 space-y-0.5 overflow-y-auto" aria-label="Settings sections">
+        <nav
+          ref={navRef}
+          className="min-h-0 flex-1 space-y-0.5 overflow-y-auto"
+          aria-label="Settings sections"
+          onKeyDown={(event) => {
+            if (event.key === 'ArrowDown') moveFocus(navRef.current, 'next');
+            else if (event.key === 'ArrowUp') moveFocus(navRef.current, 'previous');
+            else if (event.key === 'Home') moveFocus(navRef.current, 0);
+            else if (event.key === 'End') moveFocus(navRef.current, matches.length - 1);
+            else return;
+            event.preventDefault();
+          }}
+        >
           {matches.length === 0 ? (
             <p className="px-2 py-1.5 text-caption text-fg-muted">No section matches “{query.trim()}”.</p>
           ) : null}
@@ -136,10 +145,7 @@ export function SettingsLayout(): JSX.Element {
                 key={name}
                 type="button"
                 aria-current={active ? 'page' : undefined}
-                onClick={() => {
-                  localStorage.setItem(LAST_PAGE_KEY, name);
-                  setPage(name);
-                }}
+                onClick={() => setPage(name)}
                 className={cn(
                   'flex w-full items-center gap-2.5 rounded-control px-2.5 py-1.5 text-left text-body',
                   'transition-colors duration-fast ease-calm',
