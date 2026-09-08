@@ -56,6 +56,12 @@ jobs:
       - run: pnpm build
       - name: Build installers
         run: pnpm --filter @ai-anywhere/desktop dist
+        # Windows artifacts are unsigned. Add the certificate as repository
+        # secrets and uncomment these two lines to sign them; electron-builder
+        # needs nothing else.
+        # env:
+        #   CSC_LINK: ${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}
+        #   CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
 
       - uses: actions/upload-artifact@v4
         with:

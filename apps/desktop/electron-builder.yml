@@ -30,6 +30,16 @@ win:
   # Shipped rather than derived from icon.png so the build needs no network
   # round trip to electron-builder's icon conversion service.
   icon: build/icon.ico
+  # Code signing is not configured: 1.0 ships unsigned and SmartScreen warns on
+  # first run. When a certificate exists, sign by setting CSC_LINK (a path to
+  # the .pfx, or its base64) and CSC_KEY_PASSWORD in the build environment —
+  # electron-builder reads both without any change here. Uncomment the two keys
+  # below only to point at a checked-in certificate instead, which this repo
+  # does not do. Leaving the timestamp server set costs nothing while unsigned
+  # and keeps signatures valid past the certificate's expiry once it is not.
+  # certificateFile: build/certificate.pfx
+  # certificatePassword: null
+  rfc3161TimeStampServer: http://timestamp.digicert.com
   target:
     - target: nsis
       arch: [x64]
