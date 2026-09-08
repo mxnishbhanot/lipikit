@@ -10,7 +10,8 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./tailwind-preset": "./tailwind.preset.cjs"
+    "./tailwind-preset": "./tailwind.preset.cjs",
+    "./tokens.css": "./styles/tokens.css"
   },
   "scripts": {
     "build": "tsc -b",

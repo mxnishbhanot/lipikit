@@ -7,14 +7,18 @@ nothing that imitates one OS's widgets on the other.
 
 Two files hold the whole system:
 
-| File                                  | Owns                                              |
-| ------------------------------------- | ------------------------------------------------- |
-| `apps/desktop/src/styles/globals.css` | Token **values**, per theme                       |
-| `packages/ui/tailwind.preset.cjs`     | Which **utilities** exist, named after the tokens |
+| File                              | Owns                                              |
+| --------------------------------- | ------------------------------------------------- |
+| `packages/ui/styles/tokens.css`   | Token **values**, per theme                       |
+| `packages/ui/tailwind.preset.cjs` | Which **utilities** exist, named after the tokens |
 
 The split is the point: the preset never contains a colour, and the CSS never
 contains a class. Change a value in one place, in one theme, and every window
-follows.
+follows — including the landing page in `apps/landing`, which imports the same
+two files. Both apps keep their own stylesheet
+(`apps/desktop/src/styles/globals.css`, `apps/landing/src/styles.css`) for
+rules that are genuinely theirs: window quirks and prose in one, page rhythm in
+the other.
 
 ## Theme modes
 

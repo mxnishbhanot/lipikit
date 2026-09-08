@@ -188,13 +188,32 @@ Other scripts:
 
 Tokens, theme modes, type scale, radii, shadows, motion and the UI primitives
 are documented in [docs/design-system.md](docs/design-system.md). Token values
-live in `apps/desktop/src/styles/globals.css`; the utilities that name them
-live in `packages/ui/tailwind.preset.cjs`.
+live in `packages/ui/styles/tokens.css`; the utilities that name them live in
+`packages/ui/tailwind.preset.cjs`. Both the desktop app and the landing page
+import the pair, so the site and the product cannot drift.
+
+## Landing page
+
+`apps/landing` is the marketing site: a static Vite build with no server, no
+API and no runtime env, sharing the design tokens, UI primitives and branding
+config with the app. Every claim it makes lives in
+`apps/landing/src/content.ts` — copy changes there, not in JSX.
+
+```bash
+pnpm dev:landing     # vite dev server
+pnpm build:landing   # static output in apps/landing/dist
+```
+
+The product screenshots are drawn from the design tokens rather than captured
+(`WindowFrame` in `apps/landing/src/components.tsx`), so the page tracks the app
+in both themes for free. Swap in real captures when there are some: only that
+component and the Screenshots section change.
 
 ## Layout
 
 ```
 apps/
+  landing/            Marketing site (Vite + React, static build)
   desktop/            Electron shell
     electron/main/     main process: composition root, IPC, windows, OS services
     electron/preload/  contextBridge allowlist — the only renderer/native seam

@@ -8,6 +8,7 @@
     { "path": "./packages/database" },
     { "path": "./packages/context-engine" },
     { "path": "./packages/ui" },
-    { "path": "./apps/desktop" }
+    { "path": "./apps/desktop" },
+    { "path": "./apps/landing" }
   ]
 }

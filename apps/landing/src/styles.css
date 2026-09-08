@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind utilities;
+
+/**
+ * Page-only styles. Token values come from @ai-anywhere/ui/tokens.css, which
+ * main.tsx imports first; nothing here redefines a colour.
+ *
+ * No `@tailwind components` layer: the page uses the UI package's primitives
+ * and utilities, and has no component classes of its own.
+ */
+@layer base {
+  html {
+    /* Anchor navigation is the whole nav, and the sticky header would
+       otherwise cover the heading it scrolled to. */
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background font-sans text-body text-fg-primary antialiased;
+    font-optical-sizing: auto;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  summary:focus-visible,
+  [tabindex]:focus-visible {
+    @apply rounded-control outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  ::selection {
+    background-color: hsl(var(--accent) / 0.25);
+  }
+}

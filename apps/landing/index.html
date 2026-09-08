@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <!-- Real title, description and theme colour are set from the branding
+         config in src/main.tsx: the product name is not final and lives in
+         exactly one file. -->
+    <title>Loading…</title>
+    <meta name="description" content="" />
+    <script>
+      /* Paints the saved theme before first paint, so a dark-mode visitor
+         never sees a white flash. Duplicated in src/theme.ts on purpose: that
+         module cannot run this early, and the rule is four lines. */
+      try {
+        var saved = localStorage.getItem('ai-anywhere:theme');
+        var dark =
+          saved === 'dark' || (saved !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.classList.toggle('dark', dark);
+        document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+      } catch (error) {
+        /* Private mode denies localStorage; the media query alone is fine. */
+      }
+    </script>
+  </head>
+  <body class="bg-background text-foreground">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

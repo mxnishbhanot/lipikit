@@ -26,7 +26,9 @@ export default tseslint.config(
     languageOptions: {
       parserOptions: {
         // Build, test and config files sit outside the tsconfig graph.
-        projectService: { allowDefaultProject: ['*.config.ts', 'apps/desktop/e2e/*.ts'] },
+        projectService: {
+          allowDefaultProject: ['*.config.ts', 'apps/landing/vite.config.ts', 'apps/desktop/e2e/*.ts'],
+        },
         tsconfigRootDir: import.meta.dirname,
       },
       globals: { ...globals.node, ...globals.es2023 },
@@ -58,7 +60,11 @@ export default tseslint.config(
   },
   {
     // The renderer is browser code: no Node globals, hooks rules on.
-    files: ['apps/desktop/src/**/*.{ts,tsx}', 'packages/ui/src/**/*.{ts,tsx}'],
+    files: [
+      'apps/desktop/src/**/*.{ts,tsx}',
+      'apps/landing/src/**/*.{ts,tsx}',
+      'packages/ui/src/**/*.{ts,tsx}',
+    ],
     languageOptions: { globals: { ...globals.browser } },
     plugins: { 'react-hooks': reactHooks, 'react-refresh': reactRefresh },
     rules: {
