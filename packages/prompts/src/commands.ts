@@ -1,14 +1,23 @@
 import type { ActionId, ReplyStyle, Tone } from '@ai-anywhere/shared';
 
-export type CommandGroup = 'Writing' | 'Developer' | 'Communication' | 'Translation' | 'AI';
+export type CommandGroup = 'Developer' | 'Communication' | 'Writing' | 'Productivity';
 
-/** Display order of the groups in the popup; also the tab order of sections. */
+/**
+ * Display order of the groups in the popup; also the tab order of sections.
+ *
+ * Grouped by the workflow a command belongs to rather than by the machinery
+ * behind it: 'Translation' was one command in a section of its own, and 'AI'
+ * described how every row here works rather than what any of them do. The
+ * order leads with Developer because that is who the palette is aimed at.
+ *
+ * Only the *display* order lives here. `COMMANDS` keeps catalog order, which
+ * is what breaks search-rank ties.
+ */
 export const COMMAND_GROUPS: readonly CommandGroup[] = [
-  'Writing',
   'Developer',
   'Communication',
-  'Translation',
-  'AI',
+  'Writing',
+  'Productivity',
 ];
 
 /**
@@ -93,8 +102,8 @@ export const COMMANDS: readonly CommandDescriptor[] = [
   },
   {
     id: 'slack-update',
-    label: 'Slack Update',
-    group: 'Developer',
+    label: 'Slack Reply',
+    group: 'Communication',
     action: 'custom',
     instruction:
       'Rewrite the following as a short Slack update for a team channel: plain language, a few lines at most, no corporate padding.',
@@ -169,6 +178,24 @@ export const COMMANDS: readonly CommandDescriptor[] = [
     keywords: ['boss', 'lead', 'report', 'status'],
   },
   {
+    id: 'linkedin-message',
+    label: 'LinkedIn Message',
+    group: 'Communication',
+    action: 'custom',
+    instruction:
+      'Rewrite the following as a short LinkedIn message: one opening line with a reason for writing, one line of substance, one clear ask. No flattery and no buzzwords.',
+    keywords: ['recruiter', 'outreach', 'dm', 'connect'],
+  },
+  {
+    id: 'meeting-summary',
+    label: 'Meeting Summary',
+    group: 'Communication',
+    action: 'custom',
+    instruction:
+      'Turn the following notes or transcript into a meeting summary: what was decided, what is open, and who does what next. Leave a heading out rather than filling it in.',
+    keywords: ['notes', 'minutes', 'recap', 'transcript'],
+  },
+  {
     id: 'follow-up',
     label: 'Follow-up',
     group: 'Communication',
@@ -178,22 +205,21 @@ export const COMMANDS: readonly CommandDescriptor[] = [
     keywords: ['nudge', 'reminder', 'chase'],
   },
 
-  // Translation
   {
     id: 'translate',
     label: 'Translate',
-    group: 'Translation',
+    group: 'Writing',
     action: 'translate',
     instruction: 'Target language:',
     inputPlaceholder: 'Target language (e.g. Spanish)',
     keywords: ['language', 'localise', 'localize'],
   },
 
-  // AI
+  // Productivity
   {
     id: 'ask-ai',
     label: 'Ask AI',
-    group: 'AI',
+    group: 'Productivity',
     action: 'custom',
     inputPlaceholder: 'Ask anything about the selected text',
     keywords: ['question', 'prompt', 'chat'],
@@ -201,13 +227,75 @@ export const COMMANDS: readonly CommandDescriptor[] = [
   {
     id: 'explain',
     label: 'Explain',
-    group: 'AI',
+    group: 'Productivity',
     action: 'custom',
     instruction:
       'Explain the following text in plain language, defining any jargon it uses. Answer with the explanation only.',
     keywords: ['what does this mean', 'clarify', 'eli5'],
   },
-  { id: 'summarize', label: 'Summarize', group: 'AI', action: 'summarize', keywords: ['tldr', 'summary'] },
+  {
+    id: 'summarize',
+    label: 'Summarize',
+    group: 'Productivity',
+    action: 'summarize',
+    keywords: ['tldr', 'summary'],
+  },
+  {
+    id: 'bullet-points',
+    label: 'Bullet Points',
+    group: 'Productivity',
+    action: 'custom',
+    instruction:
+      'Rewrite the following as a flat bullet list, one idea per bullet, in the order the text makes them. Add nothing that is not already there.',
+    keywords: ['list', 'bullets', 'points'],
+  },
+  {
+    id: 'action-items',
+    label: 'Action Items',
+    group: 'Productivity',
+    action: 'custom',
+    instruction:
+      'Pull the action items out of the following text as a checklist, each line naming the owner if the text says who. If there are none, say so in one line rather than inventing any.',
+    keywords: ['todo', 'tasks', 'next steps', 'follow up'],
+  },
+
+  // Developer, continued: the four the palette was missing.
+  {
+    id: 'explain-code',
+    label: 'Explain Code',
+    group: 'Developer',
+    action: 'custom',
+    instruction:
+      'Explain what the following code does, in order, in plain language. Name the inputs, the outputs and any side effect. Do not rewrite it.',
+    keywords: ['what does this do', 'read', 'walkthrough', 'code'],
+  },
+  {
+    id: 'fix-bug',
+    label: 'Fix Bug',
+    group: 'Developer',
+    action: 'custom',
+    instruction:
+      'The following is code or an error from it. Say what is most likely wrong and why, then give the smallest corrected version. If the cause cannot be told from what is here, say what else you would need.',
+    keywords: ['debug', 'error', 'stack trace', 'exception', 'broken'],
+  },
+  {
+    id: 'optimize-sql',
+    label: 'Optimize SQL',
+    group: 'Developer',
+    action: 'custom',
+    instruction:
+      'Rewrite the following SQL to do the same work with less of it, then list what changed and which index would help. Keep the result set identical.',
+    keywords: ['query', 'database', 'explain plan', 'index', 'slow'],
+  },
+  {
+    id: 'review-reply',
+    label: 'Code Review Reply',
+    group: 'Developer',
+    action: 'custom',
+    instruction:
+      'Write a reply to the following code review comment: answer the point, say what you will change, and keep it short and unbothered. No apologising, no padding.',
+    keywords: ['pr comment', 'reviewer', 'feedback', 'respond'],
+  },
 ];
 
 const byId = new Map(COMMANDS.map((command) => [command.id, command]));

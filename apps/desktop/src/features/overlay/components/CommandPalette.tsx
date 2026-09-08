@@ -1,21 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { EmptyState, Input, Kbd, cn, listContainer, listItem, slideUp } from '@ai-anywhere/ui';
-import {
-  Braces,
-  Clock,
-  CornerDownLeft,
-  Languages,
-  MessageSquare,
-  PenLine,
-  Sparkles,
-  Star,
-  Wand2,
-} from 'lucide-react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { Badge, Input, Kbd, cn, listContainer, listItem, slideUp } from '@ai-anywhere/ui';
+import { Braces, Clock, CornerDownLeft, ListChecks, MessageSquare, PenLine, Star, Wand2 } from 'lucide-react';
 import { COMMAND_GROUPS, filterCommands, suggestedFor, type PaletteCommand } from '@ai-anywhere/prompts';
 import type { AppContext, CustomPrompt } from '@ai-anywhere/shared';
 import type { RecentPrompt } from '../use-command-prefs.js';
 import { nextSectionStart } from '../section-nav.js';
+import { examplesFor, tuningFor } from '../context-examples.js';
 
 interface Entry {
   readonly command: PaletteCommand;
@@ -25,6 +16,12 @@ interface Entry {
 interface Section {
   readonly title: string;
   readonly items: readonly Entry[];
+  /**
+   * 'suggested' is the context engine's own guess and is drawn as cards rather
+   * than rows: it is the answer most of the time, and a card is the difference
+   * between a list to read and a button to press.
+   */
+  readonly kind?: 'suggested';
 }
 
 export interface CommandPaletteProps {
@@ -48,16 +45,159 @@ export interface CommandPaletteProps {
  * user invented for their own prompts fall through to the wand.
  */
 const GROUP_ICONS: Record<string, typeof PenLine> = {
-  Writing: PenLine,
   Developer: Braces,
   Communication: MessageSquare,
-  Translation: Languages,
-  AI: Sparkles,
+  Writing: PenLine,
+  Productivity: ListChecks,
   Favorites: Star,
   Recent: Clock,
 };
 
 const iconFor = (title: string): typeof PenLine => GROUP_ICONS[title] ?? Wand2;
+
+/**
+ * What the popup thinks it is looking at, and one thing to try.
+ *
+ * Detection already existed and already reordered the list; what was missing
+ * was any sign of it. The chip is the whole explanation: which app, how the
+ * prompt was tuned for it, and an example in the words a user would type.
+ *
+ * The example rotates so three of them get seen without three lines of chrome.
+ * It stands still for anyone who asked the OS for less motion — a sentence
+ * swapping itself out is movement, whatever it is made of.
+ */
+function ContextStrip({ context }: { readonly context: AppContext | null }): JSX.Element | null {
+  const still = useReducedMotion() === true;
+  const examples = examplesFor(context);
+  const [shown, setShown] = useState(0);
+
+  useEffect(() => {
+    if (still || examples.length < 2) return;
+    const timer = window.setInterval(() => setShown((index) => (index + 1) % examples.length), 4_000);
+    return () => window.clearInterval(timer);
+  }, [still, examples.length]);
+
+  // A shorter list after a re-detect must not leave the index off the end.
+  const example = examples[shown % examples.length] ?? examples[0];
+  const tuning = tuningFor(context);
+  const detected = context === null || context.appId === null ? null : context.label;
+
+  return (
+    <div className="flex shrink-0 items-center gap-2 border-b border-border/60 px-3.5 py-2">
+      {detected === null ? (
+        <Badge tone="neutral" className="shrink-0">
+          No app detected
+        </Badge>
+      ) : (
+        <Badge tone="accent" className="shrink-0">
+          {detected} detected
+        </Badge>
+      )}
+      {tuning === null ? null : <span className="shrink-0 text-caption text-fg-muted">{tuning}</span>}
+      {/* aria-live off: the search field has focus and a sentence rotating
+          every four seconds would interrupt typing with every rotation. */}
+      <span className="ml-auto min-w-0 truncate text-caption italic text-fg-muted" title={example}>
+        {example === undefined ? null : `“${example}”`}
+      </span>
+    </div>
+  );
+}
+
+interface PaletteItemProps {
+  readonly entry: Entry;
+  /** Rows for the catalog, cards for the context engine's own suggestions. */
+  readonly variant: 'row' | 'card';
+  readonly active: boolean;
+  readonly starred: boolean;
+  readonly disabled: boolean;
+  /** Set on the active item only, so the list can scroll it into view. */
+  readonly activeRef: React.RefObject<HTMLDivElement> | undefined;
+  readonly onHover: () => void;
+  readonly onChoose: () => void;
+  readonly onToggleFavorite: () => void;
+}
+
+/**
+ * One command, in either shape. Both shapes are the same option to a screen
+ * reader and to the arrow keys — only the box around them differs, which is
+ * why this is one component with a variant and not two lists to keep in step.
+ */
+function PaletteItem({
+  entry,
+  variant,
+  active,
+  starred,
+  disabled,
+  activeRef,
+  onHover,
+  onChoose,
+  onToggleFavorite,
+}: PaletteItemProps): JSX.Element {
+  const Icon = iconFor(entry.command.group);
+  const card = variant === 'card';
+
+  return (
+    <div
+      ref={activeRef}
+      role="option"
+      aria-selected={active}
+      aria-disabled={disabled}
+      onMouseMove={onHover}
+      onClick={onChoose}
+      className={cn(
+        'group relative flex cursor-default items-center text-left text-body transition-colors duration-fast ease-calm',
+        card
+          ? 'min-h-[3.25rem] gap-2 rounded-card border px-3 py-2'
+          : 'w-full gap-2.5 rounded-control px-3 py-2',
+        card && (active ? 'border-accent bg-accent-subtle' : 'border-border hover:bg-surface-hover'),
+        !card && (active ? 'bg-accent-subtle text-fg-primary' : 'hover:bg-surface-hover'),
+        disabled && 'pointer-events-none opacity-50',
+      )}
+    >
+      {/* The active row gets an accent rail rather than a heavy fill: the popup
+          is read at a glance and one strong colour per screen is enough. A card
+          is already outlined in accent, so it needs no rail of its own. */}
+      {active && !card ? (
+        <motion.span
+          layoutId="active-rail"
+          className="absolute left-0 top-1.5 h-[calc(100%-0.75rem)] w-0.5 rounded-full bg-accent"
+        />
+      ) : null}
+      <Icon className={cn('h-4 w-4 shrink-0', active ? 'text-accent' : 'text-fg-muted')} />
+      <span className="min-w-0 flex-1">
+        <span className="block truncate">
+          {entry.command.label}
+          {entry.input ? <span className="text-fg-muted"> · {entry.input}</span> : null}
+        </span>
+        {card ? (
+          <span className="block truncate text-caption text-fg-muted">{entry.command.group}</span>
+        ) : null}
+      </span>
+      {active ? (
+        <span className="flex shrink-0 items-center gap-1 text-fg-muted">
+          <CornerDownLeft className="h-3 w-3" />
+        </span>
+      ) : null}
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-label={starred ? 'Remove from favorites' : 'Add to favorites'}
+        onClick={(event) => {
+          // The star sits inside the item, so its click must not also fall
+          // through and run the command.
+          event.stopPropagation();
+          onToggleFavorite();
+        }}
+        className={cn(
+          'shrink-0 rounded p-0.5 transition-opacity duration-fast hover:bg-surface',
+          starred ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
+        )}
+      >
+        <Star className={cn('h-3.5 w-3.5', starred && 'fill-current text-accent')} />
+      </button>
+    </div>
+  );
+}
 
 /**
  * The command list: search results, then favourites, recents and the catalog
@@ -120,6 +260,7 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
       {
         title: props.context?.appId === null ? 'Suggested' : `For ${props.context?.label ?? ''}`,
         items: suggested,
+        kind: 'suggested' as const,
       },
       { title: 'Favorites', items: favorites },
       { title: 'Recent', items: recents },
@@ -248,6 +389,11 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
 
   return (
     <>
+      {/* The context engine, said out loud. It used to be invisible: the
+          palette silently reordered itself and the user had no way to know
+          why, or that the prompt behind a row had changed with it. */}
+      <ContextStrip context={props.context} />
+
       <motion.div
         id="command-list"
         role="listbox"
@@ -269,89 +415,48 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
         <AnimatePresence initial={false}>
           {sections.map((section) => {
             const Icon = iconFor(section.title);
+            // Cards only on the home screen: while searching, the same rows
+            // in two shapes would make the results list read as two lists.
+            const asCards = section.kind === 'suggested' && props.query.length === 0;
             return (
               <motion.div key={section.title} variants={listItem} exit="exit">
                 <p className="flex items-center gap-1.5 px-3 pb-1 pt-2.5 text-[11px] font-medium uppercase tracking-wider text-fg-muted">
                   <Icon className="h-3 w-3" />
                   {section.title}
                 </p>
-                {section.items.map((entry) => {
-                  const index = flat.indexOf(entry);
-                  const isActive = index === active;
-                  const starred = props.favorites.includes(entry.command.id);
-                  const RowIcon = iconFor(entry.command.group);
-                  return (
-                    <div
-                      key={`${section.title}:${entry.command.id}:${entry.input}`}
-                      ref={isActive ? activeRef : undefined}
-                      role="option"
-                      aria-selected={isActive}
-                      aria-disabled={props.disabled}
-                      onMouseMove={() => setActive(index)}
-                      onClick={() => choose(entry.command, entry.input)}
-                      className={cn(
-                        'group relative flex w-full cursor-default items-center gap-2.5 rounded-control px-3 py-2 text-left text-body transition-colors duration-fast ease-calm',
-                        isActive ? 'bg-accent-subtle text-fg-primary' : 'hover:bg-surface-hover',
-                        props.disabled && 'pointer-events-none opacity-50',
-                      )}
-                    >
-                      {/* The active row gets an accent rail rather than a heavy
-                        fill: the popup is read at a glance and one strong
-                        colour per screen is enough. */}
-                      {isActive ? (
-                        <motion.span
-                          layoutId="active-rail"
-                          className="absolute left-0 top-1.5 h-[calc(100%-0.75rem)] w-0.5 rounded-full bg-accent"
-                        />
-                      ) : null}
-                      <RowIcon
-                        className={cn('h-4 w-4 shrink-0', isActive ? 'text-accent' : 'text-fg-muted')}
+                <div className={cn(asCards && 'grid grid-cols-2 gap-1.5 px-1 pb-1')}>
+                  {section.items.map((entry) => {
+                    const index = flat.indexOf(entry);
+                    return (
+                      <PaletteItem
+                        key={`${section.title}:${entry.command.id}:${entry.input}`}
+                        entry={entry}
+                        variant={asCards ? 'card' : 'row'}
+                        active={index === active}
+                        starred={props.favorites.includes(entry.command.id)}
+                        disabled={props.disabled}
+                        activeRef={index === active ? activeRef : undefined}
+                        onHover={() => setActive(index)}
+                        onChoose={() => choose(entry.command, entry.input)}
+                        onToggleFavorite={() => props.onToggleFavorite(entry.command.id)}
                       />
-                      <span className="flex-1 truncate">
-                        {entry.command.label}
-                        {entry.input ? <span className="text-fg-muted"> · {entry.input}</span> : null}
-                      </span>
-                      {isActive ? (
-                        <span className="flex shrink-0 items-center gap-1 text-fg-muted">
-                          <CornerDownLeft className="h-3 w-3" />
-                        </span>
-                      ) : null}
-                      <button
-                        type="button"
-                        tabIndex={-1}
-                        aria-label={starred ? 'Remove from favorites' : 'Add to favorites'}
-                        onClick={(event) => {
-                          // The star sits inside the row, so its click must not
-                          // also fall through and run the command.
-                          event.stopPropagation();
-                          props.onToggleFavorite(entry.command.id);
-                        }}
-                        className={cn(
-                          'shrink-0 rounded p-0.5 transition-opacity duration-fast hover:bg-surface',
-                          starred ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
-                        )}
-                      >
-                        <Star className={cn('h-3.5 w-3.5', starred && 'fill-current text-accent')} />
-                      </button>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </motion.div>
             );
           })}
         </AnimatePresence>
       </motion.div>
+      {/* One line, not an empty state. The illustrated version took ninety
+          vertical pixels of a popup that opens over someone's work, to teach a
+          single keystroke — and it sat between the list and the footer, where
+          it read as a section rather than as a hint. */}
       {teachFavorites ? (
-        <EmptyState
-          kind="no-favorites"
-          size="sm"
-          className="shrink-0 border-t border-border/70 py-4"
-          description={
-            <>
-              Press <Kbd combo="Ctrl+D" /> on a command and it moves to the top of this list.
-            </>
-          }
-        />
+        <p className="flex shrink-0 items-center gap-1.5 border-t border-border/70 px-3.5 py-2 text-caption text-fg-muted">
+          <Star className="h-3 w-3" aria-hidden />
+          <Kbd combo="Ctrl+D" /> pins a command to the top of this list.
+        </p>
       ) : null}
     </>
   );
