@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>AI Anywhere — mockup screens</title>
+    <!-- The real design tokens, not a copy: a value changes there and these
+         screens follow. -->
+    <link rel="stylesheet" href="../../packages/ui/styles/tokens.css" />
+    <link rel="stylesheet" href="screens.css" />
+  </head>
+  <body>
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <defs>
+        <g id="i-search"><circle cx="11" cy="11" r="7" /><path d="m21 21-4.3-4.3" /></g>
+        <g id="i-pen"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></g>
+        <g id="i-braces"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1" /><path d="M16 21h1a2 2 0 0 0 2-2v-5a2 2 0 0 1 2-2 2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1" /></g>
+        <g id="i-message"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z" /></g>
+        <g id="i-sparkles"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9Z" /><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9Z" /></g>
+        <g id="i-star"><path d="M12 3.5l2.6 5.3 5.9.9-4.2 4.1 1 5.8-5.3-2.8-5.3 2.8 1-5.8L3.5 9.7l5.9-.9Z" /></g>
+        <g id="i-clock"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3.5 2" /></g>
+        <g id="i-lang"><path d="M4 5h10" /><path d="M9 3v2c0 5-2.5 8-5 9" /><path d="M6 12c2.5 3 5 4 8 4" /><path d="M13 21l4.5-10 4.5 10" /><path d="M15 17h5" /></g>
+        <g id="i-enter"><path d="M9 10l-4 4 4 4" /><path d="M5 14h9a5 5 0 0 0 5-5V5" /></g>
+        <g id="i-settings"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2 2 2 0 1 1-4 0 1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3 15a2 2 0 1 1 0-4 1.7 1.7 0 0 0 1.4-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 4a2 2 0 1 1 4 0 1.7 1.7 0 0 0 2.9 1.4l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 21 11a2 2 0 1 1 0 4Z" /></g>
+        <g id="i-x"><path d="M6 6l12 12" /><path d="M18 6 6 18" /></g>
+        <g id="i-back"><path d="M19 12H5" /><path d="m12 19-7-7 7-7" /></g>
+        <g id="i-copy"><rect x="9" y="9" width="12" height="12" rx="2" /><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" /></g>
+        <g id="i-retry"><path d="M3 12a9 9 0 1 0 3-6.7" /><path d="M3 4v5h5" /></g>
+        <g id="i-pin"><path d="M12 17v5" /><path d="M9 3h6l-1 6 3 3v2H7v-2l3-3Z" /></g>
+        <g id="i-eye"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z" /><circle cx="12" cy="12" r="2.5" /></g>
+        <g id="i-trash"><path d="M4 7h16" /><path d="M9 7V5h6v2" /><path d="M6 7l1 13h10l1-13" /></g>
+        <g id="i-key"><circle cx="8" cy="15" r="4" /><path d="m11 12 8-8" /><path d="m17 4 3 3" /><path d="m14 7 3 3" /></g>
+        <g id="i-plug"><path d="M9 2v6" /><path d="M15 2v6" /><path d="M6 8h12v3a6 6 0 0 1-12 0Z" /><path d="M12 17v5" /></g>
+        <g id="i-check"><path d="m4 13 5 5L20 6" /></g>
+        <g id="i-shield"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6Z" /><path d="m9 12 2.2 2.2L15.5 10" /></g>
+        <g id="i-cpu"><rect x="6" y="6" width="12" height="12" rx="2" /><path d="M9 2v3" /><path d="M15 2v3" /><path d="M9 19v3" /><path d="M15 19v3" /><path d="M2 9h3" /><path d="M2 15h3" /><path d="M19 9h3" /><path d="M19 15h3" /></g>
+        <g id="i-keyboard"><rect x="2" y="6" width="20" height="12" rx="2" /><path d="M6 10h.01" /><path d="M10 10h.01" /><path d="M14 10h.01" /><path d="M18 10h.01" /><path d="M8 14h8" /></g>
+        <g id="i-palette"><circle cx="12" cy="12" r="9" /><circle cx="9" cy="9" r="1.2" /><circle cx="15" cy="9" r="1.2" /><circle cx="9.5" cy="15" r="1.2" /></g>
+        <g id="i-info"><circle cx="12" cy="12" r="9" /><path d="M12 11v6" /><path d="M12 7.5h.01" /></g>
+        <g id="i-sliders"><path d="M4 6h16" /><path d="M4 12h16" /><path d="M4 18h16" /><circle cx="9" cy="6" r="2" /><circle cx="15" cy="12" r="2" /><circle cx="8" cy="18" r="2" /></g>
+        <g id="i-ext"><path d="M14 4h6v6" /><path d="M20 4l-9 9" /><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" /></g>
+      </defs>
+    </svg>
+
+    <main class="sheet">
+      <!-- ============================ POPUP ============================ -->
+      <section class="shot shot--popup" data-name="popup-palette">
+        <div class="stage stage--slack">
+          <div class="ghost-app">
+            <p class="ghost-title">#team-payments — Slack</p>
+            <p class="ghost-line">
+              <span class="sel">hey all — the payment retry job was stuck since friday, i pushed a fix
+              and it is draining the queue now, should be clear in an hour, sorry for the noise</span>
+            </p>
+          </div>
+          <div class="popup">
+            <header class="popup-head">
+              <svg class="icon icon--muted" viewBox="0 0 24 24"><use href="#i-search" /></svg>
+              <span class="popup-search">Search commands…&nbsp; <em>in Slack</em></span>
+              <span class="badge badge--neutral"><span class="dot"></span>claude-sonnet-5</span>
+              <svg class="icon icon--muted" viewBox="0 0 24 24"><use href="#i-settings" /></svg>
+              <svg class="icon icon--muted" viewBox="0 0 24 24"><use href="#i-x" /></svg>
+            </header>
+            <div class="popup-body">
+              <p class="group-head"><svg class="icon icon--xs" viewBox="0 0 24 24"><use href="#i-message" /></svg>For Slack</p>
+              <div class="row row--active">
+                <span class="rail"></span>
+                <svg class="icon icon--accent" viewBox="0 0 24 24"><use href="#i-message" /></svg>
+                <span class="row-label">Slack Update</span>
+                <svg class="icon icon--xs icon--muted" viewBox="0 0 24 24"><use href="#i-enter" /></svg>
+                <svg class="icon icon--xs icon--accent fill" viewBox="0 0 24 24"><use href="#i-star" /></svg>
+              </div>
+              <div class="row">
+                <svg class="icon icon--muted" viewBox="0 0 24 24"><use href="#i-pen" /></svg>
+                <span class="row-label">Professional</span>
+              </div>
+              <div class="row">
+                <svg class="icon icon--muted" viewBox="0 0 24 24"><use href="#i-pen" /></svg>
+                <span class="row-label">Fix Grammar</span>
+              </div>
+              <p class="group-head"><svg class="icon icon--xs" viewBox="0 0 24 24"><use href="#i-star" /></svg>Favorites</p>
+              <div class="row">
+                <svg class="icon icon--muted" viewBox="0 0 24 24"><use href="#i-braces" /></svg>
+                <span class="row-label">Commit Message</span>
+                <svg class="icon icon--xs icon--accent fill" viewBox="0 0 24 24"><use href="#i-star" /></svg>
+              </div>
+              <p class="group-head"><svg class="icon icon--xs" viewBox="0 0 24 24"><use href="#i-clock" /></svg>Recent</p>
+              <div class="row">
+                <svg class="icon icon--muted" viewBox="0 0 24 24"><use href="#i-lang" /></svg>
+                <span class="row-label">Translate <span class="row-dim">· German</span></span>
+              </div>
+              <div class="row">
+                <svg class="icon icon--muted" viewBox="0 0 24 24"><use href="#i-sparkles" /></svg>
+                <span class="row-label">Ask AI <span class="row-dim">· is this breaking for API clients?</span></span>
+              </div>
+              <p class="group-head"><svg class="icon icon--xs" viewBox="0 0 24 24"><use href="#i-pen" /></svg>Writing</p>
+              <div class="row">
+                <svg class="icon icon--muted" viewBox="0 0 24 24"><use href="#i-pen" /></svg>
+                <span class="row-label">Concise</span>
+              </div>
+              <div class="row">
+                <svg class="icon icon--muted" viewBox="0 0 24 24"><use href="#i-pen" /></svg>
+                <span class="row-label">Friendly</span>
+              </div>
+            </div>
+            <footer class="popup-foot">
+              <div class="hints">
+                <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+                <span><kbd>Enter</kbd> run</span>
+                <span><kbd>Ctrl</kbd><kbd>K</kbd> search</span>
+              </div>
+              <span class="latency"><span class="dot dot--success"></span>0.9s</span>
+              <span class="select">Anthropic</span>
+              <button class="btn btn--ghost">Recapture</button>
+            </footer>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================= POPUP RESULT ========================= -->
+      <section class="shot shot--popup" data-name="popup-result">
+        <div class="stage stage--jira">
+          <div class="ghost-app">
+            <p class="ghost-title">PAY-4127 · Retry job backs off forever — Jira</p>
+            <p class="ghost-line">
+              <span class="sel">retry backoff never resets after a 429 so the job sleeps for hours,
+              needs a cap and a reset on success</span>
+            </p>
+          </div>
+          <div class="popup">
+            <header class="popup-head">
+              <svg class="icon icon--muted" viewBox="0 0 24 24"><use href="#i-back" /></svg>
+              <span class="popup-title">Jira Comment</span>
+              <svg class="icon icon--muted" viewBox="0 0 24 24"><use href="#i-pen" /></svg>
+              <svg class="icon icon--accent" viewBox="0 0 24 24"><use href="#i-pin" /></svg>
+              <span class="badge badge--neutral"><span class="dot"></span>claude-sonnet-5</span>
+              <svg class="icon icon--muted" viewBox="0 0 24 24"><use href="#i-settings" /></svg>
+              <svg class="icon icon--muted" viewBox="0 0 24 24"><use href="#i-x" /></svg>
+            </header>
+            <div class="popup-body popup-body--result">
+              <div class="answer">
+                <p><strong>Root cause</strong></p>
+                <p>
+                  The backoff multiplier is applied on every attempt but never reset once a request
+                  succeeds, so a single <code>429</code> leaves the worker sleeping for hours.
+                </p>
+                <p><strong>Proposed fix</strong></p>
+                <ul>
+                  <li>Cap the delay at 60s.</li>
+                  <li>Reset the multiplier to 1 on the first successful call.</li>
+                  <li>Log the delay so the next incident is visible in the dashboard.</li>
+                </ul>
+                <p>Happy to split the cap and the reset into two commits if that reviews easier.<span class="caret"></span></p>
+              </div>
+            </div>
+            <footer class="popup-foot">
+              <div class="hints hints--actions">
+                <button class="btn btn--ghost"><svg class="icon icon--xs" viewBox="0 0 24 24"><use href="#i-retry" /></svg>Retry</button>
+                <button class="btn btn--ghost"><svg class="icon icon--xs" viewBox="0 0 24 24"><use href="#i-pen" /></svg>Prompt</button>
+                <button class="btn btn--ghost"><svg class="icon icon--xs" viewBox="0 0 24 24"><use href="#i-copy" /></svg>Copy</button>
+                <button class="btn btn--ghost">Insert below</button>
+              </div>
+              <span class="latency"><span class="dot dot--success"></span>1.2s</span>
+              <button class="btn btn--primary"><svg class="icon icon--xs" viewBox="0 0 24 24"><use href="#i-enter" /></svg>Replace</button>
+            </footer>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================== SETTINGS =========================== -->
+      <section class="shot shot--window" data-name="settings-general">
+        <div class="window">
+          <div class="titlebar"><span class="tb-dot"></span><span class="tb-title">AI Anywhere</span></div>
+          <div class="win-body">
+            <aside class="sidebar">
+              <div class="side-search"><svg class="icon icon--xs icon--muted" viewBox="0 0 24 24"><use href="#i-search" /></svg><span>Search settings</span></div>
+              <nav>
+                <span class="nav-item nav-item--active"><svg class="icon" viewBox="0 0 24 24"><use href="#i-sliders" /></svg>General</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-palette" /></svg>Appearance</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-key" /></svg>Providers</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-cpu" /></svg>Models</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-keyboard" /></svg>Shortcuts</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-sparkles" /></svg>Prompt Templates</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-clock" /></svg>History</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-shield" /></svg>Privacy</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-info" /></svg>About</span>
+              </nav>
+            </aside>
+            <div class="page">
+              <h1 class="page-title">General</h1>
+              <p class="page-desc">How the app starts, how it writes, and how long it waits.</p>
+
+              <section class="group">
+                <p class="group-title">Startup</p>
+                <div class="card">
+                  <div class="srow">
+                    <div><p class="srow-label">Launch at login</p><p class="srow-hint">Starts hidden in the tray; the hotkey works straight away.</p></div>
+                    <span class="switch switch--on"><span></span></span>
+                  </div>
+                  <div class="srow">
+                    <div><p class="srow-label">Show tray icon</p><p class="srow-hint">Turning it off leaves the global hotkey as the only way in.</p></div>
+                    <span class="switch switch--on"><span></span></span>
+                  </div>
+                </div>
+              </section>
+
+              <section class="group">
+                <p class="group-title">Answers</p>
+                <div class="card">
+                  <div class="srow">
+                    <div><p class="srow-label">Default tone</p><p class="srow-hint">Used by every command that does not name its own.</p></div>
+                    <span class="select select--wide">Professional</span>
+                  </div>
+                  <div class="srow">
+                    <div><p class="srow-label">Stream responses</p><p class="srow-hint">Tokens appear as they arrive instead of all at once.</p></div>
+                    <span class="switch switch--on"><span></span></span>
+                  </div>
+                  <div class="srow">
+                    <div><p class="srow-label">Request timeout</p><p class="srow-hint">A call past this is cancelled and reported.</p></div>
+                    <span class="numfield">30 <em>seconds</em></span>
+                  </div>
+                </div>
+              </section>
+
+              <section class="group">
+                <p class="group-title">Backup</p>
+                <div class="card">
+                  <div class="srow">
+                    <div><p class="srow-label">Export settings and prompts</p><p class="srow-hint">A single JSON file. API keys are never included.</p></div>
+                    <span class="btn btn--outline">Export…</span>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================ HISTORY ============================ -->
+      <section class="shot shot--window" data-name="settings-history">
+        <div class="window">
+          <div class="titlebar"><span class="tb-dot"></span><span class="tb-title">AI Anywhere</span></div>
+          <div class="win-body">
+            <aside class="sidebar">
+              <div class="side-search"><svg class="icon icon--xs icon--muted" viewBox="0 0 24 24"><use href="#i-search" /></svg><span>Search settings</span></div>
+              <nav>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-sliders" /></svg>General</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-palette" /></svg>Appearance</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-key" /></svg>Providers</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-cpu" /></svg>Models</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-keyboard" /></svg>Shortcuts</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-sparkles" /></svg>Prompt Templates</span>
+                <span class="nav-item nav-item--active"><svg class="icon" viewBox="0 0 24 24"><use href="#i-clock" /></svg>History</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-shield" /></svg>Privacy</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-info" /></svg>About</span>
+              </nav>
+            </aside>
+            <div class="page">
+              <h1 class="page-title">History</h1>
+              <p class="page-desc">Every rewrite is stored locally so you can find it again. It never leaves this machine.</p>
+
+              <section class="group">
+                <p class="group-title">Recording</p>
+                <div class="card">
+                  <div class="srow">
+                    <div><p class="srow-label">Keep history</p><p class="srow-hint">Off means nothing new is written; existing entries stay until deleted.</p></div>
+                    <span class="switch switch--on"><span></span></span>
+                  </div>
+                  <div class="srow">
+                    <div><p class="srow-label">Keep for</p><p class="srow-hint">Older entries are deleted when the app starts.</p></div>
+                    <span class="numfield">90 <em>days</em></span>
+                  </div>
+                  <div class="srow">
+                    <div><p class="srow-label">Delete all history</p><p class="srow-hint">Local data only, and it cannot be undone.</p></div>
+                    <span class="btn btn--danger">Delete all</span>
+                  </div>
+                </div>
+              </section>
+
+              <section class="group">
+                <p class="group-title">Recent</p>
+                <p class="group-desc">The last 50 entries.</p>
+                <div class="card">
+                  <div class="hrow">
+                    <div class="hrow-head">
+                      <span class="badge badge--accent">Slack Update</span>
+                      <span class="hmeta">anthropic · claude-sonnet-5 · Slack</span>
+                      <span class="hwhen">8 Sep 2026, 09:41</span>
+                      <svg class="icon icon--xs icon--muted" viewBox="0 0 24 24"><use href="#i-trash" /></svg>
+                    </div>
+                    <p class="hbody">Heads up: the payment retry job was stuck from Friday evening. A fix is deployed and the queue is draining — expected clear within the hour. No action needed on your side; I'll confirm here once it's at zero.</p>
+                  </div>
+                  <div class="hrow">
+                    <div class="hrow-head">
+                      <span class="badge badge--accent">Jira Comment</span>
+                      <span class="hmeta">anthropic · claude-sonnet-5 · Jira</span>
+                      <span class="hwhen">8 Sep 2026, 09:12</span>
+                      <svg class="icon icon--xs icon--muted" viewBox="0 0 24 24"><use href="#i-trash" /></svg>
+                    </div>
+                    <p class="hbody">Root cause: the backoff multiplier is never reset after a successful call, so one 429 leaves the worker sleeping for hours. Fix caps the delay at 60s and resets on success. Adding a log line for the delay so the next incident is visible.</p>
+                  </div>
+                  <div class="hrow">
+                    <div class="hrow-head">
+                      <span class="badge badge--accent">Email</span>
+                      <span class="hmeta">openai · gpt-5-mini · Thunderbird</span>
+                      <span class="hwhen">7 Sep 2026, 17:58</span>
+                      <svg class="icon icon--xs icon--muted" viewBox="0 0 24 24"><use href="#i-trash" /></svg>
+                    </div>
+                    <p class="hbody">Hi Dana — thanks for the patience on the invoice question. The duplicate charge from 2 September has been refunded and should land in 3–5 business days. I've also switched the account to monthly billing so it can't recur. Anything else I can pick up?</p>
+                  </div>
+                  
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================== PROVIDERS =========================== -->
+      <section class="shot shot--window" data-name="settings-providers">
+        <div class="window">
+          <div class="titlebar"><span class="tb-dot"></span><span class="tb-title">AI Anywhere</span></div>
+          <div class="win-body">
+            <aside class="sidebar">
+              <div class="side-search"><svg class="icon icon--xs icon--muted" viewBox="0 0 24 24"><use href="#i-search" /></svg><span>Search settings</span></div>
+              <nav>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-sliders" /></svg>General</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-palette" /></svg>Appearance</span>
+                <span class="nav-item nav-item--active"><svg class="icon" viewBox="0 0 24 24"><use href="#i-key" /></svg>Providers</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-cpu" /></svg>Models</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-keyboard" /></svg>Shortcuts</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-sparkles" /></svg>Prompt Templates</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-clock" /></svg>History</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-shield" /></svg>Privacy</span>
+                <span class="nav-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-info" /></svg>About</span>
+              </nav>
+            </aside>
+            <div class="page">
+              <h1 class="page-title">Providers</h1>
+              <p class="page-desc">API keys are encrypted by the OS keyring (DPAPI on Windows, libsecret on Linux) and never stored in the database or exported.</p>
+
+              <div class="pcard">
+                <div class="pcard-head">
+                  <div>
+                    <div class="pcard-title">
+                      <h4>Anthropic</h4>
+                      <span class="badge badge--accent">Default</span>
+                      <span class="badge badge--success"><svg class="icon icon--xs" viewBox="0 0 24 24"><use href="#i-check" /></svg>Key stored</span>
+                    </div>
+                    <p class="pcard-url">https://api.anthropic.com/v1</p>
+                  </div>
+                  <label class="pcard-toggle">Enabled <span class="switch switch--on"><span></span></span></label>
+                </div>
+                <div class="srow srow--stack">
+                  <div><p class="srow-label">API key</p><p class="srow-hint">Verified before it is stored. <a href="#">Get a key <svg class="icon icon--xs" viewBox="0 0 24 24"><use href="#i-ext" /></svg></a></p></div>
+                  <div class="field-line">
+                    <span class="input input--muted">stored in the OS keyring</span>
+                    <span class="btn btn--primary btn--sm"><svg class="icon icon--xs" viewBox="0 0 24 24"><use href="#i-key" /></svg>Save</span>
+                    <span class="btn btn--ghost btn--sm"><svg class="icon icon--xs" viewBox="0 0 24 24"><use href="#i-trash" /></svg></span>
+                  </div>
+                </div>
+                <div class="srow srow--stack">
+                  <div><p class="srow-label">Endpoint</p><p class="srow-hint">Leave empty for the vendor default. Must be an http(s) URL.</p></div>
+                  <div class="field-line">
+                    <span class="input input--muted">https://api.anthropic.com/v1</span>
+                    <span class="btn btn--outline btn--sm">Apply</span>
+                    <span class="btn btn--outline btn--sm"><svg class="icon icon--xs" viewBox="0 0 24 24"><use href="#i-plug" /></svg>Test</span>
+                  </div>
+                </div>
+                <p class="pcard-status"><svg class="icon icon--xs" viewBox="0 0 24 24"><use href="#i-check" /></svg>Provider reachable.</p>
+              </div>
+
+              <div class="pcard">
+                <div class="pcard-head">
+                  <div>
+                    <div class="pcard-title">
+                      <h4>OpenAI</h4>
+                      <span class="badge badge--success"><svg class="icon icon--xs" viewBox="0 0 24 24"><use href="#i-check" /></svg>Key stored</span>
+                    </div>
+                    <p class="pcard-url">https://api.openai.com/v1</p>
+                  </div>
+                  <label class="pcard-toggle">Enabled <span class="switch switch--on"><span></span></span></label>
+                </div>
+                </div>
+
+              <div class="pcard">
+                <div class="pcard-head">
+                  <div>
+                    <div class="pcard-title">
+                      <h4>Ollama (local)</h4>
+                      <span class="badge badge--neutral">No key needed</span>
+                    </div>
+                    <p class="pcard-url">http://127.0.0.1:11434</p>
+                  </div>
+                  <label class="pcard-toggle">Enabled <span class="switch switch--on"><span></span></span></label>
+                </div>
+                <div class="srow srow--stack">
+                  <div><p class="srow-label">Endpoint</p><p class="srow-hint">Leave empty for the vendor default. Must be an http(s) URL.</p></div>
+                  <div class="field-line">
+                    <span class="input input--muted">http://127.0.0.1:11434</span>
+                    <span class="btn btn--outline btn--sm">Apply</span>
+                    <span class="btn btn--outline btn--sm"><svg class="icon icon--xs" viewBox="0 0 24 24"><use href="#i-plug" /></svg>Test</span>
+                  </div>
+                </div>
+              </div>
+
+                          </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
