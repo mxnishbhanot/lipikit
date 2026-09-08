@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { AppSettings } from '@ai-anywhere/shared';
-import { Input, cn } from '@ai-anywhere/ui';
+import { Input, Skeleton, SkeletonText, cn } from '@ai-anywhere/ui';
 import {
   Clock,
   Cpu,
@@ -50,13 +50,25 @@ const PAGES = [
 type Page = (typeof PAGES)[number]['name'];
 
 /**
+ * Which of the nine pages was open last. Same reasoning as the view in the UI
+ * store: it belongs to this window, not to the settings the main process owns,
+ * and a name no longer in PAGES falls back rather than rendering nothing.
+ */
+const LAST_PAGE_KEY = 'ai-anywhere:last-settings-page';
+
+const storedPage = (): Page => {
+  const saved = localStorage.getItem(LAST_PAGE_KEY);
+  return PAGES.some((entry) => entry.name === saved) ? (saved as Page) : 'General';
+};
+
+/**
  * Settings shell. Every page reads the same React Query cache entry, so the
  * settings object is loaded once here and handed down — nine pages each
  * calling useSettings would work, but then nine of them also need the pending
  * and error branches.
  */
 export function SettingsLayout(): JSX.Element {
-  const [page, setPage] = useState<Page>('General');
+  const [page, setPage] = useState<Page>(storedPage);
   const [query, setQuery] = useState('');
   const settings = useSettings();
   const update = useUpdateSettings();
@@ -124,7 +136,10 @@ export function SettingsLayout(): JSX.Element {
                 key={name}
                 type="button"
                 aria-current={active ? 'page' : undefined}
-                onClick={() => setPage(name)}
+                onClick={() => {
+                  localStorage.setItem(LAST_PAGE_KEY, name);
+                  setPage(name);
+                }}
                 className={cn(
                   'flex w-full items-center gap-2.5 rounded-control px-2.5 py-1.5 text-left text-body',
                   'transition-colors duration-fast ease-calm',
@@ -142,7 +157,15 @@ export function SettingsLayout(): JSX.Element {
       </div>
 
       <div className="min-w-0 flex-1 overflow-y-auto">
-        {settings.isPending ? <p className="px-8 py-7 text-body text-fg-muted">Loading settings…</p> : null}
+        {settings.isPending ? (
+          // The page frame is already on screen, so the wait is drawn as the
+          // page it is about to become rather than as a line of grey text.
+          <div className="space-y-6 px-8 py-7">
+            <Skeleton className="h-7 w-52" />
+            <SkeletonText lines={3} />
+            <SkeletonText heading lines={2} />
+          </div>
+        ) : null}
         {settings.isError ? (
           <p className="px-8 py-7 text-body text-danger">{settings.error.message}</p>
         ) : null}

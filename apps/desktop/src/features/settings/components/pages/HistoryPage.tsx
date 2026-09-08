@@ -1,5 +1,5 @@
 import type { AppSettings } from '@ai-anywhere/shared';
-import { Badge, Button, EmptyState } from '@ai-anywhere/ui';
+import { Badge, Button, EmptyState, Skeleton, SkeletonText } from '@ai-anywhere/ui';
 import { Trash2 } from 'lucide-react';
 import { useClearHistory, useDeleteHistoryEntry, useHistory } from '../../../history/api/history.queries.js';
 import { Group, MutationStatus, NumberRow, Row, SettingsPage, ToggleRow } from '../fields.js';
@@ -52,7 +52,19 @@ export function HistoryPage({
       </Group>
 
       <Group title="Recent" description="The last 50 entries.">
-        {history.isPending ? <Row label="Loading…" /> : null}
+        {history.isPending
+          ? // Three placeholder rows shaped like the real ones: the list has a
+            // known layout, so it can be drawn before the data arrives.
+            [0, 1, 2].map((row) => (
+              <div key={row} className="px-4 py-3.5">
+                <div className="flex items-center justify-between gap-3">
+                  <Skeleton className="h-5 w-40" />
+                  <Skeleton className="h-3 w-28" />
+                </div>
+                <SkeletonText className="mt-2" lines={2} />
+              </div>
+            ))
+          : null}
         {history.isError ? <MutationStatus error={history.error} /> : null}
         {history.data?.length === 0 ? (
           <EmptyState

@@ -6,5 +6,6 @@ export * from './components/card.js';
 export * from './components/empty-state.js';
 export * from './components/input.js';
 export * from './components/kbd.js';
+export * from './components/loading.js';
 export * from './components/select.js';
 export * from './components/switch.js';

@@ -1,6 +1,10 @@
 import { join } from 'node:path';
-import { BrowserWindow, screen, shell } from 'electron';
+import { app, BrowserWindow, screen, shell } from 'electron';
 import type { AppEnv, CursorPoint, IpcEventContract, IpcEventName, Logger } from '@ai-anywhere/shared';
+import type { SettingsRepository } from '@ai-anywhere/database';
+import { isTrayActive } from '../services/tray.js';
+import { notify } from '../services/notify.js';
+import { fitToWorkArea } from './bounds.js';
 
 export interface WindowManager {
   /** Full settings/history window. */
@@ -11,6 +15,13 @@ export interface WindowManager {
    * the captured selection without racing the first paint.
    */
   showOverlayAt(point: CursorPoint): Promise<BrowserWindow>;
+  /**
+   * Build and load the popup while nothing is waiting on it. Without this the
+   * first hotkey press pays for the whole renderer boot (window + React +
+   * first paint) before the popup can be shown, which is the difference
+   * between a ~40ms popup and a ~600ms one.
+   */
+  prewarmOverlay(): void;
   isOverlayVisible(): boolean;
   /**
    * Grow or shrink the popup to fit its content, keeping its top-left corner
@@ -21,6 +32,12 @@ export interface WindowManager {
   hideOverlay(): void;
   /** Type-safe main -> renderer push to every live window. */
   broadcast<E extends IpcEventName>(event: E, payload: IpcEventContract[E]): void;
+  /**
+   * Same push, popup only. Token deltas arrive hundreds of times per answer
+   * and the settings window has no use for any of them; broadcasting them
+   * serialises every chunk twice.
+   */
+  sendToOverlay<E extends IpcEventName>(event: E, payload: IpcEventContract[E]): void;
   closeAll(): void;
 }
 
@@ -38,11 +55,70 @@ const OVERLAY_OFFSET = { x: 12, y: 16 } as const;
 
 const clamp = (value: number, min: number, max: number): number => Math.min(Math.max(value, min), max);
 
-export function createWindowManager(env: AppEnv, logger: Logger): WindowManager {
+export function createWindowManager(
+  env: AppEnv,
+  logger: Logger,
+  settings: SettingsRepository,
+): WindowManager {
   const scoped = logger.child('windows');
   let mainWindow: BrowserWindow | null = null;
   let overlayWindow: BrowserWindow | null = null;
   let overlayReady: Promise<void> = Promise.resolve();
+  /**
+   * Set by `before-quit`, which fires for every real exit — the tray's Quit
+   * item, `app:quit` from the About page, a session logout. Without it the
+   * close handler below would cancel the last close of a quit and leave the
+   * process alive with no windows.
+   */
+  let quitting = false;
+  /** The tray hint is a one-time explanation, not a notification per close. */
+  let trayHintShown = false;
+
+  app.on('before-quit', () => {
+    quitting = true;
+  });
+
+  const readSettings = () => {
+    const stored = settings.get();
+    return stored.ok ? stored.value : null;
+  };
+
+  /**
+   * Saved geometry, refitted to whichever display it now lands on. Returns
+   * nothing on a first run, so the defaults below stay in charge.
+   */
+  const restoredBounds = (): Partial<Electron.Rectangle> => {
+    const bounds = readSettings()?.windowBounds ?? null;
+    if (!bounds) return {};
+    return fitToWorkArea(bounds, screen.getDisplayMatching(bounds).workArea);
+  };
+
+  /**
+   * `getNormalBounds`, not `getBounds`: a maximized or minimized window
+   * reports the maximized rectangle, and restoring that would lose the size
+   * the user actually chose.
+   */
+  const rememberBounds = (window: BrowserWindow): void => {
+    if (window.isDestroyed()) return;
+    settings.update({ windowBounds: window.getNormalBounds() });
+  };
+
+  /**
+   * Closing or minimizing keeps the app alive in the tray, because the global
+   * hotkey is the product: quitting on a window close would take it away
+   * without saying so. Only ever when there is a tray to restore from —
+   * hiding the last window on a desktop with no tray host would leave the app
+   * running with no way back to it.
+   */
+  const hideToTray = (window: BrowserWindow): boolean => {
+    if (quitting || !isTrayActive() || readSettings()?.minimizeToTray !== true) return false;
+    window.hide();
+    if (!trayHintShown) {
+      trayHintShown = true;
+      notify('AI Anywhere is still running', 'The window is in the tray and your hotkey still works.');
+    }
+    return true;
+  };
 
   /** Same hardening for every window: no node in renderer, no popups. */
   const baseOptions = {
@@ -77,60 +153,94 @@ export function createWindowManager(env: AppEnv, logger: Logger): WindowManager 
     });
   };
 
+  /** Creates and loads the popup if it is not already alive. */
+  const ensureOverlay = (): BrowserWindow => {
+    if (overlayWindow && !overlayWindow.isDestroyed()) return overlayWindow;
+    const window = new BrowserWindow({
+      ...baseOptions,
+      ...OVERLAY_SIZE,
+      frame: false,
+      // Transparent so the popup's own rounded corners are what the user
+      // sees, instead of a square opaque frame behind them.
+      transparent: true,
+      backgroundColor: '#00000000',
+      resizable: false,
+      skipTaskbar: true,
+      alwaysOnTop: true,
+      // The popup is transient UI over another app's window; it must not
+      // become a second "app window" in the switcher or the taskbar.
+      minimizable: false,
+      maximizable: false,
+      fullscreenable: false,
+    });
+    harden(window);
+    overlayReady = new Promise((resolve) => {
+      window.webContents.once('did-finish-load', () => resolve());
+      window.webContents.once('did-fail-load', () => resolve());
+    });
+    window.on('closed', () => {
+      overlayWindow = null;
+    });
+    overlayWindow = window;
+    load(window, '/overlay');
+    return window;
+  };
+
   return {
     showMain() {
       if (mainWindow && !mainWindow.isDestroyed()) {
+        // show() alone leaves a minimized window minimized, which is exactly
+        // the state the tray and the second-instance handler get called in.
+        if (mainWindow.isMinimized()) mainWindow.restore();
         mainWindow.show();
         mainWindow.focus();
         return mainWindow;
       }
-      mainWindow = new BrowserWindow({
+      const window = new BrowserWindow({
         ...baseOptions,
         width: 1_040,
         height: 720,
         minWidth: 840,
         minHeight: 560,
+        // Native frame on purpose: it is the Fluent title bar on Windows 11
+        // and the GNOME/Adwaita header on Ubuntu, with the platform's own
+        // window controls, snap layouts and double-click-to-maximize for
+        // free. A custom title bar would reimplement all three, worse, twice.
         title: 'AI Anywhere',
+        ...restoredBounds(),
       });
-      harden(mainWindow);
-      mainWindow.on('ready-to-show', () => mainWindow?.show());
-      mainWindow.on('closed', () => {
+      mainWindow = window;
+      harden(window);
+      window.on('ready-to-show', () => window.show());
+      // 'resized'/'moved' fire once the gesture ends, unlike 'resize'/'move',
+      // so the geometry is written per drag rather than per frame.
+      window.on('resized', () => rememberBounds(window));
+      window.on('moved', () => rememberBounds(window));
+      window.on('minimize', () => {
+        // Nothing to remember here: a minimized window reports its normal
+        // bounds, which the resize/move handlers already stored.
+        hideToTray(window);
+      });
+      window.on('close', (event) => {
+        rememberBounds(window);
+        if (hideToTray(window)) event.preventDefault();
+      });
+      window.on('closed', () => {
         mainWindow = null;
+        // 'window-all-closed' never fires while the prewarmed overlay is
+        // alive, so closing the only visible window with minimize-to-tray off
+        // has to end the process itself.
+        if (!quitting) app.quit();
       });
-      load(mainWindow, '/');
+      load(window, '/');
       scoped.info('main window created');
-      return mainWindow;
+      return window;
+    },
+    prewarmOverlay() {
+      ensureOverlay();
     },
     async showOverlayAt(point) {
-      if (!overlayWindow || overlayWindow.isDestroyed()) {
-        overlayWindow = new BrowserWindow({
-          ...baseOptions,
-          ...OVERLAY_SIZE,
-          frame: false,
-          // Transparent so the popup's own rounded corners are what the user
-          // sees, instead of a square opaque frame behind them.
-          transparent: true,
-          backgroundColor: '#00000000',
-          resizable: false,
-          skipTaskbar: true,
-          alwaysOnTop: true,
-          // The popup is transient UI over another app's window; it must not
-          // become a second "app window" in the switcher or the taskbar.
-          minimizable: false,
-          maximizable: false,
-          fullscreenable: false,
-        });
-        harden(overlayWindow);
-        const window = overlayWindow;
-        overlayReady = new Promise((resolve) => {
-          window.webContents.once('did-finish-load', () => resolve());
-          window.webContents.once('did-fail-load', () => resolve());
-        });
-        overlayWindow.on('closed', () => {
-          overlayWindow = null;
-        });
-        load(overlayWindow, '/overlay');
-      }
+      const overlay = ensureOverlay();
 
       // Wait for the renderer before showing: on the very first press the
       // window exists but has painted nothing, and showing it early flashes an
@@ -141,14 +251,14 @@ export function createWindowManager(env: AppEnv, logger: Logger): WindowManager 
       // on, so a selection near a screen edge does not open a half-offscreen
       // window — and so a second monitor is handled without special cases.
       const { workArea } = screen.getDisplayNearestPoint(point);
-      overlayWindow.setBounds({
+      overlay.setBounds({
         x: clamp(point.x + OVERLAY_OFFSET.x, workArea.x, workArea.x + workArea.width - OVERLAY_SIZE.width),
         y: clamp(point.y + OVERLAY_OFFSET.y, workArea.y, workArea.y + workArea.height - OVERLAY_SIZE.height),
         ...OVERLAY_SIZE,
       });
-      overlayWindow.show();
-      overlayWindow.focus();
-      return overlayWindow;
+      overlay.show();
+      overlay.focus();
+      return overlay;
     },
     isOverlayVisible() {
       return Boolean(overlayWindow && !overlayWindow.isDestroyed() && overlayWindow.isVisible());
@@ -176,6 +286,9 @@ export function createWindowManager(env: AppEnv, logger: Logger): WindowManager 
       for (const window of BrowserWindow.getAllWindows()) {
         window.webContents.send(event, payload);
       }
+    },
+    sendToOverlay(event, payload) {
+      if (overlayWindow && !overlayWindow.isDestroyed()) overlayWindow.webContents.send(event, payload);
     },
     closeAll() {
       for (const window of BrowserWindow.getAllWindows()) window.destroy();

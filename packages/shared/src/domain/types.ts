@@ -179,6 +179,17 @@ export interface CursorPoint {
 }
 
 /**
+ * Last known main-window geometry. Restored on the next launch so the app
+ * reopens where the user left it rather than jumping back to a default size.
+ */
+export interface WindowBounds {
+  readonly x: number;
+  readonly y: number;
+  readonly width: number;
+  readonly height: number;
+}
+
+/**
  * Accent choices. A closed list rather than a free hex value: every accent has
  * to clear contrast against both themes, and a picker that lets someone choose
  * yellow-on-white ships an unreadable UI. The names map to `[data-accent]`
@@ -237,6 +248,14 @@ export interface AppSettings {
    * setup on a machine that is already configured.
    */
   readonly onboardingCompleted: boolean;
+  /**
+   * On by default: the hotkey is the product, and quitting on a window close
+   * would silently take it away. Closing or minimizing the window leaves the
+   * app running in the tray; Quit in the tray menu is the way out.
+   */
+  readonly minimizeToTray: boolean;
+  /** Null until the window has been moved or resized once. */
+  readonly windowBounds: WindowBounds | null;
 }
 
 export interface HistoryEntry {

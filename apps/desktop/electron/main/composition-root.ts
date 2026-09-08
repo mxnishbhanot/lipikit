@@ -67,8 +67,6 @@ export function buildContainer(env: AppEnv): Container {
 
   registerPlatformServices(container, createPlatformServices(logger, { inputSettleMs: env.inputSettleMs }));
 
-  container.register(WINDOW_MANAGER, (c) => createWindowManager(c.resolve(ENV), c.resolve(LOGGER)));
-
   container.register(DATABASE, (c) =>
     openDatabase({
       file: join(app.getPath('userData'), c.resolve(ENV).databaseFileName),
@@ -76,6 +74,12 @@ export function buildContainer(env: AppEnv): Container {
     }),
   );
   container.register(SETTINGS_REPOSITORY, (c) => createSettingsRepository(c.resolve(DATABASE)));
+  // Registered after the settings repository it reads: the main window
+  // restores its own geometry and consults the minimize-to-tray preference,
+  // so window state is one store rather than a second file beside the DB.
+  container.register(WINDOW_MANAGER, (c) =>
+    createWindowManager(c.resolve(ENV), c.resolve(LOGGER), c.resolve(SETTINGS_REPOSITORY)),
+  );
   container.register(HISTORY_REPOSITORY, (c) => createHistoryRepository(c.resolve(DATABASE)));
   container.register(PROMPT_REPOSITORY, (c) => createPromptRepository(c.resolve(DATABASE)));
   container.register(CLIPBOARD_REPOSITORY, (c) => createClipboardRepository(c.resolve(DATABASE)));

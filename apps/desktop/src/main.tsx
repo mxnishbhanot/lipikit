@@ -1,8 +1,6 @@
-import { StrictMode } from 'react';
+import { StrictMode, Suspense, lazy } from 'react';
 import { createRoot } from 'react-dom/client';
-import { App } from './app/App.js';
 import { AppProviders } from './app/AppProviders.js';
-import { Overlay } from './features/overlay/components/Overlay.js';
 // Bundled, not fetched: the renderer has no network access to a font CDN and
 // a missing webfont would fall back mid-session.
 import '@fontsource-variable/inter';
@@ -21,8 +19,22 @@ const isOverlay = window.location.hash.startsWith('#/overlay');
 // opaque body would paint a square behind them.
 document.body.classList.toggle('overlay', isOverlay);
 
+/**
+ * Split, not statically imported: each window loads one of these two screens
+ * and never the other, so the popup has no reason to parse the settings tree
+ * (or settings the popup's markdown renderer) before it can paint.
+ */
+const Screen = isOverlay
+  ? lazy(async () => ({ default: (await import('./features/overlay/components/Overlay.js')).Overlay }))
+  : lazy(async () => ({ default: (await import('./app/App.js')).App }));
+
 createRoot(container).render(
   <StrictMode>
-    <AppProviders>{isOverlay ? <Overlay /> : <App />}</AppProviders>
+    <AppProviders>
+      {/* The chunk is local and already on disk; a spinner here would flash. */}
+      <Suspense fallback={<div className="h-screen bg-background" />}>
+        <Screen />
+      </Suspense>
+    </AppProviders>
   </StrictMode>,
 );

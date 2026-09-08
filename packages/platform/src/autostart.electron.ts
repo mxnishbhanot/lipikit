@@ -6,6 +6,12 @@ import { appError, err, ok } from '@ai-anywhere/shared';
 import type { AutostartService, PlatformInfo } from './contracts.js';
 
 /**
+ * Read back in main: a login launch starts in the tray instead of opening the
+ * settings window over whatever the user is doing at login.
+ */
+const HIDDEN_FLAG = '--hidden';
+
+/**
  * Windows: Electron writes the Run registry key.
  * Linux: setLoginItemSettings is a no-op there, so the XDG autostart spec is
  * the mechanism — a .desktop file in $XDG_CONFIG_HOME/autostart, which every
@@ -21,7 +27,7 @@ export function createElectronAutostartService(info: PlatformInfo): AutostartSer
    * no app: autostart is only offered once packaged.
    */
   const launchCommand = (): string =>
-    app.isPackaged ? `"${process.env['APPIMAGE'] ?? app.getPath('exe')}"` : '';
+    app.isPackaged ? `"${process.env['APPIMAGE'] ?? app.getPath('exe')}" ${HIDDEN_FLAG}` : '';
 
   return {
     async isEnabled() {
@@ -30,7 +36,11 @@ export function createElectronAutostartService(info: PlatformInfo): AutostartSer
     },
     async setEnabled(enabled) {
       if (info.platform === 'win32') {
-        app.setLoginItemSettings({ openAtLogin: enabled, path: app.getPath('exe') });
+        app.setLoginItemSettings({
+          openAtLogin: enabled,
+          path: app.getPath('exe'),
+          args: [HIDDEN_FLAG],
+        });
         return ok(undefined);
       }
       try {

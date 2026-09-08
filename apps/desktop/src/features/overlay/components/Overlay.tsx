@@ -1,6 +1,18 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Badge, Button, EmptyState, Kbd, cn, scaleIn, slideUp } from '@ai-anywhere/ui';
+import {
+  Badge,
+  Button,
+  EmptyState,
+  Kbd,
+  SkeletonText,
+  StreamCaret,
+  ThinkingIndicator,
+  cn,
+  loadingPulse,
+  popup,
+  slideUp,
+} from '@ai-anywhere/ui';
 import {
   ArrowLeft,
   Check,
@@ -46,7 +58,12 @@ import { useCustomPrompts } from '../../prompts/api/prompts.queries.js';
 import { useCommandPrefs } from '../use-command-prefs.js';
 import { CommandPalette } from './CommandPalette.js';
 import { AnalysisChips, ClientReply } from './ClientReply.js';
-import { ResponseMarkdown } from './ResponseMarkdown.js';
+// react-markdown + highlight.js are the heaviest thing the popup can show and
+// nothing is markdown until an answer arrives, so they load on the first
+// answer instead of on every hotkey press.
+const ResponseMarkdown = lazy(async () => ({
+  default: (await import('./ResponseMarkdown.js')).ResponseMarkdown,
+}));
 
 /** What was last run, so Retry needs no re-pick and no re-typing. */
 interface LastRun {
@@ -326,7 +343,7 @@ export function Overlay(): JSX.Element {
   return (
     <motion.div
       ref={shellRef}
-      variants={scaleIn}
+      variants={popup}
       initial="hidden"
       animate="visible"
       // Grows from the cursor: the popup opens where the caret was.
@@ -487,22 +504,27 @@ export function Overlay(): JSX.Element {
                 className="min-h-[12rem] flex-1 overflow-y-auto rounded-card border border-border bg-surface p-3"
               >
                 {output.length > 0 ? (
-                  <ResponseMarkdown content={output} />
+                  // Plain text while the markdown chunk loads: the first
+                  // tokens stay readable instead of blanking the panel.
+                  <Suspense fallback={<p className="whitespace-pre-wrap text-body">{output}</p>}>
+                    <ResponseMarkdown content={output} />
+                  </Suspense>
                 ) : ai.error && !busy ? (
                   // The provider's own message is the description: "that did
                   // not go through" alone is not something anyone can act on.
                   <EmptyState kind="error" size="sm" description={ai.error.message} />
+                ) : busy ? (
+                  // Before the first token there is nothing to stream, so the
+                  // box shows the shape an answer will take rather than an
+                  // empty panel with a caret blinking in the corner.
+                  <div className="space-y-3">
+                    <ThinkingIndicator phase="thinking" />
+                    <SkeletonText lines={4} />
+                  </div>
                 ) : (
-                  <p className="text-body-lg text-fg-muted">
-                    {busy ? 'Thinking…' : 'The model returned nothing.'}
-                  </p>
+                  <p className="text-body-lg text-fg-muted">The model returned nothing.</p>
                 )}
-                {busy ? (
-                  <span
-                    className="ml-0.5 inline-block h-4 w-2 translate-y-0.5 animate-pulse rounded-[2px] bg-accent"
-                    aria-hidden
-                  />
-                ) : null}
+                {busy && output.length > 0 ? <StreamCaret /> : null}
               </div>
             )}
           </motion.div>
@@ -689,7 +711,12 @@ function Latency({ busy, ms }: { readonly busy: boolean; readonly ms: number | n
   if (busy) {
     return (
       <span className="flex shrink-0 items-center gap-1.5 text-caption text-fg-muted" role="status">
-        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" aria-hidden />
+        <motion.span
+          variants={loadingPulse}
+          animate="visible"
+          className="h-1.5 w-1.5 rounded-full bg-accent"
+          aria-hidden
+        />
         running
       </span>
     );

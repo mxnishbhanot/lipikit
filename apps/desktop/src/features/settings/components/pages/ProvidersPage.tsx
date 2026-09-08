@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Badge, Button, Input, Switch, cn } from '@ai-anywhere/ui';
+import { Badge, Button, Input, Spinner, Switch, cn } from '@ai-anywhere/ui';
 import type { AppSettings, ProviderDescriptor, ProviderId } from '@ai-anywhere/shared';
-import { Check, ExternalLink, KeyRound, Loader2, Plug, Trash2 } from 'lucide-react';
+import { Check, ExternalLink, KeyRound, Plug, Trash2 } from 'lucide-react';
 import {
   useDeleteApiKey,
   useHasApiKey,
@@ -115,11 +115,7 @@ function ProviderCard({
                   save.mutate({ providerId: descriptor.id, apiKey }, { onSuccess: () => setApiKey('') });
                 }}
               >
-                {save.isPending ? (
-                  <Loader2 aria-hidden className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <KeyRound aria-hidden className="h-3.5 w-3.5" />
-                )}
+                {save.isPending ? <Spinner size="sm" /> : <KeyRound aria-hidden className="h-3.5 w-3.5" />}
                 {save.isPending ? 'Checking…' : 'Save'}
               </Button>
               {hasKey.data ? (

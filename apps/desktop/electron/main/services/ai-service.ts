@@ -113,7 +113,7 @@ export function createAiService(deps: AiServiceDeps): AiService {
           const parts: string[] = [];
           for await (const chunk of provider.value.streamText(call)) {
             parts.push(chunk.delta);
-            deps.windows.broadcast(IPC_EVENTS.aiDelta, {
+            deps.windows.sendToOverlay(IPC_EVENTS.aiDelta, {
               requestId: request.requestId,
               delta: chunk.delta,
             });

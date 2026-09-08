@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { app, BrowserWindow, dialog } from 'electron';
+import { app, BrowserWindow, dialog, nativeTheme } from 'electron';
 import {
   appError,
   err,
@@ -103,6 +103,9 @@ export function createIpcHandlers(container: Container): IpcHandlerMap {
         const bind = bindGlobalHotkey(container, result.value.clientReplyHotkey, 'client-reply');
         if (!bind.ok) return err(bind.error);
       }
+      // The title bar and the caption buttons belong to the OS, so the theme
+      // has to be pushed there as well as to the renderer.
+      if (patch.theme !== undefined) nativeTheme.themeSource = result.value.theme;
       if (patch.launchAtLogin !== undefined) {
         // Reported back as an error, not swallowed: on Linux this is a file in
         // ~/.config/autostart that can genuinely fail to be written, and a
@@ -167,6 +170,7 @@ export function createIpcHandlers(container: Container): IpcHandlerMap {
       // settings:update would have re-applied has to be re-applied here too.
       bindGlobalHotkey(container, applied.value.globalHotkey, 'palette');
       bindGlobalHotkey(container, applied.value.clientReplyHotkey, 'client-reply');
+      nativeTheme.themeSource = applied.value.theme;
       resyncPromptHotkeys();
       refreshBaseUrls();
       container.resolve(CLIPBOARD_MONITOR).sync();

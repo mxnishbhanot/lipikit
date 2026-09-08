@@ -10,6 +10,10 @@ directories:
 files:
   - out/**/*
   - package.json
+  # The tray reads these at runtime, so they have to be inside the app bundle
+  # and not only in buildResources, which the packager consumes and drops.
+  - build/icon.ico
+  - build/icons/32x32.png
 # better-sqlite3 ships a .node binary; dlopen cannot read it from inside asar.
 # The pattern is anchored, not '**/node_modules/...': a leading '**' makes the
 # packager walk the workspace symlinks it was just told to skip.
@@ -64,6 +68,10 @@ deb:
   # linked .so and puts it in Depends already.
   recommends:
     - xdotool
+    # The tray needs a StatusNotifierItem host. Ubuntu's GNOME session has one
+    # only via this library plus the AppIndicator extension, and the app runs
+    # fine without a tray, so this is recommended and not a hard dependency.
+    - libayatana-appindicator3-1
 # Artifacts are uploaded by the release workflow with `gh release`, so
 # electron-builder needs no publishing credentials of its own.
 publish: null

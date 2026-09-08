@@ -44,6 +44,15 @@ export function GeneralPage({
         />
       </Group>
 
+      <Group title="Window">
+        <ToggleRow
+          label="Keep running in the tray"
+          hint="Closing or minimizing the window leaves AI Anywhere in the tray so the hotkey keeps working. Off means closing the window quits the app."
+          checked={settings.minimizeToTray}
+          onChange={(minimizeToTray) => patch({ minimizeToTray })}
+        />
+      </Group>
+
       <Group title="Startup">
         <ToggleRow
           label="Launch at login"

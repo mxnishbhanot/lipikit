@@ -43,21 +43,37 @@ export function useGenerate(): {
   // A ref, not state: the event listener must see the current id without
   // being torn down and re-subscribed on every request.
   const requestId = useRef<string | null>(null);
+  const buffered = useRef('');
+  const frame = useRef(0);
 
-  useEffect(
-    () =>
-      ipcOn(IPC_EVENTS.aiDelta, (event) => {
-        // Late deltas from a cancelled call must not land in the new answer.
-        if (event.requestId !== requestId.current) return;
-        setOutput((previous) => previous + event.delta);
-      }),
-    [],
-  );
+  useEffect(() => {
+    // A fast model sends hundreds of deltas a second and each one would
+    // otherwise re-render the popup and re-parse the whole answer as markdown.
+    // Buffering to one flush per frame caps that at the refresh rate.
+    const flush = (): void => {
+      frame.current = 0;
+      const pending = buffered.current;
+      if (pending.length === 0) return;
+      buffered.current = '';
+      setOutput((previous) => previous + pending);
+    };
+    const unsubscribe = ipcOn(IPC_EVENTS.aiDelta, (event) => {
+      // Late deltas from a cancelled call must not land in the new answer.
+      if (event.requestId !== requestId.current) return;
+      buffered.current += event.delta;
+      if (frame.current === 0) frame.current = requestAnimationFrame(flush);
+    });
+    return () => {
+      unsubscribe();
+      if (frame.current !== 0) cancelAnimationFrame(frame.current);
+    };
+  }, []);
 
   const mutation = useMutation({
     mutationFn: async (input: RunActionInput) => {
       const id = crypto.randomUUID();
       requestId.current = id;
+      buffered.current = '';
       setOutput('');
       const request: GenerateRequest = {
         requestId: id,
@@ -90,6 +106,7 @@ export function useGenerate(): {
     void ipcInvoke(IPC.ai.cancel, { requestId: id });
   }, []);
   const reset = useCallback(() => {
+    buffered.current = '';
     setOutput('');
     resetMutation();
   }, [resetMutation]);

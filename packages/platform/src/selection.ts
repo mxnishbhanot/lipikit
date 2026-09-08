@@ -25,8 +25,13 @@ export interface SelectionDeps {
   readonly timing: SelectionTiming;
 }
 
-/** Poll rather than sleep once: fast apps answer immediately, slow ones get time. */
-const POLL_ATTEMPTS = 4;
+/**
+ * Poll rather than sleep once: fast apps answer immediately, slow ones get
+ * time. The waits escalate as fractions of settleMs so a local editor that
+ * answers in ~15ms is not held for the full calibration wait, while a slow
+ * app still gets the same total budget it had before (4x settleMs).
+ */
+const POLL_FRACTIONS = [0.125, 0.375, 1, 2.5] as const;
 
 /**
  * Copy-out. The sequence matters and every step is there for a reason:
@@ -80,8 +85,9 @@ export function createSelectionService(deps: SelectionDeps): SelectionService {
       }
 
       let text = '';
-      for (let attempt = 0; attempt < POLL_ATTEMPTS && text.length === 0; attempt += 1) {
-        await delay(deps.timing.settleMs);
+      for (const [attempt, fraction] of POLL_FRACTIONS.entries()) {
+        if (text.length > 0) break;
+        await delay(Math.max(1, Math.round(deps.timing.settleMs * fraction)));
         try {
           text = await deps.clipboard.readText();
         } catch (cause) {

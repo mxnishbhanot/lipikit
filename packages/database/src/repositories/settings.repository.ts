@@ -1,4 +1,4 @@
-import { ACCENT_COLORS, appError, err, ok, type AppSettings } from '@ai-anywhere/shared';
+import { ACCENT_COLORS, appError, err, ok, type AppSettings, type WindowBounds } from '@ai-anywhere/shared';
 import type { DatabaseHandle } from '../connection.js';
 import type { SettingsRepository } from '../contracts.js';
 
@@ -24,7 +24,19 @@ export const DEFAULT_SETTINGS: AppSettings = {
   clipboardHistoryLimit: 50,
   conversationMemoryEnabled: false,
   onboardingCompleted: false,
+  minimizeToTray: true,
+  windowBounds: null,
 };
+
+/**
+ * Window geometry is written by main, but `settings:update` is a renderer
+ * channel: a NaN or a string here would be handed straight to setBounds and
+ * throw on the next launch, so a malformed value is dropped rather than saved.
+ */
+const validBounds = (bounds: WindowBounds): boolean =>
+  (['x', 'y', 'width', 'height'] as const).every((key) => Number.isFinite(bounds[key])) &&
+  bounds.width > 0 &&
+  bounds.height > 0;
 
 const clamp = (value: number | undefined, min: number, max: number, round: boolean): number | undefined => {
   if (value === undefined || !Number.isFinite(value)) return undefined;
@@ -47,6 +59,7 @@ const sanitize = (patch: Partial<AppSettings>): Partial<AppSettings> => {
     clipboardHistoryLimit,
     globalHotkey,
     accentColor,
+    windowBounds,
     ...rest
   } = patch;
   const bounded = {
@@ -58,6 +71,10 @@ const sanitize = (patch: Partial<AppSettings>): Partial<AppSettings> => {
   };
   return {
     ...rest,
+    // undefined means "not in this patch"; null means "forget the geometry".
+    ...(windowBounds !== undefined && (windowBounds === null || validBounds(windowBounds))
+      ? { windowBounds }
+      : {}),
     // An accent name the renderer made up would write a `[data-accent]` value
     // no stylesheet answers, leaving the UI with no accent at all.
     ...(accentColor !== undefined && ACCENT_COLORS.includes(accentColor) ? { accentColor } : {}),

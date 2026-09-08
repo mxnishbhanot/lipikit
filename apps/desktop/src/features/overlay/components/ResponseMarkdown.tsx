@@ -2,9 +2,42 @@ import { memo, useState, type ReactNode } from 'react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
+import bash from 'highlight.js/lib/languages/bash';
+import css from 'highlight.js/lib/languages/css';
+import go from 'highlight.js/lib/languages/go';
+import java from 'highlight.js/lib/languages/java';
+import json from 'highlight.js/lib/languages/json';
+import markdown from 'highlight.js/lib/languages/markdown';
+import python from 'highlight.js/lib/languages/python';
+import rust from 'highlight.js/lib/languages/rust';
+import sql from 'highlight.js/lib/languages/sql';
+import typescript from 'highlight.js/lib/languages/typescript';
+import xml from 'highlight.js/lib/languages/xml';
+import yaml from 'highlight.js/lib/languages/yaml';
 import { Check, Copy } from 'lucide-react';
 import { cn } from '@ai-anywhere/ui';
 import { balanceFences, readCodeBlock } from './markdown-source.js';
+
+/**
+ * An explicit language set instead of highlight.js's "common" default: the
+ * default registers ~190 grammars and is 700kB of the popup's bundle on its
+ * own. Anything not listed still renders, just unhighlighted.
+ */
+const LANGUAGES = {
+  bash,
+  css,
+  go,
+  java,
+  javascript: typescript,
+  json,
+  markdown,
+  python,
+  rust,
+  sql,
+  typescript,
+  xml,
+  yaml,
+} as const;
 
 /** Copy-to-clipboard control shared by the code block and its mermaid variant. */
 function CopyButton({
@@ -90,7 +123,7 @@ export const ResponseMarkdown = memo(function ResponseMarkdown({
         // `ignoreMissing` so a fence tagged with a language highlight.js does
         // not know renders as plain code instead of throwing the whole answer
         // away.
-        rehypePlugins={[[rehypeHighlight, { detect: true, ignoreMissing: true }]]}
+        rehypePlugins={[[rehypeHighlight, { detect: true, ignoreMissing: true, languages: LANGUAGES }]]}
         components={{
           pre: ({ children }) => <CodeBlock>{children}</CodeBlock>,
           // Wide tables scroll inside the answer rather than widening the popup.

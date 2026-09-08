@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { EmptyState, Input, Kbd, cn, fade, slideUp } from '@ai-anywhere/ui';
+import { EmptyState, Input, Kbd, cn, listContainer, listItem, slideUp } from '@ai-anywhere/ui';
 import {
   Braces,
   Clock,
@@ -248,10 +248,16 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
 
   return (
     <>
-      <div
+      <motion.div
         id="command-list"
         role="listbox"
         aria-label="Commands"
+        // The container owns the stagger; each section only says how one row
+        // enters. Sections below inherit `visible` from here, so filtering the
+        // list re-runs the stagger without any of them tracking an index.
+        variants={listContainer}
+        initial="hidden"
+        animate="visible"
         className="max-h-[26rem] flex-1 overflow-y-auto px-2 pb-2 pt-1"
       >
         {flat.length === 0 ? (
@@ -264,7 +270,7 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
           {sections.map((section) => {
             const Icon = iconFor(section.title);
             return (
-              <motion.div key={section.title} variants={fade} initial="hidden" animate="visible" exit="exit">
+              <motion.div key={section.title} variants={listItem} exit="exit">
                 <p className="flex items-center gap-1.5 px-3 pb-1 pt-2.5 text-[11px] font-medium uppercase tracking-wider text-fg-muted">
                   <Icon className="h-3 w-3" />
                   {section.title}
@@ -334,7 +340,7 @@ export function CommandPalette(props: CommandPaletteProps): JSX.Element {
             );
           })}
         </AnimatePresence>
-      </div>
+      </motion.div>
       {teachFavorites ? (
         <EmptyState
           kind="no-favorites"

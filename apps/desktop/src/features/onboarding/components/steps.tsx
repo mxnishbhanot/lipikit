@@ -1,6 +1,16 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Badge, Button, Input, Kbd, cn } from '@ai-anywhere/ui';
+import {
+  Badge,
+  Button,
+  Input,
+  Kbd,
+  SkeletonText,
+  Spinner,
+  StreamCaret,
+  ThinkingIndicator,
+  cn,
+} from '@ai-anywhere/ui';
 import type { Platform, ProviderDescriptor, ProviderId } from '@ai-anywhere/shared';
 import {
   AlertTriangle,
@@ -8,7 +18,6 @@ import {
   ClipboardCheck,
   ExternalLink,
   Keyboard,
-  Loader2,
   MonitorSmartphone,
   Sparkles,
   Wand2,
@@ -264,7 +273,7 @@ export function ApiKeyStep({
               disabled={apiKey.trim().length === 0 || save.isPending}
               onClick={() => save.mutate({ providerId: descriptor.id, apiKey }, { onSuccess: onValidated })}
             >
-              {save.isPending ? <Loader2 aria-hidden className="h-4 w-4 animate-spin" /> : null}
+              {save.isPending ? <Spinner /> : null}
               {save.isPending ? 'Validating…' : 'Validate'}
             </Button>
           </div>
@@ -338,7 +347,7 @@ function CapabilityRow({
     <div className="flex items-start gap-3 px-4 py-3.5">
       <span className="mt-0.5 shrink-0">
         {pending ? (
-          <Loader2 aria-hidden className="h-4 w-4 animate-spin text-fg-muted" />
+          <Spinner className="text-fg-muted" />
         ) : ok ? (
           <Check aria-hidden className="h-4 w-4 text-success" />
         ) : (
@@ -461,7 +470,7 @@ export function DemoStep({ model }: { model: string | null }): JSX.Element {
               });
             }}
           >
-            {generate.isPending ? <Loader2 aria-hidden className="h-4 w-4 animate-spin" /> : null}
+            {generate.isPending ? <Spinner /> : null}
             {generate.isPending ? 'Rewriting…' : hasRun ? 'Rewrite again' : 'Rewrite with AI'}
           </Button>
           {generate.isPending ? (
@@ -482,10 +491,17 @@ export function DemoStep({ model }: { model: string | null }): JSX.Element {
         {hasRun ? (
           <div className="rounded-card border border-accent/40 bg-accent-subtle/40 p-4">
             <p className="mb-1 text-caption font-medium text-accent">Rewritten</p>
-            <p className="whitespace-pre-wrap text-body-lg leading-relaxed text-fg-primary">
-              {generate.output}
-              {generate.isPending ? <span className="animate-pulse">▍</span> : null}
-            </p>
+            {generate.output.length === 0 ? (
+              <div className="space-y-3">
+                <ThinkingIndicator phase="thinking" />
+                <SkeletonText lines={2} />
+              </div>
+            ) : (
+              <p className="whitespace-pre-wrap text-body-lg leading-relaxed text-fg-primary">
+                {generate.output}
+                {generate.isPending ? <StreamCaret /> : null}
+              </p>
+            )}
           </div>
         ) : null}
       </div>

@@ -82,6 +82,7 @@ export function createSelectionFlow(deps: SelectionFlowDeps): SelectionFlow {
       }
       inFlight = true;
       try {
+        const startedAt = Date.now();
         const point = deps.cursor.getCursorPoint();
         // Both must run before the overlay is shown, because showing it makes
         // *us* the foreground window and the answer would then be "AI
@@ -92,6 +93,9 @@ export function createSelectionFlow(deps: SelectionFlowDeps): SelectionFlow {
           deps.context.detect(),
         ]);
         await deps.windows.showOverlayAt(point);
+        // The number the popup target is measured against: hotkey press to a
+        // visible window, capture included.
+        scoped.debug('overlay shown', { ms: Date.now() - startedAt });
         currentMode = press.mode;
         // Broadcast after the window exists: on the very first press there is
         // no renderer yet, so announcing the mode any earlier reaches nobody.
