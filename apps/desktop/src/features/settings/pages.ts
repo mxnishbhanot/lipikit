@@ -4,6 +4,7 @@ import {
   Info,
   KeyRound,
   Keyboard,
+  MessageSquareWarning,
   Palette,
   Settings2,
   ShieldCheck,
@@ -12,13 +13,13 @@ import {
 } from 'lucide-react';
 
 /**
- * The nine settings pages. This lives outside the layout because three things
+ * The ten settings pages. This lives outside the layout because three things
  * need it now: the sidebar, the command palette, and the UI store's validation
  * of the page it remembered — a copy in any of them is a list that goes stale.
  *
  * `keywords` is what makes the search box worth having: someone looking for
- * "api key" or "telemetry" does not know which of nine pages owns it, and a
- * filter that only matched the nine titles would tell them nothing they cannot
+ * "api key" or "telemetry" does not know which of ten pages owns it, and a
+ * filter that only matched the ten titles would tell them nothing they cannot
  * already see in the sidebar.
  */
 export const SETTINGS_PAGES = [
@@ -34,6 +35,11 @@ export const SETTINGS_PAGES = [
   { name: 'Prompt Templates', icon: Sparkles, keywords: 'prompts custom template variables' },
   { name: 'History', icon: Clock, keywords: 'history retention entries delete log' },
   { name: 'Privacy', icon: ShieldCheck, keywords: 'clipboard telemetry memory delete data' },
+  {
+    name: 'Feedback',
+    icon: MessageSquareWarning,
+    keywords: 'bug report feature request issue github logs diagnostics screenshot support beta',
+  },
   { name: 'About', icon: Info, keywords: 'version build platform capabilities quit' },
 ] as const satisfies readonly { name: string; icon: LucideIcon; keywords: string }[];
 

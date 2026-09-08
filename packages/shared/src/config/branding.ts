@@ -17,6 +17,8 @@ export interface Branding {
   readonly tagline: string;
   readonly website: string;
   readonly supportEmail: string;
+  /** Where bug reports and feature requests go; the Feedback page links here. */
+  readonly issuesUrl: string;
   /**
    * Marketing version for the splash screen and About page. The packaged
    * build's real version comes from `app.getVersion()` over IPC; this is the
@@ -31,7 +33,8 @@ export const BRANDING: Branding = {
   tagline: 'AI writing assistant available anywhere via a global hotkey',
   website: 'https://example.invalid/ai-anywhere',
   supportEmail: 'support@example.invalid',
+  issuesUrl: 'https://example.invalid/ai-anywhere/issues',
   version: '1.0.0',
 };
 
-export const { appName, shortName, tagline, website, supportEmail, version } = BRANDING;
+export const { appName, shortName, tagline, website, supportEmail, issuesUrl, version } = BRANDING;

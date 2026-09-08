@@ -163,6 +163,11 @@ export interface IpcContract {
   [IPC.overlay.resize]: { request: { height: number }; response: Result<void> };
   [IPC.overlay.openSettings]: { request: void; response: Result<void> };
 
+  [IPC.feedback.diagnostics]: { request: void; response: Result<string> };
+  /** Null means the user cancelled the dialog; the string is the path written. */
+  [IPC.feedback.exportLogs]: { request: void; response: Result<string | null> };
+  [IPC.feedback.screenshot]: { request: void; response: Result<string | null> };
+
   [IPC.app.getInfo]: { request: void; response: Result<AppInfo> };
   [IPC.app.quit]: { request: void; response: Result<void> };
 }

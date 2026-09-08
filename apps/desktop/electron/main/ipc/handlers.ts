@@ -8,6 +8,7 @@ import {
   IPC,
   IPC_EVENTS,
   ok,
+  recentLogLines,
   type Container,
   type IpcHandlerMap,
   type Platform,
@@ -281,6 +282,78 @@ export function createIpcHandlers(container: Container): IpcHandlerMap {
       // the user asked for rather than leaving them to click again.
       windows().broadcast(IPC_EVENTS.navigate, { view: 'settings' });
       return ok(undefined);
+    },
+
+    /**
+     * Everything a bug report needs about this machine and nothing it does
+     * not: no API keys, no history, no clipboard, no text the user rewrote.
+     */
+    [IPC.feedback.diagnostics]: async () => {
+      const stored = settings().get();
+      const caps = await platform().capabilities();
+      const enabled = providerSettings().list();
+      const lines = [
+        `App: ${app.getName()} ${app.getVersion()} (${app.isPackaged ? 'packaged' : 'development'})`,
+        `Electron: ${process.versions.electron} · Chrome: ${process.versions.chrome} · Node: ${process.versions.node}`,
+        `OS: ${process.platform} ${process.arch} ${process.getSystemVersion?.() ?? ''}`.trim(),
+        `Display server: ${caps.displayServer ?? 'n/a'}`,
+        `Clipboard backend: ${caps.clipboardBackend} · Keystroke backend: ${caps.keystrokeBackend}`,
+        `Capture selection: ${caps.canCaptureSelection} · Replace text: ${caps.canReplaceText}`,
+        `Providers enabled: ${
+          enabled.ok
+            ? enabled.value
+                .filter((entry) => entry.enabled)
+                .map((entry) => entry.providerId)
+                .join(', ') || 'none'
+            : 'unknown'
+        }`,
+        stored.ok
+          ? `Settings: provider=${stored.value.defaultProvider} model=${stored.value.defaultModel} streaming=${stored.value.streamingEnabled} history=${stored.value.historyEnabled} clipboard=${stored.value.clipboardHistoryEnabled} theme=${stored.value.theme}`
+          : 'Settings: unreadable',
+      ];
+      return ok(lines.join('\n'));
+    },
+
+    [IPC.feedback.exportLogs]: async () => {
+      const parent = focused();
+      const options = {
+        title: 'Export logs',
+        defaultPath: join(app.getPath('documents'), 'ai-anywhere-logs.txt'),
+        filters: [{ name: 'Text', extensions: ['txt', 'log'] }],
+      };
+      const chosen = await (parent ? dialog.showSaveDialog(parent, options) : dialog.showSaveDialog(options));
+      if (chosen.canceled || !chosen.filePath) return ok(null);
+      try {
+        await writeFile(chosen.filePath, `${recentLogLines().join('\n')}\n`, 'utf8');
+        return ok(chosen.filePath);
+      } catch (cause) {
+        return err(appError('UNKNOWN', 'Could not write the log file', cause));
+      }
+    },
+
+    /**
+     * The focused window only — the popup is gone by the time Settings has
+     * focus, so this captures what the reporter is looking at, not the screen.
+     * A whole-desktop grab would need desktopCapturer and, on Wayland, a
+     * portal prompt for every shot.
+     */
+    [IPC.feedback.screenshot]: async () => {
+      const parent = focused();
+      if (!parent) return err(appError('UNKNOWN', 'No window is focused to capture'));
+      const image = await parent.capturePage();
+      const options = {
+        title: 'Save screenshot',
+        defaultPath: join(app.getPath('pictures'), `ai-anywhere-${Date.now()}.png`),
+        filters: [{ name: 'PNG', extensions: ['png'] }],
+      };
+      const chosen = await dialog.showSaveDialog(parent, options);
+      if (chosen.canceled || !chosen.filePath) return ok(null);
+      try {
+        await writeFile(chosen.filePath, image.toPNG());
+        return ok(chosen.filePath);
+      } catch (cause) {
+        return err(appError('UNKNOWN', 'Could not write the screenshot', cause));
+      }
     },
 
     [IPC.app.getInfo]: () =>

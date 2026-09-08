@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { SHORTCUTS, isHelpKey } from './shortcut-keys.js';
-import { filterSettingsPages, isSettingsPageName } from '../features/settings/pages.js';
+import { filterSettingsPages, isSettingsPageName, SETTINGS_PAGES } from '../features/settings/pages.js';
 
 const key = (init: KeyboardEventInit & { target?: HTMLElement }): KeyboardEvent => {
   const event = new KeyboardEvent('keydown', init);
@@ -39,7 +39,7 @@ describe('SHORTCUTS', () => {
 
 describe('filterSettingsPages', () => {
   it('returns every page for an empty query', () => {
-    expect(filterSettingsPages('   ')).toHaveLength(9);
+    expect(filterSettingsPages('   ')).toHaveLength(SETTINGS_PAGES.length);
   });
 
   it('matches keywords, not only titles', () => {

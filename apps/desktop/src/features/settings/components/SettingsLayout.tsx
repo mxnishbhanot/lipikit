@@ -7,6 +7,7 @@ import { filterSettingsPages } from '../pages.js';
 import { useUiStore } from '../../../store/ui.store.js';
 import { AboutPage } from './pages/AboutPage.js';
 import { AppearancePage } from './pages/AppearancePage.js';
+import { FeedbackPage } from './pages/FeedbackPage.js';
 import { GeneralPage } from './pages/GeneralPage.js';
 import { HistoryPage } from './pages/HistoryPage.js';
 import { ModelsPage } from './pages/ModelsPage.js';
@@ -37,7 +38,7 @@ function moveFocus(nav: HTMLElement | null, to: number | 'next' | 'previous'): v
 
 /**
  * Settings shell. Every page reads the same React Query cache entry, so the
- * settings object is loaded once here and handed down — nine pages each
+ * settings object is loaded once here and handed down — ten pages each
  * calling useSettings would work, but then nine of them also need the pending
  * and error branches.
  */
@@ -87,6 +88,8 @@ export function SettingsLayout(): JSX.Element {
         return <PrivacyPage settings={current} patch={patch} />;
       case 'Prompt Templates':
         return <PromptTemplatesPage />;
+      case 'Feedback':
+        return <FeedbackPage />;
       case 'About':
         return <AboutPage />;
     }

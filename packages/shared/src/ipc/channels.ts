@@ -66,6 +66,14 @@ export const IPC = {
     /** Hide the popup and bring the settings window forward. */
     openSettings: 'overlay:open-settings',
   },
+  feedback: {
+    /** Plain-text environment block for a bug report; no keys, no history. */
+    diagnostics: 'feedback:diagnostics',
+    /** Write the in-memory log buffer to a file the user picks. */
+    exportLogs: 'feedback:export-logs',
+    /** Save a PNG of the focused window for the user to attach themselves. */
+    screenshot: 'feedback:screenshot',
+  },
   app: {
     getInfo: 'app:get-info',
     quit: 'app:quit',
