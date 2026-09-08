@@ -5,6 +5,28 @@ README's [Troubleshooting](../README.md#troubleshooting) table is the faster
 answer; for what is stored and what leaves the machine, see
 [the privacy policy](PRIVACY.md).
 
+### Do I need ChatGPT Plus?
+
+No. A Plus subscription buys the ChatGPT web app, which is not what this talks
+to. What it needs is an API key — OpenAI, Anthropic, Google, OpenRouter, Groq,
+DeepSeek — billed per token by that vendor, which for popup-sized rewrites is
+usually cents a day rather than a monthly fee. Ollama needs neither.
+
+### Why bring your own key instead of a subscription?
+
+Because it keeps the price honest and the choice yours: you pay the vendor
+directly, pick the model per job, and switch provider from a dropdown instead
+of cancelling anything. It is also what makes the privacy claims possible —
+there is no server of ours between you and the model, because there is no
+server of ours.
+
+### Does it work offline?
+
+The app opens, the palette works and your history stays readable, but a hosted
+provider needs the network and the popup says so rather than hanging. Point it
+at Ollama on your own machine and the whole flow works with the network
+unplugged.
+
 ### Do I need an API key?
 
 For the hosted providers, yes — one key from whichever vendor you already pay.

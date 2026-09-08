@@ -1,20 +1,20 @@
 import { Github } from 'lucide-react';
 import { AppIcon, Button, cn } from '@ai-anywhere/ui';
 import { BRANDING } from '@ai-anywhere/shared';
+import { lazy, Suspense } from 'react';
 import { FOOTER_LINKS, NAV_LINKS, REPO_URL } from './content.js';
 import { Reveal, ThemeToggle } from './components.js';
-import {
-  Downloads,
-  Faq,
-  Features,
-  Footer,
-  Hero,
-  Privacy,
-  Providers,
-  Screenshots,
-  Shortcuts,
-  WorksEverywhere,
-} from './sections.js';
+import { Hero } from './hero.js';
+
+/**
+ * Everything under the hero, in one deferred chunk: nine sections, a
+ * comparison table and their icons are not worth blocking the first paint for.
+ * One dynamic import rather than one per section — ten requests to save the
+ * same bytes is a waterfall, not an optimisation.
+ */
+const BelowTheFold = lazy(async () => ({ default: (await import('./sections.js')).BelowTheFold }));
+/** Same chunk as the sections, so this costs no second request. */
+const PageFooter = lazy(async () => ({ default: (await import('./sections.js')).Footer }));
 
 /**
  * Sticky, translucent, hairline underneath. No scroll listener: `backdrop-blur`
@@ -73,7 +73,7 @@ function Nav(): JSX.Element {
 
 function FooterLinks(): JSX.Element {
   return (
-    <div className="grid gap-10 sm:grid-cols-[1fr_auto_auto]">
+    <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1fr_auto_auto_auto]">
       <Reveal className="max-w-sm">
         <p className="flex items-center gap-2 text-body font-semibold text-fg-primary">
           <AppIcon className="h-5 w-5 text-accent" />
@@ -115,7 +115,7 @@ export function App(): JSX.Element {
     <>
       {/* Keyboard-first product, keyboard-first page. */}
       <a
-        href="#features"
+        href="#workflows"
         className={cn(
           'sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60]',
           'focus:rounded-control focus:bg-accent focus:px-4 focus:py-2 focus:text-accent-foreground',
@@ -128,18 +128,17 @@ export function App(): JSX.Element {
       <Nav />
       <main>
         <Hero />
-        <Features />
-        <WorksEverywhere />
-        <Providers />
-        <Screenshots />
-        <Shortcuts />
-        <Privacy />
-        <Faq />
-        <Downloads />
+        {/* No spinner: the fallback is the height the sections will take, so
+            the page does not jump when the chunk lands. */}
+        <Suspense fallback={<div className="min-h-screen" aria-hidden />}>
+          <BelowTheFold />
+        </Suspense>
       </main>
-      <Footer>
-        <FooterLinks />
-      </Footer>
+      <Suspense fallback={null}>
+        <PageFooter>
+          <FooterLinks />
+        </PageFooter>
+      </Suspense>
     </>
   );
 }

@@ -30,7 +30,7 @@ export interface Branding {
 export const BRANDING: Branding = {
   appName: 'AI Anywhere (Temporary)',
   shortName: 'AI Anywhere',
-  tagline: 'AI writing assistant available anywhere via a global hotkey',
+  tagline: 'The fastest AI command layer for Windows and Linux',
   website: 'https://example.invalid/ai-anywhere',
   supportEmail: 'support@example.invalid',
   issuesUrl: 'https://example.invalid/ai-anywhere/issues',

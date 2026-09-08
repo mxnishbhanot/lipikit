@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { MotionConfig } from 'framer-motion';
 import { BRANDING } from '@ai-anywhere/shared';
 import { App } from './App.js';
+import { HOTKEY, POSITIONING } from './content.js';
 // Bundled rather than pulled from a font CDN: same face as the app, one less
 // third party in the request waterfall.
 import '@fontsource-variable/inter';
@@ -20,7 +21,7 @@ document
   .querySelector('meta[name="description"]')
   ?.setAttribute(
     'content',
-    `${BRANDING.shortName} is a free, MIT-licensed desktop AI writing assistant for Windows and Linux. Select text in any app, press a global hotkey, and replace it with a rewrite from your own AI provider.`,
+    `${BRANDING.shortName} is a free, MIT-licensed AI command layer for Windows and Ubuntu. Highlight text in any application, press ${HOTKEY}, and the answer replaces it in place. ${POSITIONING} Your own API key, no account, no telemetry.`,
   );
 
 createRoot(container).render(

@@ -1,37 +1,53 @@
 import { motion } from 'framer-motion';
 import {
   ArrowRight,
+  Bug,
   Check,
   ChevronDown,
+  Code,
+  Compass,
+  CornerDownLeft,
   Download,
   FileCode,
-  Github,
+  GitPullRequest,
   History,
   KeyRound,
   Keyboard,
   Layers,
+  MessageSquare,
+  Minus,
   Monitor,
   Replace,
+  Ticket,
   Terminal,
+  Users,
   type LucideIcon,
 } from 'lucide-react';
 import { BRANDING } from '@ai-anywhere/shared';
 import { AppIcon, Badge, Button, Card, cn, Kbd, liftable } from '@ai-anywhere/ui';
 import {
+  BYOK_CARDS,
+  BYOK_POINTS,
+  COMPARISON_NOTE,
+  COMPARISON_PRODUCTS,
+  COMPARISON_ROWS,
   DOWNLOADS,
   DOWNLOAD_NOTE,
   FAQS,
   FEATURES,
   HOTKEY,
+  PERSONAS,
   PLATFORMS,
   PLATFORM_NOTE,
   PRIVACY_POINTS,
   PROVIDERS,
   PROVIDER_NOTE,
   RELEASES_URL,
-  REPO_URL,
+  ROADMAP,
   SHORTCUT_GROUPS,
   STEPS,
+  WORKFLOW_DEMOS,
+  type Cell,
 } from './content.js';
 import { Reveal, Section, WindowFrame } from './components.js';
 
@@ -51,136 +67,6 @@ const FEATURE_ICONS: Record<string, LucideIcon> = {
  * `Terminal` say platform without pretending to be a trademark.
  */
 const PLATFORM_ICONS: Record<string, LucideIcon> = { Windows: Monitor, Linux: Terminal };
-
-/* -------------------------------------------------------------------------- */
-/* Hero                                                                        */
-/* -------------------------------------------------------------------------- */
-
-/** The mock palette in the hero: what the popup shows after the hotkey. */
-const MOCK_COMMANDS: readonly { readonly label: string; readonly group: string }[] = [
-  { label: 'Fix Grammar', group: 'Writing' },
-  { label: 'Professional', group: 'Tone' },
-  { label: 'Commit Message', group: 'Developer' },
-  { label: 'Client Reply', group: 'Communication' },
-];
-
-function HeroPopup(): JSX.Element {
-  return (
-    <WindowFrame className="w-full max-w-xl rounded-popup shadow-popup">
-      {/* Header: search field, active model, settings — the popup's real layout. */}
-      <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-        <span className="text-body text-fg-muted">Search commands…</span>
-        <span className="ml-auto shrink-0">
-          <Badge tone="accent">GPT-5 mini</Badge>
-        </span>
-      </div>
-
-      <ul className="p-2">
-        {MOCK_COMMANDS.map((command, index) => (
-          <li
-            key={command.label}
-            className={cn(
-              'flex items-center gap-3 rounded-control px-3 py-2.5 text-body',
-              index === 0 ? 'bg-accent-subtle text-accent' : 'text-fg-secondary',
-            )}
-          >
-            <span className="font-medium">{command.label}</span>
-            <span className="text-caption text-fg-muted">{command.group}</span>
-            {index === 0 && (
-              <span className="ml-auto">
-                <Kbd>Enter</Kbd>
-              </span>
-            )}
-          </li>
-        ))}
-      </ul>
-
-      <div className="flex items-center gap-2 border-t border-border px-4 py-2.5 text-caption text-fg-muted">
-        <Kbd combo="Ctrl+Enter" />
-        <span>replace selection</span>
-        <span className="ml-auto inline-flex items-center gap-1.5">
-          {/* A live caret, because the popup streams an answer. Stepped, not
-              faded, so it reads as a cursor and not as a loading state.
-              `MotionConfig reducedMotion="user"` in main.tsx stops it for
-              anyone who asked for no motion. */}
-          <motion.span
-            className="inline-block h-3 w-[2px] bg-accent"
-            animate={{ opacity: [1, 1, 0, 0] }}
-            transition={{ duration: 1, times: [0, 0.49, 0.5, 1], repeat: Infinity, ease: 'linear' }}
-          />
-          <span>420 ms</span>
-        </span>
-      </div>
-    </WindowFrame>
-  );
-}
-
-export function Hero(): JSX.Element {
-  return (
-    <header className="relative overflow-hidden">
-      {/* One accent wash behind the fold. Pointer-events off: it is paint, not
-          a surface, and must never eat a click on the buttons above it. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 -top-40 h-[36rem] bg-[radial-gradient(60%_60%_at_50%_40%,hsl(var(--accent)/0.18),transparent_70%)]"
-      />
-
-      <div className="relative mx-auto max-w-content px-6 pb-20 pt-16 text-center sm:pb-28 sm:pt-24">
-        <Reveal>
-          <a
-            href={RELEASES_URL}
-            className={cn(
-              'inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 px-4 py-1.5',
-              'text-caption text-fg-secondary transition-colors duration-fast ease-calm hover:bg-surface-hover',
-            )}
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-            {BRANDING.version} is out for Windows and Linux
-            <ArrowRight className="h-3.5 w-3.5" />
-          </a>
-        </Reveal>
-
-        <Reveal delay={0.05}>
-          <h1 className="mx-auto mt-8 max-w-4xl text-hero-lg font-semibold text-fg-primary">
-            AI where you already
-            <br />
-            <span className="text-accent">type</span>
-          </h1>
-        </Reveal>
-
-        <Reveal delay={0.1}>
-          <p className="mx-auto mt-6 max-w-2xl text-body-lg text-fg-secondary sm:text-lg">
-            Select text in any application, press <Kbd combo={HOTKEY} />, and get a rewrite that replaces it
-            in place. No tab to switch to, no window to find, no copy and paste.
-          </p>
-        </Reveal>
-
-        <Reveal delay={0.15} className="mt-10 flex flex-wrap items-center justify-center gap-3">
-          <Button asChild size="lg">
-            <a href="#download">
-              <Download className="h-4 w-4" />
-              Download for free
-            </a>
-          </Button>
-          <Button asChild size="lg" variant="outline">
-            <a href={REPO_URL} target="_blank" rel="noreferrer">
-              <Github className="h-4 w-4" />
-              Source on GitHub
-            </a>
-          </Button>
-        </Reveal>
-
-        <Reveal delay={0.2}>
-          <p className="mt-5 text-caption text-fg-muted">{DOWNLOAD_NOTE}</p>
-        </Reveal>
-
-        <Reveal delay={0.25} className="mt-16 flex justify-center">
-          <HeroPopup />
-        </Reveal>
-      </div>
-    </header>
-  );
-}
 
 /* -------------------------------------------------------------------------- */
 /* Features                                                                    */
@@ -550,6 +436,387 @@ export function Downloads(): JSX.Element {
         <p className="text-caption text-fg-muted">{DOWNLOAD_NOTE}</p>
       </Reveal>
     </Section>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Who it is for                                                               */
+/* -------------------------------------------------------------------------- */
+
+const PERSONA_ICONS: Record<string, LucideIcon> = { Code, Compass, Bug, Users };
+
+export function WhoItsFor(): JSX.Element {
+  return (
+    <Section
+      id="who"
+      eyebrow="Who it's for"
+      title="Written for the tabs you keep switching to"
+      lead="Four kinds of reader, and the applications they already have open. Every job named on a card is a command that ships in the palette."
+    >
+      <ul className="grid gap-5 sm:grid-cols-2">
+        {PERSONAS.map((persona, index) => {
+          const Icon = PERSONA_ICONS[persona.icon] ?? Users;
+          return (
+            <Reveal as="li" key={persona.role} delay={index * 0.04}>
+              <motion.div {...liftable} className="h-full">
+                <Card className="flex h-full flex-col p-6">
+                  <div className="flex items-center gap-3">
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-control bg-accent-subtle text-accent">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    <h3 className="text-title font-semibold text-fg-primary">{persona.role}</h3>
+                  </div>
+                  <p className="mt-3 text-body text-fg-secondary">{persona.body}</p>
+
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {persona.apps.map((app) => (
+                      <Badge key={app}>{app}</Badge>
+                    ))}
+                  </div>
+
+                  {/* The jobs, not the features: "PR description" is a thing
+                      someone has to write on Thursday, "AI-powered generation"
+                      is not. */}
+                  <ul className="mt-4 space-y-1.5 border-t border-border/60 pt-4">
+                    {persona.jobs.map((job) => (
+                      <li key={job} className="flex items-start gap-2 text-body text-fg-secondary">
+                        <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
+                        {job}
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              </motion.div>
+            </Reveal>
+          );
+        })}
+      </ul>
+    </Section>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Workflow demos                                                              */
+/* -------------------------------------------------------------------------- */
+
+const DEMO_ICONS: Record<string, LucideIcon> = {
+  MessageSquare,
+  GitPullRequest,
+  Terminal,
+  Ticket,
+};
+
+/**
+ * One worked example, told in the order it happens: what was selected, which
+ * row the popup put first and why, and what ended up in the field. Three
+ * panels rather than a carousel — a story the reader has to press play on is
+ * a story most readers skip.
+ */
+function WorkflowStory({
+  demo,
+  index,
+}: {
+  readonly demo: (typeof WORKFLOW_DEMOS)[number];
+  readonly index: number;
+}): JSX.Element {
+  const Icon = DEMO_ICONS[demo.icon] ?? MessageSquare;
+  return (
+    <Reveal as="li" delay={index * 0.04}>
+      <Card className="overflow-hidden">
+        <div className="flex flex-wrap items-center gap-3 border-b border-border bg-surface-hover/50 px-5 py-3">
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-control bg-accent-subtle text-accent">
+            <Icon className="h-4 w-4" />
+          </span>
+          <h3 className="text-body-lg font-semibold text-fg-primary">{demo.app}</h3>
+          <Badge tone="accent" className="ml-auto">
+            {demo.detected}
+          </Badge>
+        </div>
+
+        <div className="grid gap-4 p-5 lg:grid-cols-[1fr_auto_1fr] lg:items-start">
+          <div>
+            <p className="text-caption font-medium uppercase tracking-[0.14em] text-fg-muted">Selected</p>
+            <p className="mt-2 rounded-control bg-accent/[0.12] p-3 text-body text-fg-secondary">
+              {demo.before}
+            </p>
+          </div>
+
+          {/* The keystroke, between the two panels: on a phone it stacks and
+              still reads as the step in the middle. */}
+          <div className="flex items-center gap-2 lg:h-full lg:flex-col lg:justify-center lg:px-2">
+            <Kbd combo={HOTKEY} />
+            <span className="inline-flex items-center gap-1.5 rounded-control border border-accent/30 bg-accent-subtle px-2.5 py-1 text-caption font-medium text-accent">
+              {demo.command}
+              <CornerDownLeft className="h-3 w-3" />
+            </span>
+          </div>
+
+          <div>
+            <p className="text-caption font-medium uppercase tracking-[0.14em] text-fg-muted">
+              Replaced with
+            </p>
+            <p className="mt-2 whitespace-pre-line rounded-control border border-border bg-surface-hover/60 p-3 text-body text-fg-primary">
+              {demo.after}
+            </p>
+          </div>
+        </div>
+      </Card>
+    </Reveal>
+  );
+}
+
+export function Workflows(): JSX.Element {
+  return (
+    <Section
+      id="workflows"
+      eyebrow="Workflows"
+      title="Four things you did today without it"
+      lead="Highlight, one shortcut, carry on. The popup reads which application you are in and puts that app's command first — these are the real rules, not a mock-up."
+    >
+      <ul className="space-y-5">
+        {WORKFLOW_DEMOS.map((demo, index) => (
+          <WorkflowStory key={demo.app} demo={demo} index={index} />
+        ))}
+      </ul>
+      <Reveal>
+        <p className="mt-6 text-caption text-fg-muted">
+          Sample text is invented; the command names, the detected apps and the instructions behind them are
+          the ones the app ships with.
+        </p>
+      </Reveal>
+    </Section>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Comparison                                                                  */
+/* -------------------------------------------------------------------------- */
+
+/** A cell: yes, no, or a qualifier that has to be read. */
+function CompareCell({ value, own }: { readonly value: Cell; readonly own: boolean }): JSX.Element {
+  if (value === true) {
+    return (
+      <span
+        className={cn('inline-flex items-center gap-1.5 text-body', own ? 'text-accent' : 'text-success')}
+      >
+        <Check className="h-4 w-4" aria-hidden />
+        <span className="sr-only">Yes</span>
+      </span>
+    );
+  }
+  if (value === false) {
+    return (
+      <span className="inline-flex items-center text-fg-muted">
+        <Minus className="h-4 w-4" aria-hidden />
+        <span className="sr-only">No</span>
+      </span>
+    );
+  }
+  return <span className="text-caption text-fg-secondary">{value}</span>;
+}
+
+export function Compare(): JSX.Element {
+  return (
+    <Section
+      id="compare"
+      eyebrow="Compare"
+      title="What the other tabs do instead"
+      lead="These are good tools; they are just built for different jobs. The row that matters is the first one — whether the AI comes to the window you are already typing in."
+    >
+      {/* The table scrolls inside its own box rather than making the page
+          scroll sideways; the first column stays put so a row keeps its name. */}
+      <div className="overflow-x-auto rounded-card border border-border bg-surface">
+        <table className="w-full min-w-[52rem] border-collapse text-left">
+          <caption className="sr-only">
+            Feature comparison between {BRANDING.shortName} and four other tools
+          </caption>
+          <thead>
+            <tr className="border-b border-border">
+              <th
+                scope="col"
+                className="sticky left-0 bg-surface px-5 py-4 text-body font-semibold text-fg-primary"
+              >
+                Feature
+              </th>
+              {COMPARISON_PRODUCTS.map((product, index) => (
+                <th
+                  key={product}
+                  scope="col"
+                  className={cn(
+                    'px-4 py-4 text-caption font-semibold',
+                    index === 0 ? 'text-accent' : 'text-fg-secondary',
+                  )}
+                >
+                  {index === 0 ? BRANDING.shortName : product}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {COMPARISON_ROWS.map((row) => (
+              <tr key={row.feature} className="border-b border-border/60 last:border-0">
+                <th
+                  scope="row"
+                  className="sticky left-0 bg-surface px-5 py-3.5 text-body font-normal text-fg-secondary"
+                >
+                  {row.feature}
+                </th>
+                {row.cells.map((cell, index) => (
+                  <td
+                    key={`${row.feature}:${COMPARISON_PRODUCTS[index] ?? index}`}
+                    className={cn('px-4 py-3.5', index === 0 && 'bg-accent-subtle/40')}
+                  >
+                    <CompareCell value={cell} own={index === 0} />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <Reveal>
+        <p className="mt-6 max-w-3xl text-caption text-fg-muted">{COMPARISON_NOTE}</p>
+      </Reveal>
+    </Section>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Bring your own key                                                          */
+/* -------------------------------------------------------------------------- */
+
+export function Byok(): JSX.Element {
+  return (
+    <Section
+      id="byok"
+      eyebrow="Your own key"
+      title="You already pay an AI provider. Use that."
+      lead="Paste a key from whichever vendor you have an account with. The app is free and MIT-licensed; the model bill goes straight to them, at their prices."
+    >
+      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {BYOK_CARDS.map((card, index) => (
+          <Reveal as="li" key={card.label} delay={index * 0.03}>
+            <motion.div {...liftable} className="h-full">
+              <Card className="flex h-full flex-col gap-2 p-5">
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-control bg-accent-subtle text-accent">
+                    <KeyRound className="h-4 w-4" />
+                  </span>
+                  <h3 className="text-body-lg font-semibold text-fg-primary">{card.label}</h3>
+                </div>
+                <p className="text-body text-fg-secondary">{card.models}</p>
+                <p className="mt-auto pt-2 text-caption text-fg-muted">{card.billing}</p>
+              </Card>
+            </motion.div>
+          </Reveal>
+        ))}
+      </ul>
+
+      <div className="mt-5 grid gap-5 sm:grid-cols-3">
+        {BYOK_POINTS.map((point, index) => (
+          <Reveal key={point.title} delay={index * 0.04}>
+            <Card className="h-full p-6">
+              <h3 className="text-body-lg font-semibold text-fg-primary">{point.title}</h3>
+              <p className="mt-2 text-body text-fg-secondary">{point.body}</p>
+            </Card>
+          </Reveal>
+        ))}
+      </div>
+
+      <Reveal>
+        <p className="mt-6 text-caption text-fg-muted">{PROVIDER_NOTE}</p>
+      </Reveal>
+    </Section>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Roadmap                                                                     */
+/* -------------------------------------------------------------------------- */
+
+export function Roadmap(): JSX.Element {
+  return (
+    <Section
+      id="roadmap"
+      eyebrow="Roadmap"
+      title="Shipped, next, and wanted"
+      lead="Three columns so the line between what you get today and what is planned is impossible to misread. Only the first column is in the download."
+    >
+      <div className="grid gap-5 lg:grid-cols-3">
+        {ROADMAP.map((column, index) => (
+          <Reveal key={column.heading} delay={index * 0.05}>
+            <Card
+              className={cn(
+                'h-full p-6',
+                // Shipped is the loud one; the other two are deliberately
+                // quieter than everything around them.
+                column.state === 'now' ? 'border-accent/40' : 'bg-surface/60',
+              )}
+            >
+              <div className="flex items-center gap-2">
+                <h3 className="text-title font-semibold text-fg-primary">{column.heading}</h3>
+                <Badge tone={column.state === 'now' ? 'success' : 'neutral'}>
+                  {column.state === 'now' ? 'Available' : column.state === 'next' ? 'In progress' : 'Idea'}
+                </Badge>
+              </div>
+              <p className="mt-2 text-caption text-fg-muted">{column.note}</p>
+              <ul className="mt-5 space-y-2.5">
+                {column.items.map((item) => (
+                  <li
+                    key={item}
+                    className={cn(
+                      'flex items-start gap-2 text-body',
+                      column.state === 'now' ? 'text-fg-secondary' : 'text-fg-muted',
+                    )}
+                  >
+                    {column.state === 'now' ? (
+                      <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-success" aria-hidden />
+                    ) : (
+                      <Minus className="mt-0.5 h-3.5 w-3.5 shrink-0 text-fg-muted" aria-hidden />
+                    )}
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          </Reveal>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* The page under the hero                                                     */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Every section below the fold, in reading order. It lives here rather than in
+ * App so that the whole set — sections, icons, copy — is one lazily-fetched
+ * chunk; App only knows the hero and the chrome.
+ *
+ * The order is an argument: what it does for you, who you are, how it does it,
+ * why not the alternative, what it costs, what it keeps private, then the
+ * details and the download.
+ */
+export function BelowTheFold(): JSX.Element {
+  return (
+    <>
+      <Workflows />
+      <WhoItsFor />
+      <Features />
+      <WorksEverywhere />
+      <Compare />
+      <Byok />
+      <Providers />
+      <Privacy />
+      <Screenshots />
+      <Shortcuts />
+      <Roadmap />
+      <Faq />
+      <Downloads />
+    </>
   );
 }
 

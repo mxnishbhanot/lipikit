@@ -62,7 +62,7 @@ portable:
 linux:
   icon: build/icons
   category: Utility
-  synopsis: AI writing assistant available anywhere via a global hotkey
+  synopsis: The fastest AI command layer for Windows and Linux
   # Required for the .deb control file; a deb without it will not build.
   maintainer: mxnish-bhanot <mxnish-bhanot@users.noreply.github.com>
   target:
