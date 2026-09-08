@@ -74,11 +74,47 @@
 }
 
 @layer utilities {
-  /* Popup and modal glass. A utility rather than a component class because
-     both the overlay shell and dialogs need it on their own element. */
+  /* Modal glass, for dialogs inside an opaque window — the palette and the
+     cheatsheet, where there is app behind them to blur. A utility rather than
+     a component class because each surface needs it on its own element. */
   .glass {
     background-color: hsl(var(--glass-fill));
     backdrop-filter: blur(var(--glass-blur)) saturate(140%);
+  }
+
+  /**
+   * The popup's own surface: solid, hairline-bordered, and carrying its own
+   * shadow.
+   *
+   * Not glass. The popup lives in a transparent window over another
+   * application, where a blurred fill has nothing dependable behind it — on a
+   * compositor that will not blur through a foreign window it degrades to a
+   * flat wash of whatever colour happens to be underneath, and text contrast
+   * goes with it. Solid is the same on every session.
+   *
+   * The border is the first shadow layer rather than a `border` property so it
+   * cannot add a pixel to the box and break the radius, and the whole stack is
+   * tuned to fall inside the window gutter the shell reserves — the compositor
+   * shadow is off (see the window options), because it is drawn square around
+   * the window and this one follows the corners.
+   */
+  .popup-surface {
+    background-color: hsl(var(--surface-elevated));
+    box-shadow:
+      0 0 0 1px hsl(var(--border)),
+      0 2px 4px -1px hsl(240 10% 10% / 0.06),
+      0 8px 16px -6px hsl(240 10% 10% / 0.12),
+      0 16px 32px -12px hsl(240 10% 10% / 0.16);
+  }
+
+  /* Dark needs the depth in the shadow and a lifted hairline: a black shadow
+     on a near-black desktop is invisible, so the edge does the work. */
+  :is(.dark) .popup-surface {
+    box-shadow:
+      0 0 0 1px hsl(240 5% 26%),
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.04),
+      0 8px 16px -6px hsl(0 0% 0% / 0.5),
+      0 18px 36px -12px hsl(0 0% 0% / 0.6);
   }
 }
 

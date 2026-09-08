@@ -50,13 +50,20 @@ export interface WindowManager {
 
 const PRELOAD = join(__dirname, '../preload/index.js');
 
-const OVERLAY_SIZE = { width: 560, height: 440 } as const;
+/**
+ * The window, not the popup: the renderer keeps a transparent gutter inside
+ * these bounds so its own drop shadow has somewhere to fall, which is why this
+ * is wider than the 556px popup the design system describes.
+ */
+const OVERLAY_SIZE = { width: 588, height: 440 } as const;
+/** The gutter the renderer reserves on every side, in CSS pixels. */
+const OVERLAY_GUTTER = 16;
 /**
  * Height bounds for the content-driven resize. The floor keeps the header and
  * footer from colliding when a search matches nothing; the ceiling is applied
  * against the work area too, so a short display wins over this number.
  */
-const OVERLAY_HEIGHT = { min: 220, max: 704 } as const;
+const OVERLAY_HEIGHT = { min: 220 + OVERLAY_GUTTER * 2, max: 704 } as const;
 /** Nudge away from the pointer so the popup never opens under the cursor. */
 const OVERLAY_OFFSET = { x: 12, y: 16 } as const;
 
@@ -174,6 +181,11 @@ export function createWindowManager(
       // sees, instead of a square opaque frame behind them.
       transparent: true,
       backgroundColor: '#00000000',
+      // The compositor's shadow is drawn around the *window* rectangle, so on
+      // a transparent frameless window it appears as a hard square behind
+      // rounded corners. The popup draws its own shadow in CSS instead, inside
+      // the gutter above, which is the only way the two can share a shape.
+      hasShadow: false,
       resizable: false,
       skipTaskbar: true,
       alwaysOnTop: true,
@@ -257,14 +269,48 @@ export function createWindowManager(
       // empty frame over the user's app.
       await overlayReady;
 
-      // Keep the whole popup inside the work area of the display the cursor is
-      // on, so a selection near a screen edge does not open a half-offscreen
-      // window — and so a second monitor is handled without special cases.
-      const { workArea } = screen.getDisplayNearestPoint(point);
-      overlay.setBounds({
-        x: clamp(point.x + OVERLAY_OFFSET.x, workArea.x, workArea.x + workArea.width - OVERLAY_SIZE.width),
-        y: clamp(point.y + OVERLAY_OFFSET.y, workArea.y, workArea.y + workArea.height - OVERLAY_SIZE.height),
-        ...OVERLAY_SIZE,
+      // Placed like a context menu, on the display the cursor is on: below and
+      // right of the caret when there is room, flipped above or left of it when
+      // there is not.
+      //
+      // Clamping alone was not enough. Near an edge it slid the popup along
+      // that edge instead of flipping it, so a press in the bottom-right corner
+      // of the screen — the taskbar corner, the notification corner, the corner
+      // people keep windows in — pinned the popup to the corner and left it
+      // nowhere near the text it was about to rewrite.
+      const display = screen.getDisplayNearestPoint(point);
+      const { workArea } = display;
+      const { width } = OVERLAY_SIZE;
+      // The renderer owns the height — it is the only side that knows how tall
+      // its content is — so a press repositions the window without resetting
+      // what the last measurement made it. Placement below uses that height so
+      // a tall popup still flips instead of hanging off the bottom.
+      const { height } = overlay.getBounds();
+      const fitsRight = point.x + OVERLAY_OFFSET.x + width <= workArea.x + workArea.width;
+      const fitsBelow = point.y + OVERLAY_OFFSET.y + height <= workArea.y + workArea.height;
+      const bounds = {
+        x: clamp(
+          fitsRight ? point.x + OVERLAY_OFFSET.x : point.x - OVERLAY_OFFSET.x - width,
+          workArea.x,
+          workArea.x + workArea.width - width,
+        ),
+        y: clamp(
+          fitsBelow ? point.y + OVERLAY_OFFSET.y : point.y - OVERLAY_OFFSET.y - height,
+          workArea.y,
+          workArea.y + workArea.height - height,
+        ),
+        width,
+        height,
+      };
+      overlay.setBounds(bounds);
+      // Logged with the display's scale factor because that is the first thing
+      // to check when the popup lands somewhere unexpected: a cursor read in
+      // physical pixels against bounds set in DIPs looks exactly like this.
+      scoped.debug('overlay positioned', {
+        point,
+        bounds,
+        workArea,
+        scaleFactor: display.scaleFactor,
       });
       overlay.show();
       overlay.focus();
@@ -277,12 +323,29 @@ export function createWindowManager(
       if (!overlayWindow || overlayWindow.isDestroyed()) return;
       const bounds = overlayWindow.getBounds();
       const { workArea } = screen.getDisplayNearestPoint({ x: bounds.x, y: bounds.y });
-      // Never taller than what is left below the popup's own top edge, or the
-      // footer ends up off the bottom of the screen.
-      const room = workArea.y + workArea.height - bounds.y;
-      const next = clamp(Math.round(height), OVERLAY_HEIGHT.min, Math.min(OVERLAY_HEIGHT.max, room));
-      if (next === bounds.height) return;
-      overlayWindow.setBounds({ ...bounds, height: next });
+      const next = clamp(
+        Math.round(height),
+        OVERLAY_HEIGHT.min,
+        Math.min(OVERLAY_HEIGHT.max, workArea.height),
+      );
+      // A popup that grew past the bottom of the screen moves up to fit rather
+      // than being truncated: the footer holds Replace, so losing it costs the
+      // user the whole point of the window.
+      const y =
+        next > workArea.y + workArea.height - bounds.y
+          ? Math.max(workArea.y, workArea.y + workArea.height - next)
+          : bounds.y;
+      if (next === bounds.height && y === bounds.y) return;
+      overlayWindow.setBounds({ ...bounds, y, height: next });
+      // The popup is sized by the renderer measuring itself, so a clipped
+      // window is either a measurement that never arrived or a clamp that bit:
+      // both are visible in this one line.
+      scoped.debug('overlay resized', {
+        requested: Math.round(height),
+        applied: next,
+        from: bounds.height,
+        y,
+      });
     },
     hideOverlay() {
       // hide(), never close(): hiding hands focus back to the app the user was

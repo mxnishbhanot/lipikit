@@ -357,381 +357,391 @@ export function Overlay(): JSX.Element {
   const errorMessage = captureError?.message ?? replace.error?.message ?? null;
 
   return (
-    <motion.div
-      ref={shellRef}
-      variants={popup}
-      initial="hidden"
-      animate="visible"
-      // Grows from the cursor: the popup opens where the caret was.
-      className="glass flex max-h-[44rem] w-full origin-top-left flex-col overflow-hidden rounded-popup border border-border/60 text-fg-primary shadow-popup"
-    >
-      <header className="flex shrink-0 items-center gap-2 border-b border-border/70 px-3.5 py-2.5">
-        {showResult ? (
+    // The window is transparent and 16px wider and taller than the popup on
+    // every side: this gutter is where the CSS shadow falls. The compositor's
+    // own shadow is off, because it is drawn square around the window and
+    // would sit behind these rounded corners. The measured element is this
+    // wrapper, so the window follows the popup *and* its gutter.
+    <div ref={shellRef} className="p-4">
+      <motion.div
+        variants={popup}
+        initial="hidden"
+        animate="visible"
+        // Grows from the cursor: the popup opens where the caret was.
+        className="popup-surface flex max-h-[41rem] w-full origin-top-left flex-col overflow-hidden rounded-popup text-fg-primary"
+      >
+        {/* The header is the window's drag handle: it is frameless, so without
+            a drag region the popup can only ever be where it opened. Every
+            control inside it opts back out with `no-drag`, or a click on the
+            close button would start a drag instead. */}
+        <header
+          className={cn(
+            'flex shrink-0 items-center gap-2 border-b border-border/70 px-3.5 py-2.5',
+            '[-webkit-app-region:drag]',
+          )}
+        >
+          {showResult ? (
+            <button
+              type="button"
+              onClick={back}
+              aria-label="Back to commands"
+              className="rounded-control p-1.5 text-fg-muted transition-colors duration-fast hover:bg-surface-hover hover:text-fg-primary [-webkit-app-region:no-drag]"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </button>
+          ) : (
+            <Search className="h-4 w-4 shrink-0 text-fg-muted" aria-hidden />
+          )}
+
+          {showResult ? (
+            <span className="flex-1 truncate text-body font-medium">{lastRun.command.label}</span>
+          ) : (
+            // Borderless on purpose: the popup *is* the search box, so a second
+            // framed field inside it would be a box in a box.
+            <input
+              ref={searchRef}
+              autoFocus
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              // The detected app used to be tacked onto this placeholder; the
+              // palette now shows it as a chip of its own, so repeating it here
+              // would be the same fact twice on one screen.
+              placeholder={mode === 'client-reply' ? 'Client reply' : 'Search commands…'}
+              aria-label="Search commands"
+              role="combobox"
+              aria-expanded
+              aria-controls="command-list"
+              className="flex-1 bg-transparent text-body-lg text-fg-primary outline-none placeholder:text-fg-muted [-webkit-app-region:no-drag]"
+            />
+          )}
+
+          {showResult ? (
+            <>
+              <button
+                type="button"
+                onClick={() => setRaw((current) => !current)}
+                aria-pressed={raw}
+                aria-label={raw ? 'Show rendered markdown' : 'Edit raw text'}
+                title={raw ? 'Rendered' : 'Edit raw text'}
+                className="rounded-control p-1.5 text-fg-muted transition-colors duration-fast hover:bg-surface-hover hover:text-fg-primary [-webkit-app-region:no-drag]"
+              >
+                {raw ? <Eye className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
+              </button>
+              <button
+                type="button"
+                onClick={() => setPinned((current) => !current)}
+                aria-pressed={pinned}
+                aria-label={pinned ? 'Unpin response' : 'Pin response'}
+                title={pinned ? 'Pinned — new captures keep this answer' : 'Pin this answer'}
+                className={cn(
+                  'rounded-control p-1.5 transition-colors duration-fast hover:bg-surface-hover',
+                  '[-webkit-app-region:no-drag]',
+                  pinned ? 'text-accent' : 'text-fg-muted hover:text-fg-primary',
+                )}
+              >
+                {pinned ? <Pin className="h-4 w-4" /> : <PinOff className="h-4 w-4" />}
+              </button>
+            </>
+          ) : null}
+
+          {settings.data ? (
+            <Badge
+              tone="neutral"
+              className="shrink-0 gap-1.5"
+              title={`${providerLabel} · ${settings.data.defaultModel}`}
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
+              {settings.data.defaultModel}
+            </Badge>
+          ) : null}
+
           <button
             type="button"
-            onClick={back}
-            aria-label="Back to commands"
-            className="rounded-control p-1.5 text-fg-muted transition-colors duration-fast hover:bg-surface-hover hover:text-fg-primary"
+            onClick={() => void openSettingsWindow()}
+            aria-label="Open settings"
+            className="rounded-control p-1.5 text-fg-muted transition-colors duration-fast hover:bg-surface-hover hover:text-fg-primary [-webkit-app-region:no-drag]"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <Settings className="h-4 w-4" />
           </button>
-        ) : (
-          <Search className="h-4 w-4 shrink-0 text-fg-muted" aria-hidden />
-        )}
+          <button
+            type="button"
+            onClick={() => void closeOverlay()}
+            aria-label="Close"
+            className="rounded-control p-1.5 text-fg-muted transition-colors duration-fast hover:bg-surface-hover hover:text-fg-primary [-webkit-app-region:no-drag]"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </header>
 
-        {showResult ? (
-          <span className="flex-1 truncate text-body font-medium">{lastRun.command.label}</span>
-        ) : (
-          // Borderless on purpose: the popup *is* the search box, so a second
-          // framed field inside it would be a box in a box.
-          <input
-            ref={searchRef}
-            autoFocus
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder={
-              mode === 'client-reply' ? 'Client reply' : `Search commands…  ${contextHint(context, source)}`
-            }
-            aria-label="Search commands"
-            role="combobox"
-            aria-expanded
-            aria-controls="command-list"
-            className="flex-1 bg-transparent text-body-lg text-fg-primary outline-none placeholder:text-fg-muted"
-          />
-        )}
-
-        {showResult ? (
-          <>
-            <button
-              type="button"
-              onClick={() => setRaw((current) => !current)}
-              aria-pressed={raw}
-              aria-label={raw ? 'Show rendered markdown' : 'Edit raw text'}
-              title={raw ? 'Rendered' : 'Edit raw text'}
-              className="rounded-control p-1.5 text-fg-muted transition-colors duration-fast hover:bg-surface-hover hover:text-fg-primary"
+        <AnimatePresence mode="wait" initial={false}>
+          {help ? (
+            <motion.div
+              key="help"
+              variants={slideUp}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="max-h-[26rem] overflow-y-auto px-3.5 py-3"
             >
-              {raw ? <Eye className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
-            </button>
-            <button
-              type="button"
-              onClick={() => setPinned((current) => !current)}
-              aria-pressed={pinned}
-              aria-label={pinned ? 'Unpin response' : 'Pin response'}
-              title={pinned ? 'Pinned — new captures keep this answer' : 'Pin this answer'}
-              className={cn(
-                'rounded-control p-1.5 transition-colors duration-fast hover:bg-surface-hover',
-                pinned ? 'text-accent' : 'text-fg-muted hover:text-fg-primary',
-              )}
+              <ShortcutList scope="popup" />
+            </motion.div>
+          ) : showResult ? (
+            <motion.div
+              key="result"
+              variants={slideUp}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="flex min-h-0 flex-col gap-2 px-3.5 pb-3 pt-3"
             >
-              {pinned ? <Pin className="h-4 w-4" /> : <PinOff className="h-4 w-4" />}
-            </button>
-          </>
-        ) : null}
+              {analysis ? <AnalysisChips analysis={analysis} /> : null}
 
-        {settings.data ? (
-          <Badge
-            tone="neutral"
-            className="shrink-0 gap-1.5"
-            title={`${providerLabel} · ${settings.data.defaultModel}`}
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
-            {settings.data.defaultModel}
-          </Badge>
-        ) : null}
-
-        <button
-          type="button"
-          onClick={() => void openSettingsWindow()}
-          aria-label="Open settings"
-          className="rounded-control p-1.5 text-fg-muted transition-colors duration-fast hover:bg-surface-hover hover:text-fg-primary"
-        >
-          <Settings className="h-4 w-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => void closeOverlay()}
-          aria-label="Close"
-          className="rounded-control p-1.5 text-fg-muted transition-colors duration-fast hover:bg-surface-hover hover:text-fg-primary"
-        >
-          <X className="h-4 w-4" />
-        </button>
-      </header>
-
-      <AnimatePresence mode="wait" initial={false}>
-        {help ? (
-          <motion.div
-            key="help"
-            variants={slideUp}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="max-h-[26rem] overflow-y-auto px-3.5 py-3"
-          >
-            <ShortcutList scope="popup" />
-          </motion.div>
-        ) : showResult ? (
-          <motion.div
-            key="result"
-            variants={slideUp}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="flex min-h-0 flex-col gap-2 px-3.5 pb-3 pt-3"
-          >
-            {analysis ? <AnalysisChips analysis={analysis} /> : null}
-
-            {promptDraft === null ? null : (
-              // Re-word and re-run without walking back to the palette: the
-              // command is already chosen, only its input is in question.
-              <form
-                className="flex shrink-0 items-center gap-2"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  void run(lastRun.command, promptDraft);
-                }}
-              >
-                <input
-                  autoFocus
-                  value={promptDraft}
-                  onChange={(event) => setPromptDraft(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Escape') {
-                      event.preventDefault();
-                      event.stopPropagation();
-                      setPromptDraft(null);
-                    }
+              {promptDraft === null ? null : (
+                // Re-word and re-run without walking back to the palette: the
+                // command is already chosen, only its input is in question.
+                <form
+                  className="flex shrink-0 items-center gap-2"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    void run(lastRun.command, promptDraft);
                   }}
-                  placeholder={lastRun.command.inputPlaceholder ?? 'Add to the instruction…'}
-                  aria-label="Edit prompt"
-                  className="flex-1 rounded-control border border-border bg-surface px-2.5 py-1.5 text-body outline-none focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-ring/40"
-                />
-                <Button size="sm" type="submit" disabled={busy}>
-                  Run
-                </Button>
-              </form>
-            )}
-
-            {raw ? (
-              <textarea
-                value={output}
-                onChange={(event) => setOutput(event.target.value)}
-                placeholder={busy ? 'Thinking…' : 'The model returned nothing.'}
-                aria-label="AI output"
-                rows={10}
-                className="min-h-[12rem] flex-1 resize-none rounded-card border border-border bg-surface p-3 font-mono text-body leading-relaxed outline-none transition-colors duration-fast focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-ring/40"
-              />
-            ) : (
-              // The scroll lives here, not on the shell: the header and the
-              // action bar stay put while a long answer moves under them.
-              <div
-                aria-label="AI output"
-                aria-live="polite"
-                aria-busy={busy}
-                tabIndex={0}
-                className="min-h-[12rem] flex-1 overflow-y-auto rounded-card border border-border bg-surface p-3"
-              >
-                {output.length > 0 ? (
-                  // Plain text while the markdown chunk loads: the first
-                  // tokens stay readable instead of blanking the panel.
-                  <Suspense fallback={<p className="whitespace-pre-wrap text-body">{output}</p>}>
-                    <ResponseMarkdown content={output} />
-                  </Suspense>
-                ) : ai.error && !busy ? (
-                  // The provider's own message is the description: "that did
-                  // not go through" alone is not something anyone can act on.
-                  <EmptyState kind="error" size="sm" description={ai.error.message} />
-                ) : busy ? (
-                  // Before the first token there is nothing to stream, so the
-                  // box shows the shape an answer will take rather than an
-                  // empty panel with a caret blinking in the corner.
-                  <div className="space-y-3">
-                    <ThinkingIndicator phase="thinking" />
-                    <SkeletonText lines={4} />
-                  </div>
-                ) : (
-                  <p className="text-body-lg text-fg-muted">The model returned nothing.</p>
-                )}
-                {busy && output.length > 0 ? <StreamCaret /> : null}
-              </div>
-            )}
-          </motion.div>
-        ) : blocked ? (
-          <motion.div key="blocked" variants={slideUp} initial="hidden" animate="visible" exit="exit">
-            {online ? (
-              <EmptyState
-                kind="no-api-key"
-                size="sm"
-                description={`${activeProvider?.label ?? 'This provider'} has no key stored yet. Add one and every command here starts working.`}
-                action={
-                  <Button size="sm" onClick={() => void openSettingsWindow()}>
-                    Add a key
+                >
+                  <input
+                    autoFocus
+                    value={promptDraft}
+                    onChange={(event) => setPromptDraft(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Escape') {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setPromptDraft(null);
+                      }
+                    }}
+                    placeholder={lastRun.command.inputPlaceholder ?? 'Add to the instruction…'}
+                    aria-label="Edit prompt"
+                    className="flex-1 rounded-control border border-border bg-surface px-2.5 py-1.5 text-body outline-none focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-ring/40"
+                  />
+                  <Button size="sm" type="submit" disabled={busy}>
+                    Run
                   </Button>
-                }
-              />
-            ) : (
-              // No action: the online/offline listener flips this back on its
-              // own, so a Retry button would only be a button that waits.
-              <EmptyState kind="offline" size="sm" />
-            )}
-          </motion.div>
-        ) : mode === 'client-reply' ? (
-          <motion.div key="client-reply" variants={slideUp} initial="hidden" animate="visible" exit="exit">
-            <ClientReply
-              message={selection}
-              disabled={selection.trim().length === 0}
-              onRun={(command) => void run(command, '')}
-            />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="palette"
-            variants={slideUp}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="flex min-h-0 flex-col"
-          >
-            <CommandPalette
-              commands={commands}
-              customPrompts={prompts}
-              context={context}
-              favorites={prefs.favorites}
-              recents={prefs.recents}
-              query={query}
-              onToggleFavorite={prefs.toggleFavorite}
-              onRun={(command, input) => void run(command, input)}
-              disabled={selection.trim().length === 0 || help}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {errorMessage ? (
-        <p className="shrink-0 px-3.5 pb-2 text-caption text-danger" role="status">
-          {errorMessage}
-        </p>
-      ) : null}
-      {degraded ? (
-        <p className="shrink-0 px-3.5 pb-2 text-caption text-warning" role="status">
-          No keystroke backend on this session ({capabilities.data?.displayServer ?? 'unknown'}) — install
-          xdotool (X11) or ydotool (Wayland) to replace text automatically.
-        </p>
-      ) : null}
-      {!showResult && !blocked && selection.trim().length === 0 ? (
-        <p className="shrink-0 px-3.5 pb-2 text-caption text-fg-muted" role="status">
-          Nothing captured — select text, then recapture.
-        </p>
-      ) : null}
-
-      <footer className="flex shrink-0 items-center gap-3 border-t border-border/70 px-3.5 py-2">
-        {showResult ? (
-          <>
-            <div className="flex flex-1 items-center gap-1">
-              {busy ? (
-                <Button size="sm" variant="ghost" onClick={() => ai.cancel()}>
-                  Stop
-                </Button>
-              ) : (
-                <Button size="sm" variant="ghost" onClick={() => void run(lastRun.command, lastRun.input)}>
-                  <RotateCcw className="h-3.5 w-3.5" />
-                  Retry
-                </Button>
+                </form>
               )}
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setPromptDraft((current) => (current === null ? lastRun.input : null))}
-                disabled={busy}
-                title="Reword the prompt and run it again"
-              >
-                <Pencil className="h-3.5 w-3.5" />
-                Prompt
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => void copy()} disabled={output.length === 0}>
-                {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                {copied ? 'Copied' : 'Copy'}
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => void write(true)}
-                disabled={busy || replace.isPending || output.length === 0}
-              >
-                Insert below
-              </Button>
-            </div>
-            <Latency busy={busy} ms={latencyMs} />
-            <Button
-              size="sm"
-              onClick={() => void write(false)}
-              disabled={busy || replace.isPending || output.trim().length === 0}
-            >
-              <CornerDownLeft className="h-3.5 w-3.5" />
-              {replace.isPending ? 'Replacing…' : 'Replace'}
-            </Button>
-          </>
-        ) : (
-          <>
-            {/* Three hints, not five: the footer is 560px wide and shares it
-                with the provider switch. Tab-by-section and Ctrl+D favourite
-                are in the docs, not on screen. */}
-            <div className="flex flex-1 items-center gap-2.5 overflow-hidden text-caption text-fg-muted">
-              <span className="flex shrink-0 items-center gap-1">
-                <Kbd>↑</Kbd>
-                <Kbd>↓</Kbd>
-                navigate
-              </span>
-              <span className="flex shrink-0 items-center gap-1">
-                <Kbd>Enter</Kbd>
-                run
-              </span>
-              <span className="flex min-w-0 items-center gap-1 truncate">
-                <Kbd combo="Ctrl+K" />
-                search
-              </span>
-              <span className="flex shrink-0 items-center gap-1">
-                <Kbd>F1</Kbd>
-                keys
-              </span>
-            </div>
-            <Latency busy={busy} ms={latencyMs} />
-            {/* Native select: it is the right menu on both Windows and GNOME,
-                and it costs no popover, portal or focus trap of our own. */}
-            <label className="flex shrink-0 items-center gap-1 text-caption text-fg-muted">
-              <span className="sr-only">Provider</span>
-              <select
-                value={settings.data?.defaultProvider ?? ''}
-                disabled={switchProvider.isPending || selectableProviders.length === 0}
-                onChange={(event) => switchProvider.mutate(event.target.value as ProviderId)}
-                className="max-w-[9rem] cursor-pointer truncate rounded-control border border-border bg-surface px-2 py-1 text-caption text-fg-secondary outline-none transition-colors duration-fast hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-ring/40"
-              >
-                {selectableProviders.map((entry) => (
-                  <option key={entry.id} value={entry.id}>
-                    {entry.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => void onRecapture()}
-              disabled={recapture.isPending}
-            >
-              {recapture.isPending ? 'Capturing…' : 'Recapture'}
-            </Button>
-          </>
-        )}
-      </footer>
-    </motion.div>
-  );
-}
 
-/** What the popup is looking at, appended to the search placeholder. */
-function contextHint(context: AppContext | null, source: SelectionSource | null): string {
-  const label = context?.label ?? source?.appName;
-  if (label === undefined || label === null) return '';
-  return context?.browserDomain ? `in ${label} · ${context.browserDomain}` : `in ${label}`;
+              {raw ? (
+                <textarea
+                  value={output}
+                  onChange={(event) => setOutput(event.target.value)}
+                  placeholder={busy ? 'Thinking…' : 'The model returned nothing.'}
+                  aria-label="AI output"
+                  rows={10}
+                  className="min-h-[12rem] flex-1 resize-none rounded-card border border-border bg-surface p-3 font-mono text-body leading-relaxed outline-none transition-colors duration-fast focus-visible:border-accent focus-visible:ring-2 focus-visible:ring-ring/40"
+                />
+              ) : (
+                // The scroll lives here, not on the shell: the header and the
+                // action bar stay put while a long answer moves under them.
+                <div
+                  aria-label="AI output"
+                  aria-live="polite"
+                  aria-busy={busy}
+                  tabIndex={0}
+                  className="min-h-[12rem] flex-1 overflow-y-auto rounded-card border border-border bg-surface p-3"
+                >
+                  {output.length > 0 ? (
+                    // Plain text while the markdown chunk loads: the first
+                    // tokens stay readable instead of blanking the panel.
+                    <Suspense fallback={<p className="whitespace-pre-wrap text-body">{output}</p>}>
+                      <ResponseMarkdown content={output} />
+                    </Suspense>
+                  ) : ai.error && !busy ? (
+                    // The provider's own message is the description: "that did
+                    // not go through" alone is not something anyone can act on.
+                    <EmptyState kind="error" size="sm" description={ai.error.message} />
+                  ) : busy ? (
+                    // Before the first token there is nothing to stream, so the
+                    // box shows the shape an answer will take rather than an
+                    // empty panel with a caret blinking in the corner.
+                    <div className="space-y-3">
+                      <ThinkingIndicator phase="thinking" />
+                      <SkeletonText lines={4} />
+                    </div>
+                  ) : (
+                    <p className="text-body-lg text-fg-muted">The model returned nothing.</p>
+                  )}
+                  {busy && output.length > 0 ? <StreamCaret /> : null}
+                </div>
+              )}
+            </motion.div>
+          ) : blocked ? (
+            <motion.div key="blocked" variants={slideUp} initial="hidden" animate="visible" exit="exit">
+              {online ? (
+                <EmptyState
+                  kind="no-api-key"
+                  size="sm"
+                  description={`${activeProvider?.label ?? 'This provider'} has no key stored yet. Add one and every command here starts working.`}
+                  action={
+                    <Button size="sm" onClick={() => void openSettingsWindow()}>
+                      Add a key
+                    </Button>
+                  }
+                />
+              ) : (
+                // No action: the online/offline listener flips this back on its
+                // own, so a Retry button would only be a button that waits.
+                <EmptyState kind="offline" size="sm" />
+              )}
+            </motion.div>
+          ) : mode === 'client-reply' ? (
+            <motion.div key="client-reply" variants={slideUp} initial="hidden" animate="visible" exit="exit">
+              <ClientReply
+                message={selection}
+                disabled={selection.trim().length === 0}
+                onRun={(command) => void run(command, '')}
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="palette"
+              variants={slideUp}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="flex min-h-0 flex-col"
+            >
+              <CommandPalette
+                commands={commands}
+                customPrompts={prompts}
+                context={context}
+                favorites={prefs.favorites}
+                recents={prefs.recents}
+                query={query}
+                onToggleFavorite={prefs.toggleFavorite}
+                onRun={(command, input) => void run(command, input)}
+                disabled={selection.trim().length === 0 || help}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {errorMessage ? (
+          <p className="shrink-0 px-3.5 pb-2 text-caption text-danger" role="status">
+            {errorMessage}
+          </p>
+        ) : null}
+        {degraded ? (
+          <p className="shrink-0 px-3.5 pb-2 text-caption text-warning" role="status">
+            No keystroke backend on this session ({capabilities.data?.displayServer ?? 'unknown'}) — install
+            xdotool (X11) or ydotool (Wayland) to replace text automatically.
+          </p>
+        ) : null}
+        {!showResult && !blocked && selection.trim().length === 0 ? (
+          <p className="shrink-0 px-3.5 pb-2 text-caption text-fg-muted" role="status">
+            Nothing selected yet — highlight text in any app, then press Recapture.
+          </p>
+        ) : null}
+
+        <footer className="flex shrink-0 items-center gap-3 border-t border-border/70 px-3.5 py-2">
+          {showResult ? (
+            <>
+              <div className="flex flex-1 items-center gap-1">
+                {busy ? (
+                  <Button size="sm" variant="ghost" onClick={() => ai.cancel()}>
+                    Stop
+                  </Button>
+                ) : (
+                  <Button size="sm" variant="ghost" onClick={() => void run(lastRun.command, lastRun.input)}>
+                    <RotateCcw className="h-3.5 w-3.5" />
+                    Retry
+                  </Button>
+                )}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setPromptDraft((current) => (current === null ? lastRun.input : null))}
+                  disabled={busy}
+                  title="Reword the prompt and run it again"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                  Prompt
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => void copy()} disabled={output.length === 0}>
+                  {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                  {copied ? 'Copied' : 'Copy'}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => void write(true)}
+                  disabled={busy || replace.isPending || output.length === 0}
+                >
+                  Insert below
+                </Button>
+              </div>
+              <Latency busy={busy} ms={latencyMs} />
+              <Button
+                size="sm"
+                onClick={() => void write(false)}
+                disabled={busy || replace.isPending || output.trim().length === 0}
+              >
+                <CornerDownLeft className="h-3.5 w-3.5" />
+                {replace.isPending ? 'Replacing…' : 'Replace'}
+              </Button>
+            </>
+          ) : (
+            <>
+              {/* Three hints, not five: the footer is 560px wide and shares it
+                  with the provider switch. Tab-by-section and Ctrl+D favourite
+                  are in the docs, not on screen. */}
+              <div className="flex flex-1 items-center gap-2.5 overflow-hidden text-caption text-fg-muted">
+                <span className="flex shrink-0 items-center gap-1">
+                  <Kbd>↑</Kbd>
+                  <Kbd>↓</Kbd>
+                  navigate
+                </span>
+                <span className="flex shrink-0 items-center gap-1">
+                  <Kbd>Enter</Kbd>
+                  run
+                </span>
+                <span className="flex min-w-0 items-center gap-1 truncate">
+                  <Kbd combo="Ctrl+K" />
+                  search
+                </span>
+                <span className="flex shrink-0 items-center gap-1">
+                  <Kbd>F1</Kbd>
+                  keys
+                </span>
+              </div>
+              <Latency busy={busy} ms={latencyMs} />
+              {/* Native select: it is the right menu on both Windows and GNOME,
+                  and it costs no popover, portal or focus trap of our own. */}
+              <label className="flex shrink-0 items-center gap-1 text-caption text-fg-muted">
+                <span className="sr-only">Provider</span>
+                <select
+                  value={settings.data?.defaultProvider ?? ''}
+                  disabled={switchProvider.isPending || selectableProviders.length === 0}
+                  onChange={(event) => switchProvider.mutate(event.target.value as ProviderId)}
+                  className="max-w-[9rem] cursor-pointer truncate rounded-control border border-border bg-surface px-2 py-1 text-caption text-fg-secondary outline-none transition-colors duration-fast hover:bg-surface-hover focus-visible:ring-2 focus-visible:ring-ring/40"
+                >
+                  {selectableProviders.map((entry) => (
+                    <option key={entry.id} value={entry.id}>
+                      {entry.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => void onRecapture()}
+                disabled={recapture.isPending}
+              >
+                {recapture.isPending ? 'Capturing…' : 'Recapture'}
+              </Button>
+            </>
+          )}
+        </footer>
+      </motion.div>
+    </div>
+  );
 }
 
 /**

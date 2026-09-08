@@ -42,16 +42,30 @@ export function useOverlayAutoHeight(): RefObject<HTMLDivElement> {
     const element = ref.current;
     if (element === null) return undefined;
     let last = 0;
-    const observer = new ResizeObserver(() => {
+    const report = (force: boolean): void => {
       const height = Math.ceil(element.getBoundingClientRect().height);
       // Only on a real change: an observer that echoes its own resize back
       // would ping-pong with the window manager.
-      if (height === 0 || height === last) return;
+      if (height === 0 || (height === last && !force)) return;
       last = height;
       void ipcInvoke(IPC.overlay.resize, { height });
-    });
+    };
+    const observer = new ResizeObserver(() => report(false));
     observer.observe(element);
-    return () => observer.disconnect();
+    // Forced on focus, which is every time the hotkey shows the window.
+    //
+    // The popup is prewarmed and hidden rather than recreated, so this
+    // component stays mounted between presses and the observer has nothing to
+    // report when the same content comes back — while main had meanwhile reset
+    // the window to its opening size. The result was a popup clipped at the
+    // bottom: renderer and window each believed a different height, and
+    // neither was wrong about its own.
+    const onFocus = (): void => report(true);
+    window.addEventListener('focus', onFocus);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('focus', onFocus);
+    };
   }, []);
 
   return ref;
