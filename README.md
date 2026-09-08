@@ -342,6 +342,8 @@ them.
 
 ### Privacy
 
+The user-facing statement of all of this is [docs/PRIVACY.md](docs/PRIVACY.md).
+
 Conversation history is on by default and can be switched off, retained for a
 configurable number of days (swept at startup), deleted per entry, or deleted
 wholesale. Clipboard history is **off** by default: while it is on, a 1.5s poll
@@ -376,6 +378,9 @@ same reason the store exists: a plaintext key in a JSON file the user emails
 themselves is exactly the leak it prevents.
 
 ## Troubleshooting
+
+Setup and behaviour questions, as opposed to symptoms, are in
+[docs/FAQ.md](docs/FAQ.md).
 
 | Symptom                                     | Cause                                                                                              | Fix                                                                                                           |
 | ------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |

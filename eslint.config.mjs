@@ -18,6 +18,8 @@ export default tseslint.config(
       // Hand-run build tooling, outside the tsconfig graph: type-aware rules
       // see every Buffer helper as `any` and report nothing useful.
       'apps/desktop/scripts/**',
+      // Same: the one-off screenshot runner for the mockup page.
+      'docs/mockups/**',
     ],
   },
   js.configs.recommended,

@@ -1,0 +1,43 @@
+name: Feature request
+description: Suggest something the app should do
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The README's [Not in 1.0](https://github.com/mxnish-bhanot/ai-anywhere#not-in-10)
+        and [Roadmap](https://github.com/mxnish-bhanot/ai-anywhere#roadmap)
+        sections list what is already known to be missing and what is already
+        planned. macOS support is out of scope.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What you are trying to do that the app makes hard or impossible.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you would like it to do
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What you tried instead
+      description: Existing settings, prompt templates, another tool.
+
+  - type: dropdown
+    id: platforms
+    attributes:
+      label: Platforms this matters on
+      multiple: true
+      options:
+        - Windows
+        - Linux
+    validations:
+      required: true

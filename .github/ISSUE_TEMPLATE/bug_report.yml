@@ -1,0 +1,88 @@
+name: Bug report
+description: Something works differently than it should
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The README's [Troubleshooting](https://github.com/mxnish-bhanot/ai-anywhere#troubleshooting)
+        table covers the common ones — hotkey not firing, nothing captured,
+        replacement doing nothing. Worth a look first.
+
+        Never paste an API key, and check any log excerpt for one.
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, what you got instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Select text in ...
+        2. Press Ctrl+Space
+        3. Pick ...
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: settings → About, or the installer file name.
+      placeholder: 1.0.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Windows 11
+        - Windows 10
+        - Ubuntu / Debian (X11)
+        - Ubuntu / Debian (Wayland)
+        - Other Linux
+    validations:
+      required: true
+
+  - type: dropdown
+    id: artifact
+    attributes:
+      label: How it was installed
+      options:
+        - Windows installer (.exe)
+        - Windows portable (.exe)
+        - AppImage
+        - .deb
+        - From source (pnpm dev)
+    validations:
+      required: true
+
+  - type: input
+    id: provider
+    attributes:
+      label: Provider and model
+      description: Only if the bug involves a request.
+      placeholder: OpenAI / gpt-5-mini
+
+  - type: textarea
+    id: capabilities
+    attributes:
+      label: Session capabilities
+      description: >
+        If capture or replacement is the problem: settings → About reports
+        whether the session is degraded and which platform backends resolved.
+        Paste what it says.
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Errors, screenshots, the target application the text came from.

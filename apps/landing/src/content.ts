@@ -229,6 +229,7 @@ export interface Faq {
   readonly a: string;
 }
 
+/** Kept in step by hand with docs/FAQ.md, which is the longer version. */
 export const FAQS: readonly Faq[] = [
   {
     q: 'Do I need an API key?',
@@ -324,6 +325,7 @@ export const FOOTER_LINKS: readonly { readonly heading: string; readonly links: 
       { href: RELEASES_URL, label: 'Releases' },
       { href: `${REPO_URL}/issues`, label: 'Report an issue' },
       { href: `${REPO_URL}/blob/main/README.md`, label: 'Documentation' },
+      { href: `${REPO_URL}/blob/main/docs/PRIVACY.md`, label: 'Privacy' },
     ],
   },
 ];
