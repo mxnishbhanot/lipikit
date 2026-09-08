@@ -1,9 +1,15 @@
 import type { ActionId, ReplyStyle, Tone } from '@ai-anywhere/shared';
 
-export type CommandGroup = 'Writing' | 'Developer' | 'Communication' | 'AI';
+export type CommandGroup = 'Writing' | 'Developer' | 'Communication' | 'Translation' | 'AI';
 
 /** Display order of the groups in the popup; also the tab order of sections. */
-export const COMMAND_GROUPS: readonly CommandGroup[] = ['Writing', 'Developer', 'Communication', 'AI'];
+export const COMMAND_GROUPS: readonly CommandGroup[] = [
+  'Writing',
+  'Developer',
+  'Communication',
+  'Translation',
+  'AI',
+];
 
 /**
  * A user-facing command is a label plus the arguments the generic AI action
@@ -146,7 +152,9 @@ export const COMMANDS: readonly CommandDescriptor[] = [
     label: 'Client Reply',
     group: 'Communication',
     // Answers the selected client message rather than rewriting it; the same
-    // action the Ctrl+Shift+R flow runs, at its default style.
+    // action the client-reply shortcut runs, at its default style. This is the
+    // only route to a client reply when that shortcut is unbound, which it is
+    // by default.
     action: 'client-reply',
     replyStyle: 'professional',
     keywords: ['customer', 'support', 'response', 'answer'],
@@ -169,10 +177,12 @@ export const COMMANDS: readonly CommandDescriptor[] = [
       'Rewrite the following as a polite follow-up message that references the earlier request and asks for one clear next step.',
     keywords: ['nudge', 'reminder', 'chase'],
   },
+
+  // Translation
   {
     id: 'translate',
     label: 'Translate',
-    group: 'Communication',
+    group: 'Translation',
     action: 'translate',
     instruction: 'Target language:',
     inputPlaceholder: 'Target language (e.g. Spanish)',

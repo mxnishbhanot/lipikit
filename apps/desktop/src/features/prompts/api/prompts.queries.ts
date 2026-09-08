@@ -11,7 +11,9 @@ export const useSavePrompt = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (request: SavePromptRequest) => ipcInvoke(IPC.prompts.save, request),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.prompts }),
+    // Settled, not success: a prompt whose shortcut was refused is still
+    // stored, and the list has to show it alongside the error.
+    onSettled: () => queryClient.invalidateQueries({ queryKey: queryKeys.prompts }),
   });
 };
 
@@ -19,6 +21,6 @@ export const useDeletePrompt = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => ipcInvoke(IPC.prompts.delete, { id }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.prompts }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: queryKeys.prompts }),
   });
 };

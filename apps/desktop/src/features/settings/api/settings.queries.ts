@@ -15,6 +15,33 @@ export const useUpdateSettings = () => {
   });
 };
 
+/**
+ * Switch the active provider *and* the model in one write. A provider change
+ * alone would leave `defaultModel` naming a model the new vendor has never
+ * heard of, and the next call would 404 — so the model moves with it: the
+ * provider's own stored default when there is one, else the first model in its
+ * catalog.
+ */
+export const useSwitchProvider = () => {
+  const queryClient = useQueryClient();
+  const providers = useProviders();
+  const overrides = useProviderSettings();
+  return useMutation({
+    mutationFn: (providerId: ProviderId) => {
+      const stored = overrides.data?.find((row) => row.providerId === providerId)?.defaultModel;
+      const catalog = providers.data?.find((row) => row.id === providerId)?.models[0]?.id;
+      const defaultModel = stored ?? catalog;
+      return ipcInvoke(IPC.settings.update, {
+        defaultProvider: providerId,
+        // No catalog and no stored default means an unknown vendor list; keep
+        // whatever model is saved rather than clearing it to nothing.
+        ...(defaultModel === undefined ? {} : { defaultModel }),
+      });
+    },
+    onSuccess: (settings) => queryClient.setQueryData(queryKeys.settings, settings),
+  });
+};
+
 export const useProviders = () =>
   useQuery({
     queryKey: queryKeys.providers,

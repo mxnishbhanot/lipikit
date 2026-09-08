@@ -1,5 +1,19 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { AppSettings } from '@ai-anywhere/shared';
+import { Input, cn } from '@ai-anywhere/ui';
+import {
+  Clock,
+  Cpu,
+  Info,
+  KeyRound,
+  Keyboard,
+  Palette,
+  Search,
+  Settings2,
+  ShieldCheck,
+  Sparkles,
+  type LucideIcon,
+} from 'lucide-react';
 import { useSettings, useUpdateSettings } from '../api/settings.queries.js';
 import { AboutPage } from './pages/AboutPage.js';
 import { AppearancePage } from './pages/AppearancePage.js';
@@ -11,19 +25,29 @@ import { PromptTemplatesPage } from './pages/PromptTemplatesPage.js';
 import { ProvidersPage } from './pages/ProvidersPage.js';
 import { ShortcutsPage } from './pages/ShortcutsPage.js';
 
+/**
+ * `keywords` is what makes the search box worth having: someone looking for
+ * "api key" or "telemetry" does not know which of nine pages owns it, and a
+ * filter that only matched the nine titles would tell them nothing they cannot
+ * already see in the sidebar.
+ */
 const PAGES = [
-  'General',
-  'Appearance',
-  'Providers',
-  'Models',
-  'Shortcuts',
-  'History',
-  'Privacy',
-  'Prompt Templates',
-  'About',
-] as const;
+  {
+    name: 'General',
+    icon: Settings2,
+    keywords: 'tone streaming timeout launch login startup backup import export',
+  },
+  { name: 'Appearance', icon: Palette, keywords: 'theme dark light accent colour color' },
+  { name: 'Providers', icon: KeyRound, keywords: 'api key openai anthropic endpoint keyring health' },
+  { name: 'Models', icon: Cpu, keywords: 'model temperature tokens default provider' },
+  { name: 'Shortcuts', icon: Keyboard, keywords: 'hotkey keybinding global accelerator' },
+  { name: 'Prompt Templates', icon: Sparkles, keywords: 'prompts custom template variables' },
+  { name: 'History', icon: Clock, keywords: 'history retention entries delete log' },
+  { name: 'Privacy', icon: ShieldCheck, keywords: 'clipboard telemetry memory delete data' },
+  { name: 'About', icon: Info, keywords: 'version build platform capabilities quit' },
+] as const satisfies readonly { name: string; icon: LucideIcon; keywords: string }[];
 
-type Page = (typeof PAGES)[number];
+type Page = (typeof PAGES)[number]['name'];
 
 /**
  * Settings shell. Every page reads the same React Query cache entry, so the
@@ -33,8 +57,15 @@ type Page = (typeof PAGES)[number];
  */
 export function SettingsLayout(): JSX.Element {
   const [page, setPage] = useState<Page>('General');
+  const [query, setQuery] = useState('');
   const settings = useSettings();
   const update = useUpdateSettings();
+
+  const matches = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    if (needle.length === 0) return PAGES;
+    return PAGES.filter((entry) => `${entry.name} ${entry.keywords}`.toLowerCase().includes(needle));
+  }, [query]);
 
   const body = (current: AppSettings): JSX.Element => {
     // Optimistic writes are deliberately absent: a rejected hotkey or a failed
@@ -65,26 +96,56 @@ export function SettingsLayout(): JSX.Element {
   };
 
   return (
-    <div className="flex h-full gap-6">
-      <nav className="w-44 shrink-0 space-y-1" aria-label="Settings sections">
-        {PAGES.map((name) => (
-          <button
-            key={name}
-            type="button"
-            aria-current={name === page ? 'page' : undefined}
-            onClick={() => setPage(name)}
-            className={`w-full rounded-md px-3 py-1.5 text-left text-sm transition-colors ${
-              name === page ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent/50'
-            }`}
-          >
-            {name}
-          </button>
-        ))}
-      </nav>
+    <div className="flex h-full min-h-0">
+      <div className="flex w-56 shrink-0 flex-col gap-3 border-r border-border bg-background px-3 py-4">
+        <div className="relative">
+          <Search
+            aria-hidden
+            className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-fg-muted"
+          />
+          <Input
+            type="search"
+            value={query}
+            placeholder="Search settings"
+            aria-label="Search settings"
+            className="h-8 pl-8 text-caption"
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        </div>
 
-      <div className="min-w-0 flex-1">
-        {settings.isPending ? <p className="text-sm text-muted-foreground">Loading settings…</p> : null}
-        {settings.isError ? <p className="text-sm text-destructive">{settings.error.message}</p> : null}
+        <nav className="min-h-0 flex-1 space-y-0.5 overflow-y-auto" aria-label="Settings sections">
+          {matches.length === 0 ? (
+            <p className="px-2 py-1.5 text-caption text-fg-muted">No section matches “{query.trim()}”.</p>
+          ) : null}
+          {matches.map(({ name, icon: Icon }) => {
+            const active = name === page;
+            return (
+              <button
+                key={name}
+                type="button"
+                aria-current={active ? 'page' : undefined}
+                onClick={() => setPage(name)}
+                className={cn(
+                  'flex w-full items-center gap-2.5 rounded-control px-2.5 py-1.5 text-left text-body',
+                  'transition-colors duration-fast ease-calm',
+                  active
+                    ? 'bg-accent-subtle font-medium text-accent'
+                    : 'text-fg-secondary hover:bg-surface-hover hover:text-fg-primary',
+                )}
+              >
+                <Icon aria-hidden className="h-4 w-4 shrink-0" />
+                <span className="truncate">{name}</span>
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+
+      <div className="min-w-0 flex-1 overflow-y-auto">
+        {settings.isPending ? <p className="px-8 py-7 text-body text-fg-muted">Loading settings…</p> : null}
+        {settings.isError ? (
+          <p className="px-8 py-7 text-body text-danger">{settings.error.message}</p>
+        ) : null}
         {settings.data ? body(settings.data) : null}
       </div>
     </div>

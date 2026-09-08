@@ -1,6 +1,6 @@
 import type { AppSettings, Tone } from '@ai-anywhere/shared';
 import { Button } from '@ai-anywhere/ui';
-import { MutationStatus, NumberField, Row, Section, Toggle, FIELD } from '../fields.js';
+import { Group, MutationStatus, NumberRow, Row, SelectRow, SettingsPage, ToggleRow } from '../fields.js';
 import { useExportSettings, useImportSettings } from '../../api/settings.queries.js';
 
 const TONES: readonly Tone[] = ['neutral', 'formal', 'casual', 'friendly', 'confident', 'concise'];
@@ -18,59 +18,57 @@ export function GeneralPage({
   const importSettings = useImportSettings();
 
   return (
-    <div className="space-y-8">
-      <Section title="Behaviour">
-        <Row label="Default tone">
-          <select
-            className={FIELD}
-            value={settings.defaultTone}
-            onChange={(event) => patch({ defaultTone: event.target.value as Tone })}
-          >
-            {TONES.map((tone) => (
-              <option key={tone} value={tone}>
-                {tone}
-              </option>
-            ))}
-          </select>
-        </Row>
-
-        <Toggle
+    <SettingsPage title="General" description="How AI Anywhere behaves by default, and where it starts.">
+      <Group title="Behaviour">
+        <SelectRow
+          label="Default tone"
+          hint="Used by any action that does not pick its own."
+          value={settings.defaultTone}
+          options={TONES.map((tone) => [tone, tone])}
+          onChange={(tone) => patch({ defaultTone: tone as Tone })}
+        />
+        <ToggleRow
           label="Stream responses"
           hint="Off means one non-streaming call: slower to the first word, same result."
           checked={settings.streamingEnabled}
           onChange={(streamingEnabled) => patch({ streamingEnabled })}
         />
-
-        <NumberField
-          label="Request timeout (s)"
+        <NumberRow
+          label="Request timeout"
           hint="Whole-request deadline, applied per provider call."
           value={Math.round(settings.requestTimeoutMs / 1_000)}
           min={1}
           max={600}
+          suffix="seconds"
           onCommit={(seconds) => patch({ requestTimeoutMs: seconds * 1_000 })}
         />
+      </Group>
 
-        <Toggle
+      <Group title="Startup">
+        <ToggleRow
           label="Launch at login"
           hint="Starts AI Anywhere in the background so the hotkey works after a reboot. Installed builds only."
           checked={settings.launchAtLogin}
           onChange={(launchAtLogin) => patch({ launchAtLogin })}
         />
         <MutationStatus error={error} />
-      </Section>
+      </Group>
 
-      <Section
+      <Group
         title="Backup"
         description="Settings, shortcuts, prompts and provider endpoints as one JSON file. API keys are never exported — they stay encrypted in the OS keyring."
       >
-        <div className="flex flex-wrap items-center gap-2">
+        <Row
+          label="Settings file"
+          hint="Import replaces the values in the file; anything it omits is left alone."
+        >
           <Button
             size="sm"
             variant="outline"
             disabled={exportSettings.isPending}
             onClick={() => exportSettings.mutate()}
           >
-            {exportSettings.isPending ? 'Exporting…' : 'Export settings'}
+            {exportSettings.isPending ? 'Exporting…' : 'Export'}
           </Button>
           <Button
             size="sm"
@@ -78,9 +76,9 @@ export function GeneralPage({
             disabled={importSettings.isPending}
             onClick={() => importSettings.mutate()}
           >
-            {importSettings.isPending ? 'Importing…' : 'Import settings'}
+            {importSettings.isPending ? 'Importing…' : 'Import'}
           </Button>
-        </div>
+        </Row>
         <MutationStatus
           error={exportSettings.error ?? importSettings.error}
           success={
@@ -91,7 +89,7 @@ export function GeneralPage({
                 : null
           }
         />
-      </Section>
-    </div>
+      </Group>
+    </SettingsPage>
   );
 }

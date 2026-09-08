@@ -23,6 +23,14 @@ test('migrations are idempotent and settings/history round-trip', () => {
   assert.ok(reread.ok && reread.value.defaultTone === 'formal');
   assert.ok(reread.ok && reread.value.globalHotkey === DEFAULT_SETTINGS.globalHotkey);
 
+  // The optional shortcuts are clearable; the main one is not, so a blank
+  // value for it is dropped instead of locking the user out of the popup.
+  const cleared = settings.update({ clientReplyHotkey: '', globalHotkey: '  ' });
+  assert.ok(cleared.ok && cleared.value.clientReplyHotkey === '');
+  assert.ok(cleared.ok && cleared.value.globalHotkey === DEFAULT_SETTINGS.globalHotkey);
+  const afterClear = settings.get();
+  assert.ok(afterClear.ok && afterClear.value.globalHotkey === DEFAULT_SETTINGS.globalHotkey);
+
   const history = createHistoryRepository(db);
   const entry = {
     id: 'h1',
@@ -55,6 +63,16 @@ test('settings update clamps out-of-range numbers and drops unusable ones', () =
   const rejected = settings.update({ temperature: Number.NaN });
   assert.ok(rejected.ok);
   assert.equal(rejected.value.temperature, 2, 'a NaN patch must leave the stored value alone');
+
+  const accent = settings.update({ accentColor: 'violet' });
+  assert.ok(accent.ok);
+  assert.equal(accent.value.accentColor, 'violet');
+
+  // An unknown accent would write a `[data-accent]` value no stylesheet
+  // answers, leaving the UI with no accent colour at all.
+  const bogus = settings.update({ accentColor: 'chartreuse' as never });
+  assert.ok(bogus.ok);
+  assert.equal(bogus.value.accentColor, 'violet');
 });
 
 test('custom prompts round-trip, upsert on save, and validate', () => {
@@ -70,10 +88,15 @@ test('custom prompts round-trip, upsert on save, and validate', () => {
     group: 'Developer',
     template: 'Turn this into a bug report for {{app}}:\n\n{{text}}',
     appId: 'jira' as const,
+    shortcut: 'Control+Alt+B',
     createdAt: 1,
     updatedAt: 1,
   };
   assert.ok(prompts.save(prompt).ok);
+  // A blank shortcut is stored as "none", so the binder has one shape to check.
+  const blanked = prompts.save({ ...prompt, id: 'p2', shortcut: '   ' });
+  assert.ok(blanked.ok && blanked.value.shortcut === null);
+  assert.ok(prompts.delete('p2').ok);
 
   // Same id twice is an edit, not a second row.
   assert.ok(prompts.save({ ...prompt, label: 'Bug report v2', updatedAt: 2 }).ok);
@@ -181,6 +204,7 @@ test('export/import round-trips settings and prompts, and rejects junk', () => {
     group: 'Developer',
     template: 'Report: {{text}}',
     appId: 'jira',
+    shortcut: null,
     createdAt: 1,
     updatedAt: 1,
   });

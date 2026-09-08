@@ -4,18 +4,30 @@ import { forwardRef, type ButtonHTMLAttributes } from 'react';
 import { cn } from '../lib/cn.js';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+  [
+    'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-control',
+    'text-body font-medium',
+    'transition-colors duration-fast ease-calm',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+    'disabled:pointer-events-none disabled:opacity-50',
+  ].join(' '),
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-        outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
-        link: 'text-primary underline-offset-4 hover:underline',
+        /** The one emerald control on a screen: submit, run, save. */
+        default: 'bg-accent text-accent-foreground shadow-sm hover:bg-accent/90 active:bg-accent/95',
+        secondary: 'bg-surface-hover text-fg-primary hover:bg-surface-hover/70',
+        destructive: 'bg-danger text-white shadow-sm hover:bg-danger/90',
+        outline: 'border border-border bg-surface text-fg-primary shadow-sm hover:bg-surface-hover',
+        ghost: 'text-fg-secondary hover:bg-surface-hover hover:text-fg-primary',
+        link: 'text-accent underline-offset-4 hover:underline',
       },
-      size: { default: 'h-9 px-4 py-2', sm: 'h-8 px-3 text-xs', lg: 'h-10 px-6', icon: 'h-9 w-9' },
+      size: {
+        default: 'h-9 px-4',
+        sm: 'h-8 px-3 text-caption',
+        lg: 'h-11 px-6 text-body-lg',
+        icon: 'h-9 w-9',
+      },
     },
     defaultVariants: { variant: 'default', size: 'default' },
   },

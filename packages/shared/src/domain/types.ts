@@ -33,7 +33,12 @@ export const REPLY_STYLES: readonly ReplyStyle[] = [
  * What the popup is doing this time round. The palette is the general-purpose
  * flow; client-reply is its own hotkey and skips straight to the style picker.
  */
-export type OverlayMode = 'palette' | 'client-reply';
+/**
+ * Which screen the popup opens on. `quick-prompt` is the palette with one
+ * command already chosen — how a prompt's own shortcut runs it: the same list
+ * renders, then the command runs as soon as the selection lands.
+ */
+export type OverlayMode = 'palette' | 'client-reply' | 'quick-prompt';
 
 /**
  * The model's read of an inbound client message, parsed out of the answer it
@@ -58,6 +63,7 @@ export type KnownAppId =
   | 'slack'
   | 'jira'
   | 'confluence'
+  | 'github'
   | 'gmail'
   | 'outlook'
   | 'linkedin'
@@ -73,6 +79,7 @@ export const KNOWN_APP_IDS: readonly KnownAppId[] = [
   'slack',
   'jira',
   'confluence',
+  'github',
   'gmail',
   'outlook',
   'linkedin',
@@ -91,11 +98,15 @@ export interface AppContext {
   readonly label: string;
   readonly appName: string | null;
   readonly windowTitle: string | null;
-  /** Host guessed from a browser window title; null outside browsers. */
-  readonly domain: string | null;
+  /** OS the window was read on; null when nothing could be read at all. */
+  readonly platform: Platform | null;
+  /** Host of the site in a browser window; null outside browsers. */
+  readonly browserDomain: string | null;
   readonly isBrowser: boolean;
   /** Command ids the palette lists first, most relevant one leading. */
   readonly suggestedCommandIds: readonly string[];
+  /** When the window was read, so a stale context is recognisable as one. */
+  readonly timestamp: number;
 }
 
 /**
@@ -110,6 +121,12 @@ export interface CustomPrompt {
   readonly template: string;
   /** Suggest this prompt first when that app is in the foreground. */
   readonly appId: KnownAppId | null;
+  /**
+   * Optional global shortcut that runs this prompt directly. Null means none;
+   * a combination another app owns is refused and the prompt keeps saving
+   * without it.
+   */
+  readonly shortcut: string | null;
   readonly createdAt: number;
   readonly updatedAt: number;
 }
@@ -161,10 +178,30 @@ export interface CursorPoint {
   readonly y: number;
 }
 
+/**
+ * Accent choices. A closed list rather than a free hex value: every accent has
+ * to clear contrast against both themes, and a picker that lets someone choose
+ * yellow-on-white ships an unreadable UI. The names map to `[data-accent]`
+ * blocks in globals.css, which is the only place the actual colours live.
+ */
+export type AccentColor = 'emerald' | 'blue' | 'violet' | 'amber' | 'rose';
+
+export const ACCENT_COLORS: readonly AccentColor[] = ['emerald', 'blue', 'violet', 'amber', 'rose'];
+
 export interface AppSettings {
   readonly theme: 'system' | 'light' | 'dark';
+  /** Tints selection, focus and primary actions. Purely cosmetic. */
+  readonly accentColor: AccentColor;
+  /**
+   * The one shortcut that always exists: it is the only way into the popup, so
+   * an empty value is rejected rather than saved.
+   */
   readonly globalHotkey: string;
-  /** Second shortcut: capture a client message and go straight to a reply. */
+  /**
+   * Optional shortcut: capture a client message and go straight to a reply.
+   * Empty means unbound — Client Reply is still in the palette. Unset by
+   * default, because most users never answer clients from the desktop.
+   */
   readonly clientReplyHotkey: string;
   readonly defaultProvider: ProviderId;
   readonly defaultModel: string;
@@ -193,6 +230,13 @@ export interface AppSettings {
    * decision the user has to make deliberately.
    */
   readonly conversationMemoryEnabled: boolean;
+  /**
+   * False until the first-run wizard finishes or is skipped. Gates the main
+   * window on onboarding rather than a separate flag file: it exports and
+   * imports with the rest of settings, so a restored backup does not re-run
+   * setup on a machine that is already configured.
+   */
+  readonly onboardingCompleted: boolean;
 }
 
 export interface HistoryEntry {

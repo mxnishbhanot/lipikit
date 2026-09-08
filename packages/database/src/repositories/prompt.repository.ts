@@ -8,6 +8,7 @@ interface PromptRow {
   group: string;
   template: string;
   app_id: string | null;
+  shortcut: string | null;
   created_at: number;
   updated_at: number;
 }
@@ -18,6 +19,7 @@ const toPrompt = (row: PromptRow): CustomPrompt => ({
   group: row.group,
   template: row.template,
   appId: row.app_id as KnownAppId | null,
+  shortcut: row.shortcut,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
 });
@@ -26,13 +28,14 @@ export function createPromptRepository(db: DatabaseHandle): PromptRepository {
   // "group" is a reserved word in SQLite, hence the quoting everywhere.
   const listStmt = db.prepare('SELECT * FROM prompts ORDER BY "group", label');
   const upsert = db.prepare(
-    `INSERT INTO prompts (id, label, "group", template, app_id, created_at, updated_at)
-     VALUES (@id, @label, @group, @template, @appId, @createdAt, @updatedAt)
+    `INSERT INTO prompts (id, label, "group", template, app_id, shortcut, created_at, updated_at)
+     VALUES (@id, @label, @group, @template, @appId, @shortcut, @createdAt, @updatedAt)
      ON CONFLICT(id) DO UPDATE SET
        label = excluded.label,
        "group" = excluded."group",
        template = excluded.template,
        app_id = excluded.app_id,
+       shortcut = excluded.shortcut,
        updated_at = excluded.updated_at`,
   );
   const deleteStmt = db.prepare('DELETE FROM prompts WHERE id = ?');
@@ -55,8 +58,12 @@ export function createPromptRepository(db: DatabaseHandle): PromptRepository {
         return err(appError('VALIDATION', 'A prompt needs a template'));
       }
       try {
-        upsert.run({ ...prompt, label: prompt.label.trim(), template: prompt.template.trim() });
-        return ok(prompt);
+        // An empty string is not a shortcut; store it as "none" so the binder
+        // has one shape to check.
+        const shortcut =
+          prompt.shortcut === null || prompt.shortcut.trim().length === 0 ? null : prompt.shortcut;
+        upsert.run({ ...prompt, label: prompt.label.trim(), template: prompt.template.trim(), shortcut });
+        return ok({ ...prompt, shortcut });
       } catch (cause) {
         return err(appError('UNKNOWN', 'Failed to save prompt', cause));
       }

@@ -10,7 +10,8 @@ export interface ClientReplyProps {
 }
 
 /**
- * The Ctrl+Shift+R home screen: pick a voice, and the reply is generated.
+ * The client-reply home screen: pick a voice, and the reply is generated.
+ * Reached from the palette, or from the optional client-reply shortcut.
  * Styles are ordinary commands, so picking one goes through the same run /
  * retry / history path as everything in the palette.
  */

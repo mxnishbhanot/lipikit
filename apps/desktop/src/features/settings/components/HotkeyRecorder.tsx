@@ -53,10 +53,13 @@ export function HotkeyRecorder({
   value,
   disabled,
   onChange,
+  onClear,
 }: {
   value: string;
   disabled?: boolean;
   onChange: (accelerator: string) => void;
+  /** Omitted for a shortcut that cannot be removed, which hides the button. */
+  onClear?: () => void;
 }): JSX.Element {
   const [recording, setRecording] = useState(false);
 
@@ -87,7 +90,9 @@ export function HotkeyRecorder({
           }}
         />
       ) : (
-        <code className="w-56 rounded bg-muted px-2 py-1 text-sm">{value}</code>
+        <code className="w-56 rounded bg-muted px-2 py-1 text-sm">
+          {value.length > 0 ? value : <span className="text-muted-foreground">Not set</span>}
+        </code>
       )}
       <Button
         size="sm"
@@ -95,8 +100,13 @@ export function HotkeyRecorder({
         disabled={disabled ?? false}
         onClick={() => setRecording((previous) => !previous)}
       >
-        {recording ? 'Cancel' : 'Change'}
+        {recording ? 'Cancel' : value.length > 0 ? 'Change' : 'Set'}
       </Button>
+      {onClear !== undefined && value.length > 0 && !recording ? (
+        <Button size="sm" variant="ghost" disabled={disabled ?? false} onClick={onClear}>
+          Remove
+        </Button>
+      ) : null}
     </div>
   );
 }

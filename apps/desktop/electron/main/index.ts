@@ -1,11 +1,11 @@
 import { app, BrowserWindow } from 'electron';
 import { loadEnv } from '@ai-anywhere/shared';
 import { HOTKEY_SERVICE } from '@ai-anywhere/platform';
-import { HISTORY_REPOSITORY, SETTINGS_REPOSITORY } from '@ai-anywhere/database';
+import { HISTORY_REPOSITORY, PROMPT_REPOSITORY, SETTINGS_REPOSITORY } from '@ai-anywhere/database';
 import { buildContainer } from './composition-root.js';
 import { createIpcHandlers } from './ipc/handlers.js';
 import { registerIpcHandlers } from './ipc/typed-ipc.js';
-import { bindGlobalHotkey, resetHotkeyBinding } from './services/hotkey-binding.js';
+import { bindGlobalHotkey, resetHotkeyBinding, syncPromptHotkeys } from './services/hotkey-binding.js';
 import { CLIPBOARD_MONITOR, LOGGER, WINDOW_MANAGER } from './tokens.js';
 
 // A packaged build never trusts an inherited NODE_ENV: it would try to load
@@ -39,6 +39,10 @@ if (!app.requestSingleInstanceLock()) {
     if (settings.ok) {
       bindGlobalHotkey(container, settings.value.globalHotkey, 'palette');
       bindGlobalHotkey(container, settings.value.clientReplyHotkey, 'client-reply');
+      // Prompt shortcuts live on the prompt rows, so they are bound from the
+      // list rather than from settings.
+      const stored = container.resolve(PROMPT_REPOSITORY).list();
+      if (stored.ok) syncPromptHotkeys(container, stored.value);
       // Retention is enforced at startup rather than on a timer: the app is
       // long-lived but the window the user cares about is "what is in the DB
       // now", and a sweep on boot is one query instead of a scheduler.

@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Button, Input } from '@ai-anywhere/ui';
+import { Button, EmptyState, Input } from '@ai-anywhere/ui';
 import { PROMPT_VARIABLES } from '@ai-anywhere/prompts';
 import { KNOWN_APP_IDS, type CustomPrompt, type KnownAppId } from '@ai-anywhere/shared';
+import { HotkeyRecorder } from '../../settings/components/HotkeyRecorder.js';
 import { useCustomPrompts, useDeletePrompt, useSavePrompt } from '../api/prompts.queries.js';
 
 interface Draft {
@@ -10,9 +11,10 @@ interface Draft {
   readonly group: string;
   readonly template: string;
   readonly appId: KnownAppId | null;
+  readonly shortcut: string | null;
 }
 
-const EMPTY: Draft = { label: '', group: 'Custom', template: '', appId: null };
+const EMPTY: Draft = { label: '', group: 'Custom', template: '', appId: null, shortcut: null };
 
 const toDraft = (prompt: CustomPrompt): Draft => ({
   id: prompt.id,
@@ -20,6 +22,7 @@ const toDraft = (prompt: CustomPrompt): Draft => ({
   group: prompt.group,
   template: prompt.template,
   appId: prompt.appId,
+  shortcut: prompt.shortcut,
 });
 
 /**
@@ -40,6 +43,7 @@ export function PromptBuilder(): JSX.Element {
       group: draft.group,
       template: draft.template,
       appId: draft.appId,
+      shortcut: draft.shortcut,
     });
     setDraft(EMPTY);
   };
@@ -93,6 +97,17 @@ export function PromptBuilder(): JSX.Element {
           className="resize-y rounded-md border border-input bg-background p-2 font-mono text-xs outline-none focus-visible:ring-1 focus-visible:ring-ring"
         />
 
+        <div className="flex flex-col gap-1">
+          <span className="text-xs text-muted-foreground">
+            Global shortcut — optional. Runs this prompt on the selected text with no popup in between.
+          </span>
+          <HotkeyRecorder
+            value={draft.shortcut ?? ''}
+            onChange={(shortcut) => setDraft({ ...draft, shortcut })}
+            onClear={() => setDraft({ ...draft, shortcut: null })}
+          />
+        </div>
+
         <div className="flex flex-wrap gap-1">
           {PROMPT_VARIABLES.map((variable) => (
             <button
@@ -127,7 +142,7 @@ export function PromptBuilder(): JSX.Element {
 
       <section className="flex flex-col gap-1">
         <h2 className="text-sm font-semibold">Your prompts</h2>
-        {prompts.data?.length === 0 ? <p className="text-xs text-muted-foreground">None yet.</p> : null}
+        {prompts.data?.length === 0 ? <EmptyState kind="first-prompt" size="sm" /> : null}
         {prompts.data?.map((prompt) => (
           <div
             key={prompt.id}
@@ -139,6 +154,7 @@ export function PromptBuilder(): JSX.Element {
                 {' · '}
                 {prompt.group}
                 {prompt.appId === null ? '' : ` · ${prompt.appId}`}
+                {prompt.shortcut === null ? '' : ` · ${prompt.shortcut}`}
               </span>
             </span>
             <Button size="sm" variant="ghost" onClick={() => setDraft(toDraft(prompt))}>

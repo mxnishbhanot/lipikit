@@ -17,6 +17,8 @@ import type { WindowManager } from '../windows/window-manager.js';
 export interface HotkeyPress {
   readonly accelerator: string;
   readonly mode: OverlayMode;
+  /** Command the renderer should run on arrival; only `quick-prompt` sets it. */
+  readonly commandId?: string | null;
 }
 
 /**

@@ -1,9 +1,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MotionConfig } from 'framer-motion';
 import { useEffect, useState, type ReactNode } from 'react';
 import { IPC_EVENTS } from '@ai-anywhere/shared';
+import { DURATION, EASE } from '@ai-anywhere/ui';
 import { ipcOn } from '../lib/ipc-client.js';
 import { queryKeys } from '../lib/query-keys.js';
-import { useTheme } from '../lib/use-theme.js';
+import { ThemeProvider } from '../lib/theme-provider.js';
 
 export function AppProviders({ children }: { readonly children: ReactNode }): JSX.Element {
   // One client per app instance; created lazily so StrictMode's double render
@@ -32,13 +34,15 @@ export function AppProviders({ children }: { readonly children: ReactNode }): JS
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemedShell>{children}</ThemedShell>
+      {/*
+        `reducedMotion="user"` is the whole reduced-motion story: framer-motion
+        drops transforms and keeps opacity for every animation in the tree, so
+        no variant has to check the media query itself.
+      */}
+      <MotionConfig reducedMotion="user" transition={{ duration: DURATION.base, ease: EASE }}>
+        {/* Inside the query provider: the theme comes from the settings query. */}
+        <ThemeProvider>{children}</ThemeProvider>
+      </MotionConfig>
     </QueryClientProvider>
   );
-}
-
-/** Inside the provider, because the theme comes from the settings query. */
-function ThemedShell({ children }: { readonly children: ReactNode }): JSX.Element {
-  useTheme();
-  return <>{children}</>;
 }

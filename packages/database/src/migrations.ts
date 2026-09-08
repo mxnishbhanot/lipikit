@@ -72,6 +72,13 @@ export const MIGRATIONS: readonly Migration[] = [
       );
     `,
   },
+  {
+    version: 4,
+    name: 'prompt-shortcuts',
+    up: `
+      ALTER TABLE prompts ADD COLUMN shortcut TEXT;
+    `,
+  },
 ];
 
 /** Runs pending migrations in one transaction each; returns how many ran. */

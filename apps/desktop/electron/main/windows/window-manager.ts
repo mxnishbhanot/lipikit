@@ -12,6 +12,12 @@ export interface WindowManager {
    */
   showOverlayAt(point: CursorPoint): Promise<BrowserWindow>;
   isOverlayVisible(): boolean;
+  /**
+   * Grow or shrink the popup to fit its content, keeping its top-left corner
+   * where it is. Returns silently when the popup is gone: a resize that
+   * arrives after the window closed is a race, not an error.
+   */
+  resizeOverlay(height: number): void;
   hideOverlay(): void;
   /** Type-safe main -> renderer push to every live window. */
   broadcast<E extends IpcEventName>(event: E, payload: IpcEventContract[E]): void;
@@ -21,6 +27,12 @@ export interface WindowManager {
 const PRELOAD = join(__dirname, '../preload/index.js');
 
 const OVERLAY_SIZE = { width: 560, height: 440 } as const;
+/**
+ * Height bounds for the content-driven resize. The floor keeps the header and
+ * footer from colliding when a search matches nothing; the ceiling is applied
+ * against the work area too, so a short display wins over this number.
+ */
+const OVERLAY_HEIGHT = { min: 220, max: 704 } as const;
 /** Nudge away from the pointer so the popup never opens under the cursor. */
 const OVERLAY_OFFSET = { x: 12, y: 16 } as const;
 
@@ -140,6 +152,17 @@ export function createWindowManager(env: AppEnv, logger: Logger): WindowManager 
     },
     isOverlayVisible() {
       return Boolean(overlayWindow && !overlayWindow.isDestroyed() && overlayWindow.isVisible());
+    },
+    resizeOverlay(height) {
+      if (!overlayWindow || overlayWindow.isDestroyed()) return;
+      const bounds = overlayWindow.getBounds();
+      const { workArea } = screen.getDisplayNearestPoint({ x: bounds.x, y: bounds.y });
+      // Never taller than what is left below the popup's own top edge, or the
+      // footer ends up off the bottom of the screen.
+      const room = workArea.y + workArea.height - bounds.y;
+      const next = clamp(Math.round(height), OVERLAY_HEIGHT.min, Math.min(OVERLAY_HEIGHT.max, room));
+      if (next === bounds.height) return;
+      overlayWindow.setBounds({ ...bounds, height: next });
     },
     hideOverlay() {
       // hide(), never close(): hiding hands focus back to the app the user was

@@ -78,6 +78,7 @@ export interface SavePromptRequest {
   readonly group: string;
   readonly template: string;
   readonly appId: CustomPrompt['appId'];
+  readonly shortcut: CustomPrompt['shortcut'];
 }
 
 export interface GenerateResponse {
@@ -155,6 +156,12 @@ export interface IpcContract {
   [IPC.prompts.delete]: { request: { id: string }; response: Result<void> };
 
   [IPC.overlay.close]: { request: void; response: Result<void> };
+  /**
+   * The popup's height follows its content, so the renderer is the only thing
+   * that knows the right value; main clamps it to the display it is on.
+   */
+  [IPC.overlay.resize]: { request: { height: number }; response: Result<void> };
+  [IPC.overlay.openSettings]: { request: void; response: Result<void> };
 
   [IPC.app.getInfo]: { request: void; response: Result<AppInfo> };
   [IPC.app.quit]: { request: void; response: Result<void> };
@@ -176,9 +183,11 @@ export interface IpcEventContract {
   [IPC_EVENTS.settingsChanged]: AppSettings;
   [IPC_EVENTS.selectionCaptured]: CapturedSelection;
   [IPC_EVENTS.selectionCaptureFailed]: AppError;
-  [IPC_EVENTS.hotkeyTriggered]: { accelerator: string; mode: OverlayMode };
+  /** `commandId` is set only for `quick-prompt`: the command to run on arrival. */
+  [IPC_EVENTS.hotkeyTriggered]: { accelerator: string; mode: OverlayMode; commandId?: string | null };
   [IPC_EVENTS.aiDelta]: { requestId: string; delta: string };
   [IPC_EVENTS.contextDetected]: AppContext;
+  [IPC_EVENTS.navigate]: { view: 'home' | 'settings' };
 }
 
 export type IpcEventName = keyof IpcEventContract;

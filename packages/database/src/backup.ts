@@ -71,6 +71,7 @@ const pickPrompts = (value: unknown): readonly CustomPrompt[] => {
         group: typeof raw['group'] === 'string' ? raw['group'] : 'Imported',
         template: raw['template'],
         appId: (typeof raw['appId'] === 'string' ? raw['appId'] : null) as CustomPrompt['appId'],
+        shortcut: typeof raw['shortcut'] === 'string' ? raw['shortcut'] : null,
         createdAt: typeof raw['createdAt'] === 'number' ? raw['createdAt'] : now,
         updatedAt: now,
       },

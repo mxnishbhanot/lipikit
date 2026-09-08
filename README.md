@@ -50,25 +50,49 @@ settings export, or the renderer. If the keyring is unavailable, storing a key
 
 ## Keyboard shortcuts
 
-Both global hotkeys are rebindable under **settings → Shortcuts**; a
+`Ctrl+Space` is the only shortcut that always exists — it is the one way into
+the popup, so it can be rebound but not removed. The other two are optional and
+**unbound by default**; set or clear them under **settings → Shortcuts**. A
 combination another app already owns is refused, with the previous binding left
 working.
 
-| Shortcut        | Scope         | Action                                                |
-| --------------- | ------------- | ----------------------------------------------------- |
-| `Ctrl+Space`    | global        | Capture the selection and open the command palette    |
-| `Ctrl+Shift+R`  | global        | Capture the selection and open client reply           |
-| `↓` / `Ctrl+N`  | palette       | Next command                                          |
-| `↑` / `Ctrl+P`  | palette       | Previous command                                      |
-| `Home` / `End`  | palette       | First / last command                                  |
-| `Enter`         | palette       | Run the highlighted command                           |
-| `Ctrl+D`        | palette       | Toggle the highlighted command as a favourite         |
-| `Enter`         | command input | Run a command that asks for extra input               |
-| `Esc`           | command input | Back to the command list                              |
-| `←` `→` `↑` `↓` | client reply  | Move through the reply-style grid (2 columns, wraps)  |
-| `Ctrl+Enter`    | result        | Replace the original selection with the result        |
-| `Esc`           | result        | Back to the palette (the request is cancelled)        |
-| `Esc`           | palette       | Close the popup; the clipboard is restored either way |
+| Shortcut            | Scope         | Action                                                |
+| ------------------- | ------------- | ----------------------------------------------------- |
+| `Ctrl+Space`        | global        | Capture the selection and open the command palette    |
+| unset               | global        | Capture the selection and open client reply           |
+| `↓` / `Ctrl+N`      | palette       | Next command                                          |
+| `↑` / `Ctrl+P`      | palette       | Previous command                                      |
+| `Home` / `End`      | palette       | First / last command                                  |
+| `Enter`             | palette       | Run the highlighted command                           |
+| `Tab` / `Shift+Tab` | palette       | Next / previous section                               |
+| `Ctrl+K`            | popup         | Focus and clear the search field, from any screen     |
+| `Ctrl+D`            | palette       | Toggle the highlighted command as a favourite         |
+| `Enter`             | command input | Run a command that asks for extra input               |
+| `Esc`               | command input | Back to the command list                              |
+| `←` `→` `↑` `↓`     | client reply  | Move through the reply-style grid (2 columns, wraps)  |
+| `Ctrl+Enter`        | result        | Replace the original selection with the result        |
+| `Esc`               | result        | Back to the palette (the request is cancelled)        |
+| `Esc`               | palette       | Close the popup; the clipboard is restored either way |
+
+The popup is 560px wide and as tall as its content: the window resizes as a
+search narrows the list, rather than leaving half of it empty. Its header holds
+the search field, the active model, and a settings button; its footer holds the
+shortcut hints, a provider switch, and the round-trip time of the last call.
+
+**Client reply** needs no shortcut: it is a built-in palette command
+(Communication → Client Reply) and runs at the professional style. The optional
+shortcut only skips the palette and lands on the style picker, so removing it
+loses nothing. Installs from before 1.0 keep whatever they had bound.
+
+**Your own prompts get their own shortcuts.** Every prompt template has an
+optional global shortcut, stored on the prompt itself, so there is no limit of
+one: `Ctrl+Alt+B` can run "Bug report" while `Ctrl+Alt+S` runs "Standup
+update". It runs on the selected text with no popup in between. Set it in
+either place — settings → Shortcuts lists every template beside its
+combination, and the Prompt Templates editor has the same field. Clearing it,
+or deleting the prompt, releases the combination back to the OS. A combination
+another app owns is refused: the prompt still saves, and the error says the
+shortcut did not take.
 
 Copying the result and appending it below the original are buttons in the
 result view, not shortcuts. A global shortcut needs at least one modifier: the
@@ -149,6 +173,13 @@ Other scripts:
 | `pnpm dist:win`               | NSIS installer + portable .exe                 |
 | `pnpm dist:linux`             | AppImage + .deb                                |
 | `pnpm dist`                   | Every target for the host platform             |
+
+## Design system
+
+Tokens, theme modes, type scale, radii, shadows, motion and the UI primitives
+are documented in [docs/design-system.md](docs/design-system.md). Token values
+live in `apps/desktop/src/styles/globals.css`; the utilities that name them
+live in `packages/ui/tailwind.preset.cjs`.
 
 ## Layout
 
@@ -432,8 +463,9 @@ usefulness.
 5. **macOS support** — the platform interfaces are already the seam
    (`packages/platform/src/contracts.ts`); it needs a backend using Accessibility
    APIs plus the permission prompts that come with them.
-6. **User-defined commands** — the palette is fed from `packages/prompts`
-   templates; letting users add and edit their own is mostly UI.
+6. **Shortcut conflict hints** — a combination another app owns is refused per
+   binding and reported, but nothing warns you up front, and two prompts can
+   still be given the same one.
 7. **Streaming into the result view** — providers already implement
    `streamText`; the overlay still waits for the whole answer.
 8. **Wayland foreground window** — needs a portal or per-compositor protocol,

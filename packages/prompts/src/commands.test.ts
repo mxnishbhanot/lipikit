@@ -75,6 +75,7 @@ test('custom prompts merge into the palette without colliding with built-ins', (
     group: 'Standups',
     template: 'Bug: {{text}}',
     appId: 'jira' as const,
+    shortcut: null,
     createdAt: 0,
     updatedAt: 0,
   };
@@ -94,6 +95,7 @@ test('suggestions put an app-tagged user prompt ahead of the built-ins', () => {
     group: 'Custom',
     template: '{{text}}',
     appId: 'jira' as const,
+    shortcut: null,
     createdAt: 0,
     updatedAt: 0,
   };
@@ -103,9 +105,11 @@ test('suggestions put an app-tagged user prompt ahead of the built-ins', () => {
     label: 'Jira',
     appName: 'firefox',
     windowTitle: 'Jira',
-    domain: 'atlassian.net',
+    platform: 'linux' as const,
+    browserDomain: 'atlassian.net',
     isBrowser: true,
     suggestedCommandIds: ['jira-comment', 'nope', 'jira-comment'],
+    timestamp: 0,
   };
   const suggested = suggestedFor(context, merged, [prompt]).map((command) => command.id);
   // Unknown ids dropped, duplicates collapsed, user prompt first.

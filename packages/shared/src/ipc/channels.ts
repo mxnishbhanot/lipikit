@@ -61,6 +61,10 @@ export const IPC = {
   },
   overlay: {
     close: 'overlay:close',
+    /** Content-driven height: the popup measures itself and asks for the size. */
+    resize: 'overlay:resize',
+    /** Hide the popup and bring the settings window forward. */
+    openSettings: 'overlay:open-settings',
   },
   app: {
     getInfo: 'app:get-info',
@@ -78,6 +82,8 @@ export const IPC_EVENTS = {
   aiDelta: 'event:ai-delta',
   /** Foreground app resolved for the selection the popup is about to show. */
   contextDetected: 'event:context-detected',
+  /** Main asks the main window to show a view — the popup's settings button. */
+  navigate: 'event:navigate',
 } as const;
 
 export type IpcEventChannel = (typeof IPC_EVENTS)[keyof typeof IPC_EVENTS];

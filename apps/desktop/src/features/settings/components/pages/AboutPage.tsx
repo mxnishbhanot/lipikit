@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { IPC } from '@ai-anywhere/shared';
-import { Button } from '@ai-anywhere/ui';
+import { Badge, Button } from '@ai-anywhere/ui';
+import { Power } from 'lucide-react';
 import { ipcInvoke } from '../../../../lib/ipc-client.js';
 import { queryKeys } from '../../../../lib/query-keys.js';
-import { Row, Section } from '../fields.js';
+import { Group, Row, SettingsPage } from '../fields.js';
 
 export function AboutPage(): JSX.Element {
   const appInfo = useQuery({
@@ -17,46 +18,52 @@ export function AboutPage(): JSX.Element {
     staleTime: Infinity,
   });
 
+  const yesNo = (value: boolean): JSX.Element => (
+    <Badge tone={value ? 'success' : 'warning'}>{value ? 'Yes' : 'No'}</Badge>
+  );
+
   return (
-    <div className="space-y-8">
-      <Section title="AI Anywhere" description="Select text in any app, press the hotkey, pick an action.">
+    <SettingsPage title="About" description="Select text in any app, press the hotkey, pick an action.">
+      <Group title="AI Anywhere">
         <Row label="Version">
-          <span>{appInfo.data?.version ?? '…'}</span>
+          <span className="text-body tabular-nums text-fg-secondary">{appInfo.data?.version ?? '…'}</span>
         </Row>
         <Row label="Build">
-          <span>{appInfo.data ? (appInfo.data.isPackaged ? 'packaged' : 'development') : '…'}</span>
+          <Badge tone={appInfo.data?.isPackaged ? 'neutral' : 'accent'}>
+            {appInfo.data ? (appInfo.data.isPackaged ? 'packaged' : 'development') : '…'}
+          </Badge>
         </Row>
-      </Section>
+      </Group>
 
-      <Section title="This machine" description="What the app can actually do here, resolved at startup.">
+      <Group title="This machine" description="What the app can actually do here, resolved at startup.">
         <Row label="Platform">
-          <span>
+          <span className="text-body text-fg-secondary">
             {capabilities.data?.platform ?? '…'}
             {capabilities.data?.displayServer === null ? '' : ` · ${capabilities.data?.displayServer}`}
           </span>
         </Row>
         <Row label="Clipboard backend">
-          <code>{capabilities.data?.clipboardBackend ?? '…'}</code>
+          <code className="text-caption text-fg-secondary">{capabilities.data?.clipboardBackend ?? '…'}</code>
         </Row>
         <Row label="Keystroke backend">
-          <code>{capabilities.data?.keystrokeBackend ?? '…'}</code>
+          <code className="text-caption text-fg-secondary">{capabilities.data?.keystrokeBackend ?? '…'}</code>
         </Row>
-        <Row label="Capture / replace">
-          <span>
-            {capabilities.data
-              ? `${capabilities.data.canCaptureSelection ? 'yes' : 'no'} / ${
-                  capabilities.data.canReplaceText ? 'yes' : 'no'
-                }`
-              : '…'}
-          </span>
+        <Row label="Capture selection" hint="Injects Ctrl+C to read the selection.">
+          {capabilities.data ? yesNo(capabilities.data.canCaptureSelection) : <span>…</span>}
         </Row>
-      </Section>
+        <Row label="Replace text" hint="Injects Ctrl+V to write the answer back.">
+          {capabilities.data ? yesNo(capabilities.data.canReplaceText) : <span>…</span>}
+        </Row>
+      </Group>
 
-      <Section title="Quit">
-        <Button size="sm" variant="outline" onClick={() => void ipcInvoke(IPC.app.quit, undefined)}>
-          Quit AI Anywhere
-        </Button>
-      </Section>
-    </div>
+      <Group title="Quit">
+        <Row label="Quit AI Anywhere" hint="Stops the background process; global shortcuts stop working.">
+          <Button size="sm" variant="outline" onClick={() => void ipcInvoke(IPC.app.quit, undefined)}>
+            <Power aria-hidden className="h-3.5 w-3.5" />
+            Quit
+          </Button>
+        </Row>
+      </Group>
+    </SettingsPage>
   );
 }

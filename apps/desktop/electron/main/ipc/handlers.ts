@@ -26,7 +26,7 @@ import {
 } from '@ai-anywhere/database';
 import { AUTOSTART_SERVICE, PLATFORM_SERVICES } from '@ai-anywhere/platform';
 import { APP_CONTEXT_SERVICE, TEXT_CAPTURE_SERVICE } from '@ai-anywhere/context-engine';
-import { bindGlobalHotkey } from '../services/hotkey-binding.js';
+import { bindGlobalHotkey, syncPromptHotkeys } from '../services/hotkey-binding.js';
 import {
   AI_SERVICE,
   CLIPBOARD_MONITOR,
@@ -45,6 +45,11 @@ export function createIpcHandlers(container: Container): IpcHandlerMap {
   const settings = () => container.resolve(SETTINGS_REPOSITORY);
   const history = () => container.resolve(HISTORY_REPOSITORY);
   const prompts = () => container.resolve(PROMPT_REPOSITORY);
+  /** Re-reads the list so the OS holds exactly the prompt shortcuts it stores. */
+  const resyncPromptHotkeys = () => {
+    const list = prompts().list();
+    return list.ok ? syncPromptHotkeys(container, list.value) : list;
+  };
   const providers = () => container.resolve(PROVIDER_REGISTRY);
   const keys = () => container.resolve(API_KEY_STORE);
   const windows = () => container.resolve(WINDOW_MANAGER);
@@ -162,6 +167,7 @@ export function createIpcHandlers(container: Container): IpcHandlerMap {
       // settings:update would have re-applied has to be re-applied here too.
       bindGlobalHotkey(container, applied.value.globalHotkey, 'palette');
       bindGlobalHotkey(container, applied.value.clientReplyHotkey, 'client-reply');
+      resyncPromptHotkeys();
       refreshBaseUrls();
       container.resolve(CLIPBOARD_MONITOR).sync();
       windows().broadcast(IPC_EVENTS.settingsChanged, applied.value);
@@ -222,19 +228,56 @@ export function createIpcHandlers(container: Container): IpcHandlerMap {
       // One upsert for both create and edit: the renderer sends an id only
       // when it is editing, so a missing id is what "new" means. ON CONFLICT
       // leaves created_at alone, so this `now` only lands on a real create.
-      return prompts().save({
+      const saved = prompts().save({
         id: request.id ?? randomUUID(),
         label: request.label,
         group: request.group,
         template: request.template,
         appId: request.appId,
+        shortcut: request.shortcut,
         createdAt: now,
         updatedAt: now,
       });
+      if (!saved.ok) return saved;
+      // The prompt is already stored, so a refused combination is reported as
+      // "saved, but the shortcut did not take" rather than losing the edit.
+      const synced = resyncPromptHotkeys();
+      if (!synced.ok) {
+        return err(
+          appError(
+            'VALIDATION',
+            `Prompt saved, but ${request.shortcut ?? 'the shortcut'} is already taken by another app`,
+            synced.error,
+          ),
+        );
+      }
+      return saved;
     },
-    [IPC.prompts.delete]: ({ id }) => prompts().delete(id),
+    [IPC.prompts.delete]: ({ id }) => {
+      const removed = prompts().delete(id);
+      if (!removed.ok) return removed;
+      resyncPromptHotkeys();
+      return removed;
+    },
 
     [IPC.overlay.close]: () => flow().dismiss(),
+
+    [IPC.overlay.resize]: ({ height }) => {
+      if (!Number.isFinite(height) || height <= 0) {
+        return err(appError('VALIDATION', 'Overlay height must be a positive number'));
+      }
+      windows().resizeOverlay(height);
+      return ok(undefined);
+    },
+
+    [IPC.overlay.openSettings]: () => {
+      windows().hideOverlay();
+      windows().showMain();
+      // The main window may already be open on another view; tell it which one
+      // the user asked for rather than leaving them to click again.
+      windows().broadcast(IPC_EVENTS.navigate, { view: 'settings' });
+      return ok(undefined);
+    },
 
     [IPC.app.getInfo]: () =>
       ok({

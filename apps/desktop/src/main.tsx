@@ -3,6 +3,9 @@ import { createRoot } from 'react-dom/client';
 import { App } from './app/App.js';
 import { AppProviders } from './app/AppProviders.js';
 import { Overlay } from './features/overlay/components/Overlay.js';
+// Bundled, not fetched: the renderer has no network access to a font CDN and
+// a missing webfont would fall back mid-session.
+import '@fontsource-variable/inter';
 import './styles/globals.css';
 
 const container = document.getElementById('root');

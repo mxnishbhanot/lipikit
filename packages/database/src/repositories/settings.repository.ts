@@ -1,11 +1,15 @@
-import { appError, err, ok, type AppSettings } from '@ai-anywhere/shared';
+import { ACCENT_COLORS, appError, err, ok, type AppSettings } from '@ai-anywhere/shared';
 import type { DatabaseHandle } from '../connection.js';
 import type { SettingsRepository } from '../contracts.js';
 
 export const DEFAULT_SETTINGS: AppSettings = {
   theme: 'system',
+  accentColor: 'emerald',
   globalHotkey: 'Control+Space',
-  clientReplyHotkey: 'Control+Shift+R',
+  // Unbound: a global accelerator the user did not ask for is one taken away
+  // from every other app on the machine. Prompt shortcuts live on the prompt
+  // rows, not here.
+  clientReplyHotkey: '',
   defaultProvider: 'openai',
   defaultModel: 'gpt-5-mini',
   defaultTone: 'neutral',
@@ -19,6 +23,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   clipboardHistoryEnabled: false,
   clipboardHistoryLimit: 50,
   conversationMemoryEnabled: false,
+  onboardingCompleted: false,
 };
 
 const clamp = (value: number | undefined, min: number, max: number, round: boolean): number | undefined => {
@@ -34,8 +39,16 @@ const clamp = (value: number | undefined, min: number, max: number, round: boole
  * the patch, which leaves the previous (or default) value in place.
  */
 const sanitize = (patch: Partial<AppSettings>): Partial<AppSettings> => {
-  const { temperature, maxTokens, requestTimeoutMs, historyRetentionDays, clipboardHistoryLimit, ...rest } =
-    patch;
+  const {
+    temperature,
+    maxTokens,
+    requestTimeoutMs,
+    historyRetentionDays,
+    clipboardHistoryLimit,
+    globalHotkey,
+    accentColor,
+    ...rest
+  } = patch;
   const bounded = {
     temperature: clamp(temperature, 0, 2, false),
     maxTokens: clamp(maxTokens, 16, 32_000, true),
@@ -45,6 +58,13 @@ const sanitize = (patch: Partial<AppSettings>): Partial<AppSettings> => {
   };
   return {
     ...rest,
+    // An accent name the renderer made up would write a `[data-accent]` value
+    // no stylesheet answers, leaving the UI with no accent at all.
+    ...(accentColor !== undefined && ACCENT_COLORS.includes(accentColor) ? { accentColor } : {}),
+    // The main shortcut is the only door into the popup, so a blank one is
+    // dropped from the patch rather than saved: the optional shortcuts are
+    // clearable, this one is not.
+    ...(globalHotkey === undefined || globalHotkey.trim().length === 0 ? {} : { globalHotkey }),
     ...(bounded.temperature === undefined ? {} : { temperature: bounded.temperature }),
     ...(bounded.maxTokens === undefined ? {} : { maxTokens: bounded.maxTokens }),
     ...(bounded.requestTimeoutMs === undefined ? {} : { requestTimeoutMs: bounded.requestTimeoutMs }),

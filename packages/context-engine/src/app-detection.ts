@@ -3,12 +3,13 @@ import type { AppContext, KnownAppId, SelectionSource } from '@ai-anywhere/share
 /**
  * How one application is recognised, and what it should offer.
  *
- * Two signals, deliberately: the process/class name identifies a native app
- * (Slack, VS Code, Discord), while the window title is the only thing that
- * separates the web apps that all run inside the same browser process. So
- * Chrome matches on process name and Gmail matches on title, and the title
- * rules are tried first — "Inbox - Gmail - Google Chrome" is Gmail, not
- * "a browser".
+ * Three signals, deliberately: the process/window-class name identifies a
+ * native app (Slack, VS Code, Discord), the window title separates the web
+ * apps that all run inside the same browser process, and a host recovered
+ * from that title is the last resort for a site whose name the title does not
+ * spell out. So Chrome matches on process name and Gmail matches on title,
+ * and the title rules are tried first — "Inbox - Gmail - Google Chrome" is
+ * Gmail, not "a browser".
  */
 interface AppRule {
   readonly id: KnownAppId;
@@ -17,13 +18,20 @@ interface AppRule {
   readonly processPatterns?: readonly RegExp[];
   /** Matched against the lowercased window title. */
   readonly titlePatterns?: readonly RegExp[];
+  /**
+   * Matched against a host recovered from the window title, for titles that
+   * carry the URL but not the product name ("Pull requests · github.com").
+   */
+  readonly domainPatterns?: readonly RegExp[];
   /** Reported as the domain when this rule matched inside a browser. */
   readonly domain?: string;
   readonly isBrowser?: boolean;
   /**
-   * Commands the palette lists first, best guess leading. Ids come from the
-   * prompts catalog; an id that no longer exists is dropped by the UI rather
-   * than breaking detection.
+   * Commands the palette lists first, best guess leading. The leading id is
+   * also what `routeCommandId` routes to, so it is the prompt this app should
+   * default to: Slack rewrite for Slack, PR description for GitHub. Ids come
+   * from the prompts catalog; an id that no longer exists is dropped by the UI
+   * rather than breaking detection.
    */
   readonly suggests: readonly string[];
 }
@@ -39,6 +47,7 @@ const RULES: readonly AppRule[] = [
     id: 'gmail',
     label: 'Gmail',
     titlePatterns: [/\bgmail\b/, /\binbox\b.*\bgoogle\b/],
+    domainPatterns: [/^mail\.google\.com$/],
     domain: 'mail.google.com',
     suggests: ['email', 'client-reply', 'follow-up', 'professional'],
   },
@@ -48,6 +57,7 @@ const RULES: readonly AppRule[] = [
     // "[ABC-123] Fix the thing - Jira"; the bare issue key alone is too
     // common in commit messages and chat to match on.
     titlePatterns: [/\bjira\b/, /\batlassian\.net\b/],
+    domainPatterns: [/(^|\.)atlassian\.(net|com)$/],
     domain: 'atlassian.net',
     suggests: ['jira-comment', 'standup-update', 'concise'],
   },
@@ -59,9 +69,20 @@ const RULES: readonly AppRule[] = [
     suggests: ['improve-english', 'professional', 'expand', 'summarize'],
   },
   {
+    id: 'github',
+    label: 'GitHub',
+    // Matched before the browser rules, like every other web app: a GitHub
+    // tab is a PR review surface, not "a Chrome window".
+    titlePatterns: [/\bgithub\b/, /\bpull request\b/],
+    domainPatterns: [/(^|\.)github\.com$/],
+    domain: 'github.com',
+    suggests: ['pr-description', 'commit-message', 'explain', 'concise'],
+  },
+  {
     id: 'linkedin',
     label: 'LinkedIn',
     titlePatterns: [/\blinkedin\b/],
+    domainPatterns: [/(^|\.)linkedin\.com$/],
     domain: 'linkedin.com',
     suggests: ['professional', 'client-reply', 'concise'],
   },
@@ -72,6 +93,7 @@ const RULES: readonly AppRule[] = [
     label: 'Slack',
     processPatterns: [/^slack$/],
     titlePatterns: [/\bslack\b/],
+    domainPatterns: [/(^|\.)slack\.com$/],
     domain: 'app.slack.com',
     suggests: ['slack-update', 'concise', 'friendly'],
   },
@@ -80,6 +102,7 @@ const RULES: readonly AppRule[] = [
     label: 'Microsoft Teams',
     processPatterns: [/^(ms-?)?teams/],
     titlePatterns: [/\bmicrosoft teams\b/],
+    domainPatterns: [/(^|\.)teams\.microsoft\.com$/],
     domain: 'teams.microsoft.com',
     suggests: ['slack-update', 'manager-update', 'professional'],
   },
@@ -88,6 +111,7 @@ const RULES: readonly AppRule[] = [
     label: 'Discord',
     processPatterns: [/^discord/],
     titlePatterns: [/\bdiscord\b/],
+    domainPatterns: [/(^|\.)discord\.com$/],
     domain: 'discord.com',
     suggests: ['friendly', 'concise', 'slack-update'],
   },
@@ -96,6 +120,7 @@ const RULES: readonly AppRule[] = [
     label: 'Outlook',
     processPatterns: [/^outlook$/, /^olk$/],
     titlePatterns: [/\boutlook\b/],
+    domainPatterns: [/(^|\.)outlook\.(office|live)\.com$/],
     domain: 'outlook.office.com',
     suggests: ['email', 'client-reply', 'professional', 'follow-up'],
   },
@@ -136,7 +161,7 @@ const RULES: readonly AppRule[] = [
 /** Rules whose match implies the window is a browser window. */
 const BROWSER_IDS = new Set<KnownAppId>(['chrome', 'firefox']);
 /** Rules that are web apps: a match means the host app is a browser too. */
-const WEB_APP_IDS = new Set<KnownAppId>(['gmail', 'jira', 'confluence', 'linkedin']);
+const WEB_APP_IDS = new Set<KnownAppId>(['gmail', 'jira', 'confluence', 'github', 'linkedin']);
 
 /** Fallback suggestions when nothing is recognised. */
 const DEFAULT_SUGGESTIONS: readonly string[] = ['improve-english', 'fix-grammar', 'concise'];
@@ -160,17 +185,22 @@ const guessDomain = (title: string | null): string | null => {
 /**
  * Pure: everything the OS could tell us in, one context out. Kept free of any
  * OS call so the renderer can derive the context from the `SelectionSource`
- * it already received, instead of paying a second IPC round trip.
+ * it already received, instead of paying a second IPC round trip. `now` is a
+ * parameter only so the timestamp is assertable in a test.
  */
-export function detectApp(source: SelectionSource | null): AppContext {
+export function detectApp(source: SelectionSource | null, now: number = Date.now()): AppContext {
   const appName = source?.appName ?? null;
   const windowTitle = source?.windowTitle ?? null;
+  const platform = source?.platform ?? null;
   const process = appName?.toLowerCase().replace(/\.exe$/, '') ?? null;
   const title = windowTitle?.toLowerCase() ?? null;
+  const host = guessDomain(windowTitle);
 
-  // Title first: it is what distinguishes Gmail from "a Chrome window".
+  // Title first: it is what distinguishes Gmail from "a Chrome window". Then
+  // the host in the title, then the process name.
   const rule =
     RULES.find((candidate) => matches(candidate.titlePatterns, title)) ??
+    RULES.find((candidate) => matches(candidate.domainPatterns, host)) ??
     RULES.find((candidate) => matches(candidate.processPatterns, process));
 
   if (rule === undefined) {
@@ -179,9 +209,11 @@ export function detectApp(source: SelectionSource | null): AppContext {
       label: appName ?? 'Unknown app',
       appName,
       windowTitle,
-      domain: null,
+      platform,
+      browserDomain: null,
       isBrowser: false,
       suggestedCommandIds: DEFAULT_SUGGESTIONS,
+      timestamp: now,
     };
   }
 
@@ -195,10 +227,22 @@ export function detectApp(source: SelectionSource | null): AppContext {
     label: rule.label,
     appName,
     windowTitle,
-    domain: isBrowser ? (rule.domain ?? guessDomain(windowTitle)) : null,
+    platform,
+    browserDomain: isBrowser ? (rule.domain ?? host) : null,
     isBrowser,
     suggestedCommandIds: rule.suggests,
+    timestamp: now,
   };
+}
+
+/**
+ * Auto prompt routing: the one command this context should run when the user
+ * wants the obvious thing (Slack rewrite in Slack, PR description on GitHub,
+ * commit message in VS Code). It is the head of `suggestedCommandIds` rather
+ * than a second table, so routing cannot drift from what the palette lists.
+ */
+export function routeCommandId(context: AppContext | null): string | null {
+  return context?.suggestedCommandIds[0] ?? null;
 }
 
 /** The detection service: one OS read, then the pure rules above. */
