@@ -16,6 +16,10 @@ _Highlight → `Ctrl+Space` → pick an action → text replaced in place._
 > **Note:** the logo and app icons are placeholders and will be replaced before
 > the first public release. The name, behaviour and APIs are final.
 
+> **Note:** LipiKit 1.0 is free and open source, and the core stays that way.
+> Optional paid add-ons may arrive later — nothing is planned, designed or
+> priced yet.
+
 An AI command layer for **Windows and Ubuntu/Linux**: highlight text in any
 application, press `Ctrl+Space`, and the answer replaces it in place — no tab
 to switch to and nothing to copy. GPT, Claude, Gemini and OpenRouter behind one
@@ -42,7 +46,7 @@ which cannot import TypeScript.
 
 ## Why LipiKit?
 
-- **Free forever** — no subscription, no credits, no markup
+- **Free core** — no subscription, no credits, no markup
 - **Bring your own AI key** — GPT-5, Claude, Gemini, OpenRouter, Groq, DeepSeek, or local Ollama
 - **Works everywhere** — Slack, VS Code, Jira, Gmail, Discord, any text box on Windows or Ubuntu
 - **Open source** — MIT licensed, inspect everything
@@ -559,9 +563,13 @@ Issues and PRs are welcome. Before opening a PR:
 - Run `pnpm typecheck && pnpm lint && pnpm test` locally.
 - Keep commits focused; one concern per PR.
 
+By contributing you agree your contribution is licensed under the MIT License,
+and that the project may also distribute it under other licence terms.
+
 For security issues, please email support@lipikit.io rather than open a public
 issue.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE). The MIT grant covers the code; the LipiKit name
+and logo are not covered by it.
