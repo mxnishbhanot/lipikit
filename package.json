@@ -5,7 +5,7 @@
   "description": "Cross-platform (Windows + Linux) desktop AI writing assistant",
   "packageManager": "pnpm@9.12.3",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "dev": "pnpm --filter @lipikit/desktop dev",
