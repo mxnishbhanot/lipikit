@@ -447,7 +447,12 @@ Setup and behaviour questions, as opposed to symptoms, are in
 logic version together and break together; separate repos would mean publishing
 a package to test a one-line type change. pnpm's symlinked store also keeps one
 Electron download for the whole tree, and `node-linker=hoisted` (`.npmrc`) is set
-because electron-builder and native modules assume a real `node_modules`.
+because electron-builder and native modules assume a real `node_modules`. better-sqlite3
+is listed under `pnpm.neverBuiltDependencies`: the copy its own install script
+would compile targets the Node ABI, which nothing here loads — the one the app
+and the database suite use is the Electron-ABI build that
+`electron-builder install-app-deps` produces afterwards. Skipping it means no
+C++ toolchain is needed to install the repo on Windows.
 
 **Electron main / preload / renderer split, enforced by ESLint.** The renderer
 runs with `sandbox: true`, `contextIsolation: true`, `nodeIntegration: false`.
