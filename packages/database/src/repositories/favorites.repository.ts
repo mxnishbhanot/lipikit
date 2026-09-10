@@ -1,4 +1,4 @@
-import { appError, err, ok, type FavoriteKind } from '@ai-anywhere/shared';
+import { appError, err, ok, type FavoriteKind } from '@lipikit/shared';
 import type { DatabaseHandle } from '../connection.js';
 import type { FavoritesRepository } from '../contracts.js';
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { BRANDING, IPC } from '@ai-anywhere/shared';
-import { Button, Input, cn } from '@ai-anywhere/ui';
+import { BRANDING, IPC } from '@lipikit/shared';
+import { Button, Input, cn } from '@lipikit/ui';
 import { Bug, Camera, Clipboard, ExternalLink, FileText, Lightbulb } from 'lucide-react';
 import { ipcInvoke } from '../../../../lib/ipc-client.js';
 import {

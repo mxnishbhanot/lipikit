@@ -1,4 +1,4 @@
-import { appError, err, ok, type CapturedSelection, type Logger } from '@ai-anywhere/shared';
+import { appError, err, ok, type CapturedSelection, type Logger } from '@lipikit/shared';
 import type {
   ActiveWindowService,
   ClipboardService,
@@ -101,7 +101,7 @@ export function createSelectionService(deps: SelectionDeps): SelectionService {
         return err(
           appError(
             'VALIDATION',
-            'No text selected — highlight something first, or raise AI_ANYWHERE_INPUT_SETTLE_MS if the app is slow',
+            'No text selected — highlight something first, or raise LIPIKIT_INPUT_SETTLE_MS if the app is slow',
           ),
         );
       }

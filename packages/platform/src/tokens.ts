@@ -1,4 +1,4 @@
-import { token } from '@ai-anywhere/shared';
+import { token } from '@lipikit/shared';
 import type {
   ActiveWindowService,
   AutostartService,

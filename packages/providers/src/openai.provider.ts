@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { appError, err, ok, type ProviderModel } from '@ai-anywhere/shared';
+import { appError, err, ok, type ProviderModel } from '@lipikit/shared';
 import type {
   AiProvider,
   AiProviderFactory,

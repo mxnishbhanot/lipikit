@@ -12,8 +12,8 @@ import {
   Search,
   Terminal,
 } from 'lucide-react';
-import { BRANDING } from '@ai-anywhere/shared';
-import { Badge, Button, Kbd, cn, transition } from '@ai-anywhere/ui';
+import { BRANDING } from '@lipikit/shared';
+import { Badge, Button, Kbd, cn, transition } from '@lipikit/ui';
 import { HERO, HOTKEY, POSITIONING, RELEASES_URL, REPO_URL } from './content.js';
 import { Reveal, WindowFrame } from './components.js';
 

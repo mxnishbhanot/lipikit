@@ -12,7 +12,7 @@ import {
   loadingPulse,
   popup,
   slideUp,
-} from '@ai-anywhere/ui';
+} from '@lipikit/ui';
 import {
   ArrowLeft,
   Check,
@@ -27,7 +27,7 @@ import {
   Settings,
   X,
 } from 'lucide-react';
-import { mergeCommands, parseReply, resolveInstruction, type PaletteCommand } from '@ai-anywhere/prompts';
+import { mergeCommands, parseReply, resolveInstruction, type PaletteCommand } from '@lipikit/prompts';
 import {
   IPC_EVENTS,
   type AppContext,
@@ -36,7 +36,7 @@ import {
   type ProviderId,
   type ReplyAnalysis,
   type SelectionSource,
-} from '@ai-anywhere/shared';
+} from '@lipikit/shared';
 import { ipcOn } from '../../../lib/ipc-client.js';
 import {
   closeOverlay,
@@ -88,7 +88,7 @@ export function Overlay(): JSX.Element {
   const [source, setSource] = useState<SelectionSource | null>(null);
   const [captureError, setCaptureError] = useState<AppError | null>(null);
   // Detected in main *before* the popup takes focus; asking for it from here
-  // would only ever answer "AI Anywhere".
+  // would only ever answer "LipiKit".
   const [context, setContext] = useState<AppContext | null>(null);
   const [lastRun, setLastRun] = useState<LastRun | null>(null);
   const [output, setOutput] = useState('');

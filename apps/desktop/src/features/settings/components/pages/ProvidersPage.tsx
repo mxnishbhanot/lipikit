@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Badge, Button, Input, Spinner, Switch, cn } from '@ai-anywhere/ui';
-import type { AppSettings, ProviderDescriptor, ProviderId } from '@ai-anywhere/shared';
+import { Badge, Button, Input, Spinner, Switch, cn } from '@lipikit/ui';
+import type { AppSettings, ProviderDescriptor, ProviderId } from '@lipikit/shared';
 import { Check, ExternalLink, KeyRound, Plug, Trash2 } from 'lucide-react';
 import {
   useDeleteApiKey,

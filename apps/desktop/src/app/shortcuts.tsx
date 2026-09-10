@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Kbd } from '@ai-anywhere/ui';
+import { Kbd } from '@lipikit/ui';
 import { SHORTCUTS, SHORTCUT_SHEET_EVENT, isHelpKey, type ShortcutScope } from './shortcut-keys.js';
 
 /**

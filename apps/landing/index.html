@@ -14,7 +14,7 @@
          never sees a white flash. Duplicated in src/theme.ts on purpose: that
          module cannot run this early, and the rule is four lines. */
       try {
-        var saved = localStorage.getItem('ai-anywhere:theme');
+        var saved = localStorage.getItem('lipikit:theme');
         var dark =
           saved === 'dark' || (saved !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
         document.documentElement.classList.toggle('dark', dark);

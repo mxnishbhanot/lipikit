@@ -5,8 +5,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        The README's [Not in 1.0](https://github.com/mxnish-bhanot/ai-anywhere#not-in-10)
-        and [Roadmap](https://github.com/mxnish-bhanot/ai-anywhere#roadmap)
+        The README's [Not in 1.0](https://github.com/mxnishbhanot/lipikit#not-in-10)
+        and [Roadmap](https://github.com/mxnishbhanot/lipikit#roadmap)
         sections list what is already known to be missing and what is already
         planned. macOS support is out of scope.
 

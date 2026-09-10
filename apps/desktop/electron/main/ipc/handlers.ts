@@ -12,8 +12,8 @@ import {
   type Container,
   type IpcHandlerMap,
   type Platform,
-} from '@ai-anywhere/shared';
-import { PROVIDER_REGISTRY, API_KEY_STORE } from '@ai-anywhere/providers';
+} from '@lipikit/shared';
+import { PROVIDER_REGISTRY, API_KEY_STORE } from '@lipikit/providers';
 import {
   applyBackup,
   buildBackup,
@@ -24,9 +24,9 @@ import {
   PROMPT_REPOSITORY,
   PROVIDER_SETTINGS_REPOSITORY,
   SETTINGS_REPOSITORY,
-} from '@ai-anywhere/database';
-import { AUTOSTART_SERVICE, PLATFORM_SERVICES } from '@ai-anywhere/platform';
-import { APP_CONTEXT_SERVICE, TEXT_CAPTURE_SERVICE } from '@ai-anywhere/context-engine';
+} from '@lipikit/database';
+import { AUTOSTART_SERVICE, PLATFORM_SERVICES } from '@lipikit/platform';
+import { APP_CONTEXT_SERVICE, TEXT_CAPTURE_SERVICE } from '@lipikit/context-engine';
 import { bindGlobalHotkey, syncPromptHotkeys } from '../services/hotkey-binding.js';
 import {
   AI_SERVICE,
@@ -132,7 +132,7 @@ export function createIpcHandlers(container: Container): IpcHandlerMap {
       const parent = focused();
       const options = {
         title: 'Export settings',
-        defaultPath: join(app.getPath('documents'), 'ai-anywhere-settings.json'),
+        defaultPath: join(app.getPath('documents'), 'lipikit-settings.json'),
         filters: [{ name: 'JSON', extensions: ['json'] }],
       };
       const chosen = await (parent ? dialog.showSaveDialog(parent, options) : dialog.showSaveDialog(options));
@@ -318,7 +318,7 @@ export function createIpcHandlers(container: Container): IpcHandlerMap {
       const parent = focused();
       const options = {
         title: 'Export logs',
-        defaultPath: join(app.getPath('documents'), 'ai-anywhere-logs.txt'),
+        defaultPath: join(app.getPath('documents'), 'lipikit-logs.txt'),
         filters: [{ name: 'Text', extensions: ['txt', 'log'] }],
       };
       const chosen = await (parent ? dialog.showSaveDialog(parent, options) : dialog.showSaveDialog(options));
@@ -343,7 +343,7 @@ export function createIpcHandlers(container: Container): IpcHandlerMap {
       const image = await parent.capturePage();
       const options = {
         title: 'Save screenshot',
-        defaultPath: join(app.getPath('pictures'), `ai-anywhere-${Date.now()}.png`),
+        defaultPath: join(app.getPath('pictures'), `lipikit-${Date.now()}.png`),
         filters: [{ name: 'PNG', extensions: ['png'] }],
       };
       const chosen = await dialog.showSaveDialog(parent, options);

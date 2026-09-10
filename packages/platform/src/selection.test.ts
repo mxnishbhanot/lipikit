@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'vitest';
-import { appError, err } from '@ai-anywhere/shared';
+import { appError, err } from '@lipikit/shared';
 import { createSelectionService, createTextReplacementService } from './selection.js';
 import type { ActiveWindowService } from './contracts.js';
 import { fakeClipboard, fakeCommands, fakeKeystroke, fakeSource, silentLogger } from './test-doubles.js';

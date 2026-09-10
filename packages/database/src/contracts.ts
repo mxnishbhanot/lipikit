@@ -7,7 +7,7 @@ import type {
   ProviderSettings,
   ProviderSettingsPatch,
   Result,
-} from '@ai-anywhere/shared';
+} from '@lipikit/shared';
 
 /**
  * Repositories, not an ORM: the schema is ~2 tables and every query is known

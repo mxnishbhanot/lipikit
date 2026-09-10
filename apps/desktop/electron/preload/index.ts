@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
-import { IPC, IPC_EVENTS, type AiAnywhereBridge } from '@ai-anywhere/shared';
+import { IPC, IPC_EVENTS, type LipiKitBridge } from '@lipikit/shared';
 
 const ALLOWED_CHANNELS = new Set<string>(Object.values(IPC).flatMap((group) => Object.values(group)));
 const ALLOWED_EVENTS = new Set<string>(Object.values(IPC_EVENTS));
@@ -9,7 +9,7 @@ const ALLOWED_EVENTS = new Set<string>(Object.values(IPC_EVENTS));
  * allowlisted. contextIsolation + sandbox mean the renderer cannot reach
  * ipcRenderer, fs, or require by any other route.
  */
-const bridge: AiAnywhereBridge = {
+const bridge: LipiKitBridge = {
   invoke(channel, payload) {
     if (!ALLOWED_CHANNELS.has(channel)) {
       throw new Error(`Blocked IPC channel: ${String(channel)}`);
@@ -28,4 +28,4 @@ const bridge: AiAnywhereBridge = {
   },
 };
 
-contextBridge.exposeInMainWorld('aiAnywhere', bridge);
+contextBridge.exposeInMainWorld('lipikit', bridge);

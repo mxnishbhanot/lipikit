@@ -1,8 +1,8 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { app, safeStorage } from 'electron';
-import { appError, err, ok, type ProviderId } from '@ai-anywhere/shared';
-import type { ApiKeyStore } from '@ai-anywhere/providers';
+import { appError, err, ok, type ProviderId } from '@lipikit/shared';
+import type { ApiKeyStore } from '@lipikit/providers';
 
 /**
  * Keys are encrypted with the OS keyring (DPAPI on Windows, libsecret/kwallet

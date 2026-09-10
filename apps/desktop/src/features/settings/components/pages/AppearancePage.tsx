@@ -1,5 +1,5 @@
-import { ACCENT_COLORS, type AccentColor, type AppSettings } from '@ai-anywhere/shared';
-import { cn } from '@ai-anywhere/ui';
+import { ACCENT_COLORS, type AccentColor, type AppSettings } from '@lipikit/shared';
+import { cn } from '@lipikit/ui';
 import { Check, Monitor, Moon, Sun, type LucideIcon } from 'lucide-react';
 import { Group, Row, SettingsPage } from '../fields.js';
 

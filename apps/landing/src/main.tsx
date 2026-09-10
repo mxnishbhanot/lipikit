@@ -1,14 +1,14 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { MotionConfig } from 'framer-motion';
-import { BRANDING } from '@ai-anywhere/shared';
+import { BRANDING } from '@lipikit/shared';
 import { App } from './App.js';
 import { HOTKEY, POSITIONING } from './content.js';
 // Bundled rather than pulled from a font CDN: same face as the app, one less
 // third party in the request waterfall.
 import '@fontsource-variable/inter';
 // Tokens first: the shared values, then the page-only rules that use them.
-import '@ai-anywhere/ui/tokens.css';
+import '@lipikit/ui/tokens.css';
 import './styles.css';
 
 const container = document.getElementById('root');

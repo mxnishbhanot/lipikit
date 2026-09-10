@@ -2,7 +2,7 @@
 @tailwind utilities;
 
 /**
- * Page-only styles. Token values come from @ai-anywhere/ui/tokens.css, which
+ * Page-only styles. Token values come from @lipikit/ui/tokens.css, which
  * main.tsx imports first; nothing here redefines a colour.
  *
  * No `@tailwind components` layer: the page uses the UI package's primitives

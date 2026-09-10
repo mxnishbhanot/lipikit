@@ -1,4 +1,4 @@
-import type { AppSettings } from '@ai-anywhere/shared';
+import type { AppSettings } from '@lipikit/shared';
 
 export type ThemeMode = AppSettings['theme'];
 export type ResolvedTheme = 'light' | 'dark';

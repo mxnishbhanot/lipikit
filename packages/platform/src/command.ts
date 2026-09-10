@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process';
-import { appError, err, ok, type Result } from '@ai-anywhere/shared';
+import { appError, err, ok, type Result } from '@lipikit/shared';
 
 /**
  * Every native capability on Linux is a CLI tool that may or may not be

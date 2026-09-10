@@ -1,4 +1,4 @@
-import type { Platform, ProviderId } from '@ai-anywhere/shared';
+import type { Platform, ProviderId } from '@lipikit/shared';
 
 /**
  * The wizard's order, as data. The shell renders `STEPS[index]` and the dots

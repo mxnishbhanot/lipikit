@@ -1,5 +1,5 @@
 {
-  "name": "@ai-anywhere/database",
+  "name": "@lipikit/database",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -17,7 +17,7 @@
     "test": "ELECTRON_RUN_AS_NODE=1 electron --test dist/database.test.js"
   },
   "dependencies": {
-    "@ai-anywhere/shared": "workspace:*",
+    "@lipikit/shared": "workspace:*",
     "better-sqlite3": "^11.5.0"
   },
   "devDependencies": {

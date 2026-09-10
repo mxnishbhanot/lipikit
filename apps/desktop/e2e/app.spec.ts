@@ -2,7 +2,7 @@ import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { _electron as electron, expect, test, type ElectronApplication, type Page } from '@playwright/test';
-import { BRANDING } from '@ai-anywhere/shared';
+import { BRANDING } from '@lipikit/shared';
 
 const APP_DIR = join(__dirname, '..');
 
@@ -30,11 +30,11 @@ test.beforeAll(async () => {
       APP_DIR,
       // A throwaway profile per run: the suite must never read or write the
       // developer's real settings, history or clipboard log.
-      `--user-data-dir=${mkdtempSync(join(tmpdir(), 'ai-anywhere-e2e-'))}`,
+      `--user-data-dir=${mkdtempSync(join(tmpdir(), 'lipikit-e2e-'))}`,
     ],
     // Unpackaged + NODE_ENV=development would send the window at the Vite dev
     // server; production makes it load the built renderer from out/.
-    env: { ...process.env, NODE_ENV: 'production', AI_ANYWHERE_LOG_LEVEL: 'error' },
+    env: { ...process.env, NODE_ENV: 'production', LIPIKIT_LOG_LEVEL: 'error' },
   });
   window = await mainWindow(app);
   await window.waitForLoadState('domcontentloaded');

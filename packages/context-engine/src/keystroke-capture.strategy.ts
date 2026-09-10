@@ -1,4 +1,4 @@
-import type { KeystrokeService, SelectionService } from '@ai-anywhere/platform';
+import type { KeystrokeService, SelectionService } from '@lipikit/platform';
 import type { CaptureStrategy } from './contracts.js';
 
 /**

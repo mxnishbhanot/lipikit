@@ -1,7 +1,7 @@
 import { app, BrowserWindow, nativeTheme } from 'electron';
-import { loadEnv } from '@ai-anywhere/shared';
-import { HOTKEY_SERVICE } from '@ai-anywhere/platform';
-import { HISTORY_REPOSITORY, PROMPT_REPOSITORY, SETTINGS_REPOSITORY } from '@ai-anywhere/database';
+import { loadEnv } from '@lipikit/shared';
+import { HOTKEY_SERVICE } from '@lipikit/platform';
+import { HISTORY_REPOSITORY, PROMPT_REPOSITORY, SETTINGS_REPOSITORY } from '@lipikit/database';
 import { buildContainer } from './composition-root.js';
 import { createIpcHandlers } from './ipc/handlers.js';
 import { registerIpcHandlers } from './ipc/typed-ipc.js';
@@ -23,7 +23,7 @@ const env = envResult.ok ? envResult.value : null;
 // Windows ties toasts to the AppUserModelID: without this they are attributed
 // to "electron.app.Electron" in a dev run and dropped entirely in a packaged
 // one, so every notification below depends on it. No-op on Linux.
-app.setAppUserModelId('com.aianywhere.app');
+app.setAppUserModelId('com.lipikit.app');
 
 /**
  * Autostart launches with --hidden (see the autostart service): showing the

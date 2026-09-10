@@ -1,5 +1,5 @@
-import { appError, type Logger, type PlatformCapabilities } from '@ai-anywhere/shared';
-import type { Container } from '@ai-anywhere/shared';
+import { appError, type Logger, type PlatformCapabilities } from '@lipikit/shared';
+import type { Container } from '@lipikit/shared';
 import type { PlatformInfo, PlatformServices } from './contracts.js';
 import { createCommandRunner, type CommandRunner } from './command.js';
 import { createActiveWindowService } from './active-window.js';

@@ -1,10 +1,10 @@
 /**
  * Every user-visible name, URL and address the app prints, in one place.
  *
- * The product name is NOT final. Nothing here is a branding decision — it is
- * a placeholder that exists so the real name, when it lands, is one edit to
- * this file and not a grep across fifty components. Never re-type any of
- * these strings elsewhere, and never bake them into an asset.
+ * The product name is LipiKit. Keep it here and nowhere else: never re-type
+ * any of these strings elsewhere, and never bake them into an asset, so a
+ * future change stays one edit to this file and not a grep across fifty
+ * components.
  *
  * Deliberately not exported through the theme: accent colours are independent
  * of the brand, so a rename cannot change how the app looks.
@@ -28,12 +28,12 @@ export interface Branding {
 }
 
 export const BRANDING: Branding = {
-  appName: 'AI Anywhere (Temporary)',
-  shortName: 'AI Anywhere',
+  appName: 'LipiKit',
+  shortName: 'LipiKit',
   tagline: 'The fastest AI command layer for Windows and Linux',
-  website: 'https://example.invalid/ai-anywhere',
-  supportEmail: 'support@example.invalid',
-  issuesUrl: 'https://example.invalid/ai-anywhere/issues',
+  website: 'https://lipikit.io',
+  supportEmail: 'support@lipikit.io',
+  issuesUrl: 'https://github.com/mxnishbhanot/lipikit/issues',
   version: '1.0.0',
 };
 

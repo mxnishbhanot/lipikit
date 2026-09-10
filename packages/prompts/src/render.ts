@@ -1,4 +1,4 @@
-import { appError, err, ok, type ActionId, type Result, type Tone } from '@ai-anywhere/shared';
+import { appError, err, ok, type ActionId, type Result, type Tone } from '@lipikit/shared';
 import { PROMPT_TEMPLATES, TONE_HINTS, type PromptTemplate } from './templates.js';
 
 /**

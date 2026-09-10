@@ -1,12 +1,12 @@
 import { StrictMode, Suspense, lazy } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BRANDING } from '@ai-anywhere/shared';
+import { BRANDING } from '@lipikit/shared';
 import { AppProviders } from './app/AppProviders.js';
 // Bundled, not fetched: the renderer has no network access to a font CDN and
 // a missing webfont would fall back mid-session.
 import '@fontsource-variable/inter';
 // Tokens first: shared values, then the desktop-only rules that use them.
-import '@ai-anywhere/ui/tokens.css';
+import '@lipikit/ui/tokens.css';
 import './styles/globals.css';
 
 const container = document.getElementById('root');

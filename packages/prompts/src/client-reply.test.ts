@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import assert from 'node:assert/strict';
-import type { HistoryEntry } from '@ai-anywhere/shared';
+import type { HistoryEntry } from '@lipikit/shared';
 import { formatMemory, MEMORY_LIMIT, parseReply, REPLY_COMMANDS } from './client-reply.js';
 import { renderPrompt } from './render.js';
 

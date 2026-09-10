@@ -1,4 +1,4 @@
-import { REPLY_STYLES, type HistoryEntry, type ReplyAnalysis, type ReplyStyle } from '@ai-anywhere/shared';
+import { REPLY_STYLES, type HistoryEntry, type ReplyAnalysis, type ReplyStyle } from '@lipikit/shared';
 import type { CommandDescriptor } from './commands.js';
 
 /** How many stored interactions are replayed as conversation memory. */

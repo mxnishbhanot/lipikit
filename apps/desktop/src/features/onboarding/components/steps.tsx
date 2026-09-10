@@ -11,8 +11,8 @@ import {
   StreamCaret,
   ThinkingIndicator,
   cn,
-} from '@ai-anywhere/ui';
-import type { Platform, ProviderDescriptor, ProviderId } from '@ai-anywhere/shared';
+} from '@lipikit/ui';
+import type { Platform, ProviderDescriptor, ProviderId } from '@lipikit/shared';
 import {
   AlertTriangle,
   ArrowRight,

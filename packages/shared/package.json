@@ -1,5 +1,5 @@
 {
-  "name": "@ai-anywhere/shared",
+  "name": "@lipikit/shared",
   "version": "0.1.0",
   "private": true,
   "type": "module",

@@ -1,6 +1,6 @@
 import { Github } from 'lucide-react';
-import { AppIcon, Button, cn } from '@ai-anywhere/ui';
-import { BRANDING } from '@ai-anywhere/shared';
+import { AppIcon, Button, cn } from '@lipikit/ui';
+import { BRANDING } from '@lipikit/shared';
 import { lazy, Suspense } from 'react';
 import { FOOTER_LINKS, NAV_LINKS, REPO_URL } from './content.js';
 import { Reveal, ThemeToggle } from './components.js';

@@ -23,7 +23,7 @@ const DEFAULTS: AppEnv = {
   nodeEnv: 'development',
   logLevel: 'info',
   devServerUrl: 'http://localhost:5173',
-  databaseFileName: 'ai-anywhere.db',
+  databaseFileName: 'lipikit.db',
   ollamaBaseUrl: 'http://127.0.0.1:11434',
   inputSettleMs: 120,
 };
@@ -37,20 +37,20 @@ export function loadEnv(source: Record<string, string | undefined>): Result<AppE
   if (!NODE_ENVS.includes(nodeEnv as NodeEnv)) {
     return err(appError('VALIDATION', `Invalid NODE_ENV: ${nodeEnv}`));
   }
-  const logLevel = source['AI_ANYWHERE_LOG_LEVEL'] ?? DEFAULTS.logLevel;
+  const logLevel = source['LIPIKIT_LOG_LEVEL'] ?? DEFAULTS.logLevel;
   if (!LOG_LEVELS.includes(logLevel as (typeof LOG_LEVELS)[number])) {
-    return err(appError('VALIDATION', `Invalid AI_ANYWHERE_LOG_LEVEL: ${logLevel}`));
+    return err(appError('VALIDATION', `Invalid LIPIKIT_LOG_LEVEL: ${logLevel}`));
   }
-  const rawSettle = source['AI_ANYWHERE_INPUT_SETTLE_MS'];
+  const rawSettle = source['LIPIKIT_INPUT_SETTLE_MS'];
   const inputSettleMs = rawSettle === undefined ? DEFAULTS.inputSettleMs : Number(rawSettle);
   if (!Number.isFinite(inputSettleMs) || inputSettleMs < 0 || inputSettleMs > 5_000) {
-    return err(appError('VALIDATION', `Invalid AI_ANYWHERE_INPUT_SETTLE_MS: ${String(rawSettle)}`));
+    return err(appError('VALIDATION', `Invalid LIPIKIT_INPUT_SETTLE_MS: ${String(rawSettle)}`));
   }
   return ok({
     nodeEnv: nodeEnv as NodeEnv,
     logLevel: logLevel as AppEnv['logLevel'],
     devServerUrl: source['VITE_DEV_SERVER_URL'] ?? DEFAULTS.devServerUrl,
-    databaseFileName: source['AI_ANYWHERE_DB_FILE'] ?? DEFAULTS.databaseFileName,
+    databaseFileName: source['LIPIKIT_DB_FILE'] ?? DEFAULTS.databaseFileName,
     ollamaBaseUrl: source['OLLAMA_BASE_URL'] ?? DEFAULTS.ollamaBaseUrl,
     inputSettleMs,
   });

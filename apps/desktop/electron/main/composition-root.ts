@@ -1,6 +1,6 @@
 import { join } from 'node:path';
 import { app } from 'electron';
-import { createContainer, createConsoleLogger, type AppEnv, type Container } from '@ai-anywhere/shared';
+import { createContainer, createConsoleLogger, type AppEnv, type Container } from '@lipikit/shared';
 import {
   createPlatformServices,
   registerPlatformServices,
@@ -11,8 +11,8 @@ import {
   PLATFORM_SERVICES,
   SELECTION_SERVICE,
   TEXT_REPLACEMENT_SERVICE,
-} from '@ai-anywhere/platform';
-import { API_KEY_STORE, PROVIDER_REGISTRY, createDefaultProviderRegistry } from '@ai-anywhere/providers';
+} from '@lipikit/platform';
+import { API_KEY_STORE, PROVIDER_REGISTRY, createDefaultProviderRegistry } from '@lipikit/providers';
 import {
   CLIPBOARD_REPOSITORY,
   DATABASE,
@@ -28,7 +28,7 @@ import {
   createProviderSettingsRepository,
   createSettingsRepository,
   openDatabase,
-} from '@ai-anywhere/database';
+} from '@lipikit/database';
 import {
   APP_CONTEXT_SERVICE,
   CAPTURE_STRATEGIES,
@@ -37,7 +37,7 @@ import {
   createClipboardCaptureStrategy,
   createKeystrokeCaptureStrategy,
   createTextCaptureService,
-} from '@ai-anywhere/context-engine';
+} from '@lipikit/context-engine';
 import { createElectronApiKeyStore } from './services/api-key-store.electron.js';
 import { createAiService } from './services/ai-service.js';
 import { createClipboardMonitor } from './services/clipboard-monitor.js';

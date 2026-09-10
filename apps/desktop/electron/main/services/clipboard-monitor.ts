@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
-import type { ClipboardService } from '@ai-anywhere/platform';
-import type { ClipboardRepository, SettingsRepository } from '@ai-anywhere/database';
-import type { ActiveWindowService } from '@ai-anywhere/platform';
-import type { Logger } from '@ai-anywhere/shared';
+import type { ClipboardService } from '@lipikit/platform';
+import type { ClipboardRepository, SettingsRepository } from '@lipikit/database';
+import type { ActiveWindowService } from '@lipikit/platform';
+import type { Logger } from '@lipikit/shared';
 
 /**
  * Records what the user copies, while they have asked for it. Polling, not a

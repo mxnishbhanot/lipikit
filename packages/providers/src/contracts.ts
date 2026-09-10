@@ -1,4 +1,4 @@
-import type { ProviderDescriptor, ProviderId, ProviderModel, Result } from '@ai-anywhere/shared';
+import type { ProviderDescriptor, ProviderId, ProviderModel, Result } from '@lipikit/shared';
 
 export interface GenerateTextRequest {
   readonly model: string;

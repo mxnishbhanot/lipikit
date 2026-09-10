@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import type { Logger } from '@ai-anywhere/shared';
+import type { Logger } from '@lipikit/shared';
 import { runMigrations } from './migrations.js';
 
 export type DatabaseHandle = Database.Database;

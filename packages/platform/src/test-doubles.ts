@@ -1,4 +1,4 @@
-import { ok, type Logger, type Result, type SelectionSource } from '@ai-anywhere/shared';
+import { ok, type Logger, type Result, type SelectionSource } from '@lipikit/shared';
 import type { ClipboardService, KeystrokeService } from './contracts.js';
 import type { CommandResult, CommandRunner } from './command.js';
 

@@ -1,5 +1,5 @@
 {
-  "name": "@ai-anywhere/landing",
+  "name": "@lipikit/landing",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -17,8 +17,8 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@ai-anywhere/shared": "workspace:*",
-    "@ai-anywhere/ui": "workspace:*",
+    "@lipikit/shared": "workspace:*",
+    "@lipikit/ui": "workspace:*",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
@@ -28,6 +28,6 @@
     "typescript": "^5.6.3",
     "vite": "^5.4.10"
   },
-  "author": "mxnish-bhanot",
+  "author": "mxnishbhanot",
   "license": "MIT"
 }

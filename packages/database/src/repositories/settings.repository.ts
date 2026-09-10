@@ -1,4 +1,4 @@
-import { ACCENT_COLORS, appError, err, ok, type AppSettings, type WindowBounds } from '@ai-anywhere/shared';
+import { ACCENT_COLORS, appError, err, ok, type AppSettings, type WindowBounds } from '@lipikit/shared';
 import type { DatabaseHandle } from '../connection.js';
 import type { SettingsRepository } from '../contracts.js';
 

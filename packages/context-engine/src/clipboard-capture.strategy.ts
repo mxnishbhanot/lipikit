@@ -1,5 +1,5 @@
-import { appError, err, ok, type CapturedSelection } from '@ai-anywhere/shared';
-import type { ActiveWindowService, ClipboardService } from '@ai-anywhere/platform';
+import { appError, err, ok, type CapturedSelection } from '@lipikit/shared';
+import type { ActiveWindowService, ClipboardService } from '@lipikit/platform';
 import type { CaptureStrategy } from './contracts.js';
 
 /**

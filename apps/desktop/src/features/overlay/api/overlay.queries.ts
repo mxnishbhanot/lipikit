@@ -1,6 +1,6 @@
 import { useEffect, useRef, type RefObject } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { IPC, type ReplaceSelectionRequest } from '@ai-anywhere/shared';
+import { IPC, type ReplaceSelectionRequest } from '@lipikit/shared';
 import { ipcInvoke } from '../../../lib/ipc-client.js';
 import { queryKeys } from '../../../lib/query-keys.js';
 

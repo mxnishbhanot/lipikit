@@ -1,4 +1,4 @@
-import { token, type AppEnv, type Logger } from '@ai-anywhere/shared';
+import { token, type AppEnv, type Logger } from '@lipikit/shared';
 import type { AiService } from './services/ai-service.js';
 import type { ClipboardMonitor } from './services/clipboard-monitor.js';
 import type { SelectionFlow } from './services/selection-flow.js';

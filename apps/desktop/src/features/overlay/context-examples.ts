@@ -1,4 +1,4 @@
-import type { AppContext, KnownAppId } from '@ai-anywhere/shared';
+import type { AppContext, KnownAppId } from '@lipikit/shared';
 
 /**
  * What to suggest out loud for the app the popup opened over.

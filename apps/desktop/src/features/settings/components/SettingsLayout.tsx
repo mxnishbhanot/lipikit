@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { AppSettings } from '@ai-anywhere/shared';
-import { Input, Skeleton, SkeletonText, cn } from '@ai-anywhere/ui';
+import type { AppSettings } from '@lipikit/shared';
+import { Input, Skeleton, SkeletonText, cn } from '@lipikit/ui';
 import { Search } from 'lucide-react';
 import { useSettings, useUpdateSettings } from '../api/settings.queries.js';
 import { filterSettingsPages } from '../pages.js';

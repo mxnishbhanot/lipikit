@@ -1,4 +1,4 @@
-import { appError, type AppError } from '@ai-anywhere/shared';
+import { appError, type AppError } from '@lipikit/shared';
 
 const statusOf = (cause: unknown): number | null => {
   if (typeof cause !== 'object' || cause === null) return null;

@@ -81,7 +81,7 @@ jobs:
       - run: pnpm build
 
       - name: Build installers
-        run: pnpm --filter @ai-anywhere/desktop dist
+        run: pnpm --filter @lipikit/desktop dist
 
       # Not attached to a release — this only proves the installers still
       # build on both platforms. The release workflow is what publishes.

@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Token values live in @ai-anywhere/ui/tokens.css, imported by main.tsx so
+/* Token values live in @lipikit/ui/tokens.css, imported by main.tsx so
    every app paints the same system. Everything here is desktop-only:
    window quirks, chrome and prose. */
 

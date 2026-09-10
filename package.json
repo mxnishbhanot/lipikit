@@ -1,5 +1,5 @@
 {
-  "name": "ai-anywhere",
+  "name": "lipikit",
   "version": "1.0.0",
   "private": true,
   "description": "Cross-platform (Windows + Linux) desktop AI writing assistant",
@@ -8,12 +8,12 @@
     "node": ">=20"
   },
   "scripts": {
-    "dev": "pnpm --filter @ai-anywhere/desktop dev",
-    "build": "pnpm -r --filter \"./packages/*\" build && pnpm --filter @ai-anywhere/desktop build",
-    "dev:landing": "pnpm --filter @ai-anywhere/landing dev",
-    "build:landing": "pnpm -r --filter \"./packages/*\" build && pnpm --filter @ai-anywhere/landing build",
-    "dist:win": "pnpm build && pnpm --filter @ai-anywhere/desktop dist:win",
-    "dist:linux": "pnpm build && pnpm --filter @ai-anywhere/desktop dist:linux",
+    "dev": "pnpm --filter @lipikit/desktop dev",
+    "build": "pnpm -r --filter \"./packages/*\" build && pnpm --filter @lipikit/desktop build",
+    "dev:landing": "pnpm --filter @lipikit/landing dev",
+    "build:landing": "pnpm -r --filter \"./packages/*\" build && pnpm --filter @lipikit/landing build",
+    "dist:win": "pnpm build && pnpm --filter @lipikit/desktop dist:win",
+    "dist:linux": "pnpm build && pnpm --filter @lipikit/desktop dist:linux",
     "typecheck": "tsc -b --pretty",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --fix",
@@ -22,9 +22,9 @@
     "prepare": "husky",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:db": "pnpm --filter @ai-anywhere/database test",
+    "test:db": "pnpm --filter @lipikit/database test",
     "test:e2e": "playwright test",
-    "dist": "pnpm build && pnpm --filter @ai-anywhere/desktop dist"
+    "dist": "pnpm build && pnpm --filter @lipikit/desktop dist"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
@@ -54,11 +54,11 @@
       "prettier --write"
     ]
   },
-  "author": "mxnish-bhanot",
+  "author": "mxnishbhanot",
   "license": "MIT",
-  "homepage": "https://github.com/mxnish-bhanot/ai-anywhere",
+  "homepage": "https://github.com/mxnishbhanot/lipikit",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mxnish-bhanot/ai-anywhere.git"
+    "url": "https://github.com/mxnishbhanot/lipikit.git"
   }
 }

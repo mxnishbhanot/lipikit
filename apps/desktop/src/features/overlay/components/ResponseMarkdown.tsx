@@ -15,7 +15,7 @@ import typescript from 'highlight.js/lib/languages/typescript';
 import xml from 'highlight.js/lib/languages/xml';
 import yaml from 'highlight.js/lib/languages/yaml';
 import { Check, Copy } from 'lucide-react';
-import { cn } from '@ai-anywhere/ui';
+import { cn } from '@lipikit/ui';
 import { balanceFences, readCodeBlock } from './markdown-source.js';
 
 /**

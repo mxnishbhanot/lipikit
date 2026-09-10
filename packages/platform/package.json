@@ -1,5 +1,5 @@
 {
-  "name": "@ai-anywhere/platform",
+  "name": "@lipikit/platform",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -16,7 +16,7 @@
     "clean": "rm -rf dist *.tsbuildinfo"
   },
   "dependencies": {
-    "@ai-anywhere/shared": "workspace:*",
+    "@lipikit/shared": "workspace:*",
     "electron": "33.0.2"
   },
   "devDependencies": {

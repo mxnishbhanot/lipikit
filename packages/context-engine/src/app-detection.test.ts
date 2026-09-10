@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'vitest';
-import type { SelectionSource } from '@ai-anywhere/shared';
+import type { SelectionSource } from '@lipikit/shared';
 import { createAppContextService, detectApp, routeCommandId } from './app-detection.js';
 
 const source = (

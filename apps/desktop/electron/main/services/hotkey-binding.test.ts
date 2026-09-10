@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { afterEach, test } from 'vitest';
-import { HOTKEY_SERVICE, type HotkeyService } from '@ai-anywhere/platform';
-import { createContainer, ok, type CustomPrompt, type Logger } from '@ai-anywhere/shared';
+import { HOTKEY_SERVICE, type HotkeyService } from '@lipikit/platform';
+import { createContainer, ok, type CustomPrompt, type Logger } from '@lipikit/shared';
 import { bindGlobalHotkey, resetHotkeyBinding, syncPromptHotkeys } from './hotkey-binding.js';
 import type { HotkeyPress, SelectionFlow } from './selection-flow.js';
 import { LOGGER, SELECTION_FLOW } from '../tokens.js';

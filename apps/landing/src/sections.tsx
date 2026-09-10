@@ -23,8 +23,8 @@ import {
   Users,
   type LucideIcon,
 } from 'lucide-react';
-import { BRANDING } from '@ai-anywhere/shared';
-import { AppIcon, Badge, Button, Card, cn, Kbd, liftable } from '@ai-anywhere/ui';
+import { BRANDING } from '@lipikit/shared';
+import { AppIcon, Badge, Button, Card, cn, Kbd, liftable } from '@lipikit/ui';
 import {
   BYOK_CARDS,
   BYOK_POINTS,

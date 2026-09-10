@@ -1,4 +1,4 @@
-import type { CapturedSelection, Result } from '@ai-anywhere/shared';
+import type { CapturedSelection, Result } from '@lipikit/shared';
 
 /**
  * How text gets out of a foreign application. Phase 1 ships the clipboard

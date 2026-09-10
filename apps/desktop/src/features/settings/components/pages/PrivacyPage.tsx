@@ -1,5 +1,5 @@
-import type { AppSettings } from '@ai-anywhere/shared';
-import { Button } from '@ai-anywhere/ui';
+import type { AppSettings } from '@lipikit/shared';
+import { Button } from '@lipikit/ui';
 import { ShieldCheck, Trash2 } from 'lucide-react';
 import {
   useClearClipboardHistory,

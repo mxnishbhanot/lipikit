@@ -1,4 +1,4 @@
-import type { WindowBounds } from '@ai-anywhere/shared';
+import type { WindowBounds } from '@lipikit/shared';
 
 const clamp = (value: number, min: number, max: number): number => Math.min(Math.max(value, min), max);
 

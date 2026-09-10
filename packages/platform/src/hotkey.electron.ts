@@ -1,5 +1,5 @@
 import { globalShortcut } from 'electron';
-import { appError, err, ok, type Logger } from '@ai-anywhere/shared';
+import { appError, err, ok, type Logger } from '@lipikit/shared';
 import type { HotkeyService } from './contracts.js';
 
 export function createElectronHotkeyService(logger: Logger): HotkeyService {

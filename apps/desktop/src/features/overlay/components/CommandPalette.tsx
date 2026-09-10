@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { Badge, Input, Kbd, cn, listContainer, listItem, slideUp } from '@ai-anywhere/ui';
+import { Badge, Input, Kbd, cn, listContainer, listItem, slideUp } from '@lipikit/ui';
 import { Braces, Clock, CornerDownLeft, ListChecks, MessageSquare, PenLine, Star, Wand2 } from 'lucide-react';
-import { COMMAND_GROUPS, filterCommands, suggestedFor, type PaletteCommand } from '@ai-anywhere/prompts';
-import type { AppContext, CustomPrompt } from '@ai-anywhere/shared';
+import { COMMAND_GROUPS, filterCommands, suggestedFor, type PaletteCommand } from '@lipikit/prompts';
+import type { AppContext, CustomPrompt } from '@lipikit/shared';
 import type { RecentPrompt } from '../use-command-prefs.js';
 import { nextSectionStart } from '../section-nav.js';
 import { examplesFor, tuningFor } from '../context-examples.js';

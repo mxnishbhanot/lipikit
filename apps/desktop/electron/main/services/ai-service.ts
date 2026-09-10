@@ -8,11 +8,11 @@ import {
   type GenerateResponse,
   type Logger,
   type Result,
-} from '@ai-anywhere/shared';
-import { mapProviderError, type GenerateTextRequest, type ProviderRegistry } from '@ai-anywhere/providers';
-import { formatMemory, MEMORY_LIMIT, REPLY_STYLE_HINTS, renderPrompt } from '@ai-anywhere/prompts';
-import type { ClipboardService } from '@ai-anywhere/platform';
-import type { HistoryRepository, SettingsRepository } from '@ai-anywhere/database';
+} from '@lipikit/shared';
+import { mapProviderError, type GenerateTextRequest, type ProviderRegistry } from '@lipikit/providers';
+import { formatMemory, MEMORY_LIMIT, REPLY_STYLE_HINTS, renderPrompt } from '@lipikit/prompts';
+import type { ClipboardService } from '@lipikit/platform';
+import type { HistoryRepository, SettingsRepository } from '@lipikit/database';
 import type { WindowManager } from '../windows/window-manager.js';
 
 /**

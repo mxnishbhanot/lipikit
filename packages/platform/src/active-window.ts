@@ -1,4 +1,4 @@
-import type { Platform, SelectionSource } from '@ai-anywhere/shared';
+import type { Platform, SelectionSource } from '@lipikit/shared';
 import type { ActiveWindowService, PlatformInfo } from './contracts.js';
 import type { CommandRunner } from './command.js';
 

@@ -6,7 +6,7 @@ import type {
   PlatformCapabilities,
   Result,
   SelectionSource,
-} from '@ai-anywhere/shared';
+} from '@lipikit/shared';
 
 /**
  * One interface per OS capability. Windows and Linux differ only in the

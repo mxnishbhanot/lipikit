@@ -1,6 +1,6 @@
 # Privacy Policy
 
-_Last updated: 2026-09-09. Applies to AI Anywhere 1.0.0._
+_Last updated: 2026-09-09. Applies to LipiKit 1.0.0._
 
 The product name is a placeholder; see `packages/shared/src/config/branding.ts`.
 
@@ -71,4 +71,4 @@ with it only if you also clear them from your OS keyring.
 
 ## Contact
 
-Open an issue at https://github.com/mxnish-bhanot/ai-anywhere/issues.
+Open an issue at https://github.com/mxnishbhanot/lipikit/issues.

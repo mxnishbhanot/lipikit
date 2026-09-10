@@ -7,13 +7,13 @@ import { defineConfig, externalizeDepsPlugin } from 'electron-vite';
  * main/preload/renderer triple isn't three hand-maintained Vite configs.
  */
 const workspacePackages = [
-  '@ai-anywhere/shared',
-  '@ai-anywhere/ui',
-  '@ai-anywhere/platform',
-  '@ai-anywhere/providers',
-  '@ai-anywhere/context-engine',
-  '@ai-anywhere/database',
-  '@ai-anywhere/prompts',
+  '@lipikit/shared',
+  '@lipikit/ui',
+  '@lipikit/platform',
+  '@lipikit/providers',
+  '@lipikit/context-engine',
+  '@lipikit/database',
+  '@lipikit/prompts',
 ];
 
 export default defineConfig({

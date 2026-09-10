@@ -1,4 +1,4 @@
-import { appError, err, ok, type ProviderId } from '@ai-anywhere/shared';
+import { appError, err, ok, type ProviderId } from '@lipikit/shared';
 import type { AiProvider, AiProviderFactory, ProviderDeps, ProviderRegistry } from './contracts.js';
 import { PROVIDER_CATALOG } from './catalog.js';
 import { openAiProviderFactory } from './openai.provider.js';

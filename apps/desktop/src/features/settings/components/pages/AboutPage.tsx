@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { BRANDING, IPC } from '@ai-anywhere/shared';
-import { AppIcon, Badge, Button, cn } from '@ai-anywhere/ui';
+import { BRANDING, IPC } from '@lipikit/shared';
+import { AppIcon, Badge, Button, cn } from '@lipikit/ui';
 import { FileText, Mic, Power, ScanText, Workflow, type LucideIcon } from 'lucide-react';
 import { ipcInvoke } from '../../../../lib/ipc-client.js';
 import { queryKeys } from '../../../../lib/query-keys.js';

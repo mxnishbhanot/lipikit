@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { app } from 'electron';
-import { BRANDING, appError, err, ok } from '@ai-anywhere/shared';
+import { BRANDING, appError, err, ok } from '@lipikit/shared';
 import type { AutostartService, PlatformInfo } from './contracts.js';
 
 /**
@@ -19,7 +19,7 @@ const HIDDEN_FLAG = '--hidden';
  */
 export function createElectronAutostartService(info: PlatformInfo): AutostartService {
   const configHome = process.env['XDG_CONFIG_HOME'] ?? join(homedir(), '.config');
-  const desktopFile = join(configHome, 'autostart', 'ai-anywhere.desktop');
+  const desktopFile = join(configHome, 'autostart', 'lipikit.desktop');
 
   /**
    * In a packaged build this is the AppImage/binary itself. Running from a dev

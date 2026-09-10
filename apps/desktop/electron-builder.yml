@@ -1,14 +1,13 @@
 # Packaging metadata. The two name fields below are the only branding strings
 # outside packages/shared/src/config/branding.ts — a YAML config cannot import
 # TypeScript — so keep them equal to BRANDING.appName / BRANDING.tagline.
-# appId is deliberately NOT renamed with the product: it keys the Windows
-# AppUserModelID and the installer's registry entry, and changing it orphans
-# every installed copy.
-appId: com.aianywhere.app
-productName: AI Anywhere (Temporary)
+# appId keys the Windows AppUserModelID and the installer's registry entry:
+# changing it orphans every installed copy, so it stays fixed from here on.
+appId: com.lipikit.app
+productName: LipiKit
 # Without this the binary is named after the scoped package —
-# "@ai-anywheredesktop" — which also breaks the StartupWMClass match below.
-executableName: ai-anywhere
+# "@lipikitdesktop" — which also breaks the StartupWMClass match below.
+executableName: lipikit
 copyright: Copyright © 2026 the authors
 directories:
   output: release
@@ -45,7 +44,7 @@ win:
       arch: [x64]
     - target: portable
       arch: [x64]
-  artifactName: AI-Anywhere-${version}-win-${arch}.${ext}
+  artifactName: LipiKit-${version}-win-${arch}.${ext}
 nsis:
   # A one-click installer would give the user no say over the install location
   # and no uninstaller entry worth the name.
@@ -58,13 +57,13 @@ nsis:
   # user's, not the installer's, and a reinstall should find them again.
   deleteAppDataOnUninstall: false
 portable:
-  artifactName: AI-Anywhere-${version}-win-${arch}-portable.${ext}
+  artifactName: LipiKit-${version}-win-${arch}-portable.${ext}
 linux:
   icon: build/icons
   category: Utility
   synopsis: The fastest AI command layer for Windows and Linux
   # Required for the .deb control file; a deb without it will not build.
-  maintainer: mxnish-bhanot <mxnish-bhanot@users.noreply.github.com>
+  maintainer: mxnishbhanot <mxnishbhanot@users.noreply.github.com>
   target:
     - target: AppImage
       arch: [x64]
@@ -74,9 +73,9 @@ linux:
   # nesting one writes a literal `entry=[object Object]` line and drops these,
   # leaving StartupWMClass defaulted to the product name.
   desktop:
-    StartupWMClass: ai-anywhere
+    StartupWMClass: lipikit
     Keywords: AI;writing;rewrite;assistant;
-  artifactName: AI-Anywhere-${version}-linux-${arch}.${ext}
+  artifactName: LipiKit-${version}-linux-${arch}.${ext}
 deb:
   # xdotool is the X11 active-window/keystroke path: recommended, not required,
   # because the app starts and explains a degraded session rather than refusing

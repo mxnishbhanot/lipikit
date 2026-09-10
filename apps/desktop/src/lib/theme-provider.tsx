@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { IPC } from '@ai-anywhere/shared';
+import { IPC } from '@lipikit/shared';
 import { useQuery } from '@tanstack/react-query';
 import { ipcInvoke } from './ipc-client.js';
 import { queryKeys } from './query-keys.js';

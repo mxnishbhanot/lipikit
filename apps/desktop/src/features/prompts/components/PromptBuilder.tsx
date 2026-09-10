@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Button, EmptyState, Input, Kbd } from '@ai-anywhere/ui';
-import { PROMPT_VARIABLES } from '@ai-anywhere/prompts';
-import { KNOWN_APP_IDS, type CustomPrompt, type KnownAppId } from '@ai-anywhere/shared';
+import { Button, EmptyState, Input, Kbd } from '@lipikit/ui';
+import { PROMPT_VARIABLES } from '@lipikit/prompts';
+import { KNOWN_APP_IDS, type CustomPrompt, type KnownAppId } from '@lipikit/shared';
 import { HotkeyRecorder } from '../../settings/components/HotkeyRecorder.js';
 import { useCustomPrompts, useDeletePrompt, useSavePrompt } from '../api/prompts.queries.js';
 

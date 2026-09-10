@@ -9,7 +9,7 @@ import {
   type ProviderSettings,
   type Result,
   type SettingsBackup,
-} from '@ai-anywhere/shared';
+} from '@lipikit/shared';
 import type { PromptRepository, ProviderSettingsRepository, SettingsRepository } from './contracts.js';
 import { DEFAULT_SETTINGS } from './repositories/settings.repository.js';
 

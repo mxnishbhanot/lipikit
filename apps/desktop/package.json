@@ -1,5 +1,5 @@
 {
-  "name": "@ai-anywhere/desktop",
+  "name": "@lipikit/desktop",
   "version": "1.0.0",
   "private": true,
   "description": "AI writing assistant available anywhere via a global hotkey",
@@ -26,13 +26,13 @@
     "zustand": "^5.0.0"
   },
   "devDependencies": {
-    "@ai-anywhere/context-engine": "workspace:*",
-    "@ai-anywhere/database": "workspace:*",
-    "@ai-anywhere/platform": "workspace:*",
-    "@ai-anywhere/prompts": "workspace:*",
-    "@ai-anywhere/providers": "workspace:*",
-    "@ai-anywhere/shared": "workspace:*",
-    "@ai-anywhere/ui": "workspace:*",
+    "@lipikit/context-engine": "workspace:*",
+    "@lipikit/database": "workspace:*",
+    "@lipikit/platform": "workspace:*",
+    "@lipikit/prompts": "workspace:*",
+    "@lipikit/providers": "workspace:*",
+    "@lipikit/shared": "workspace:*",
+    "@lipikit/ui": "workspace:*",
     "@types/better-sqlite3": "^7.6.11",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
@@ -46,7 +46,7 @@
     "typescript": "^5.6.3",
     "vite": "^5.4.10"
   },
-  "author": "mxnish-bhanot",
+  "author": "mxnishbhanot",
   "license": "MIT",
-  "homepage": "https://github.com/mxnish-bhanot/ai-anywhere"
+  "homepage": "https://github.com/mxnishbhanot/lipikit"
 }

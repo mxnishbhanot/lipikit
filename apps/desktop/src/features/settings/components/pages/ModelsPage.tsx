@@ -1,5 +1,5 @@
-import type { AppSettings, ProviderId } from '@ai-anywhere/shared';
-import { Badge } from '@ai-anywhere/ui';
+import type { AppSettings, ProviderId } from '@lipikit/shared';
+import { Badge } from '@lipikit/ui';
 import { Group, NumberRow, Row, SelectRow, SettingsPage } from '../fields.js';
 import { useProviderModels, useProviderSettings, useProviders } from '../../api/settings.queries.js';
 

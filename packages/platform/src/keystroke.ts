@@ -1,4 +1,4 @@
-import { appError, err, ok, type Logger, type Result } from '@ai-anywhere/shared';
+import { appError, err, ok, type Logger, type Result } from '@lipikit/shared';
 import type { KeystrokeBackendId, KeystrokeService, PlatformInfo } from './contracts.js';
 import type { CommandRunner } from './command.js';
 

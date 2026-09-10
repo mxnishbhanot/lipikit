@@ -1,5 +1,5 @@
-import type { AppSettings } from '@ai-anywhere/shared';
-import { Badge, Button, EmptyState, Skeleton, SkeletonText } from '@ai-anywhere/ui';
+import type { AppSettings } from '@lipikit/shared';
+import { Badge, Button, EmptyState, Skeleton, SkeletonText } from '@lipikit/ui';
 import { Trash2 } from 'lucide-react';
 import { useClearHistory, useDeleteHistoryEntry, useHistory } from '../../../history/api/history.queries.js';
 import { Group, MutationStatus, NumberRow, Row, SettingsPage, ToggleRow } from '../fields.js';

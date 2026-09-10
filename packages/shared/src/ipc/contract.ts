@@ -198,8 +198,8 @@ export interface IpcEventContract {
 export type IpcEventName = keyof IpcEventContract;
 export type Unsubscribe = () => void;
 
-/** Shape mounted on `window.aiAnywhere` by the preload script. */
-export interface AiAnywhereBridge {
+/** Shape mounted on `window.lipikit` by the preload script. */
+export interface LipiKitBridge {
   invoke<C extends IpcChannel>(channel: C, payload: IpcRequest<C>): Promise<IpcResponse<C>>;
   on<E extends IpcEventName>(event: E, listener: (payload: IpcEventContract[E]) => void): Unsubscribe;
 }

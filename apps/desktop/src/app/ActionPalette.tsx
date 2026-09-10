@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Kbd, cn } from '@ai-anywhere/ui';
+import { Kbd, cn } from '@lipikit/ui';
 import { Home, Keyboard, Search, type LucideIcon } from 'lucide-react';
 import { SETTINGS_PAGES } from '../features/settings/pages.js';
 import { useUiStore } from '../store/ui.store.js';

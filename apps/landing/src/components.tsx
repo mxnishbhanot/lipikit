@@ -1,12 +1,12 @@
 import { motion, useReducedMotion, type Variants } from 'framer-motion';
 import { Moon, Sun } from 'lucide-react';
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
-import { cn, DURATION, EASE } from '@ai-anywhere/ui';
+import { cn, DURATION, EASE } from '@lipikit/ui';
 import { resolveTheme, THEME_KEY, type ThemeChoice } from './theme.js';
 
 /**
  * Page-level building blocks. The app's own primitives (Button, Card, Kbd,
- * Badge) come straight from @ai-anywhere/ui and are used as-is; only the three
+ * Badge) come straight from @lipikit/ui and are used as-is; only the three
  * things a marketing page needs and an app does not live here.
  */
 

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { AppIcon, Button, EmptyState, Kbd } from '@ai-anywhere/ui';
-import { BRANDING, IPC, IPC_EVENTS } from '@ai-anywhere/shared';
+import { AppIcon, Button, EmptyState, Kbd } from '@lipikit/ui';
+import { BRANDING, IPC, IPC_EVENTS } from '@lipikit/shared';
 import { SettingsLayout } from '../features/settings/components/SettingsLayout.js';
 import { Onboarding } from '../features/onboarding/components/Onboarding.js';
 import { Splash } from './Splash.js';

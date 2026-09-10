@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { IPC, type AppSettings, type CustomPrompt } from '@ai-anywhere/shared';
-import { EmptyState } from '@ai-anywhere/ui';
+import { IPC, type AppSettings, type CustomPrompt } from '@lipikit/shared';
+import { EmptyState } from '@lipikit/ui';
 import { AlertTriangle } from 'lucide-react';
 import { ipcInvoke } from '../../../../lib/ipc-client.js';
 import { queryKeys } from '../../../../lib/query-keys.js';

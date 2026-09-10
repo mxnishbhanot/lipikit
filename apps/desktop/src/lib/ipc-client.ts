@@ -1,10 +1,4 @@
-import type {
-  IpcChannel,
-  IpcEventContract,
-  IpcEventName,
-  IpcRequest,
-  IpcResponse,
-} from '@ai-anywhere/shared';
+import type { IpcChannel, IpcEventContract, IpcEventName, IpcRequest, IpcResponse } from '@lipikit/shared';
 
 /**
  * Renderer-side wrapper over the preload bridge. Unwraps Result into a
@@ -28,7 +22,7 @@ export async function ipcInvoke<C extends IpcChannel>(
   channel: C,
   payload: IpcRequest<C>,
 ): Promise<Unwrapped<C>> {
-  const response = await window.aiAnywhere.invoke(channel, payload);
+  const response = await window.lipikit.invoke(channel, payload);
   if (!response.ok) throw new IpcError(response.error.message, response.error.code);
   return response.value as Unwrapped<C>;
 }
@@ -36,4 +30,4 @@ export async function ipcInvoke<C extends IpcChannel>(
 export const ipcOn = <E extends IpcEventName>(
   event: E,
   listener: (payload: IpcEventContract[E]) => void,
-): (() => void) => window.aiAnywhere.on(event, listener);
+): (() => void) => window.lipikit.on(event, listener);

@@ -1,8 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MotionConfig } from 'framer-motion';
 import { useEffect, useState, type ReactNode } from 'react';
-import { IPC_EVENTS } from '@ai-anywhere/shared';
-import { DURATION, EASE } from '@ai-anywhere/ui';
+import { IPC_EVENTS } from '@lipikit/shared';
+import { DURATION, EASE } from '@lipikit/ui';
 import { ipcOn } from '../lib/ipc-client.js';
 import { queryKeys } from '../lib/query-keys.js';
 import { ThemeProvider } from '../lib/theme-provider.js';

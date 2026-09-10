@@ -8,9 +8,9 @@ import {
   type OverlayMode,
   type ReplaceSelectionRequest,
   type Result,
-} from '@ai-anywhere/shared';
-import type { CursorService, TextReplacementService } from '@ai-anywhere/platform';
-import type { AppContextService, TextCaptureService } from '@ai-anywhere/context-engine';
+} from '@lipikit/shared';
+import type { CursorService, TextReplacementService } from '@lipikit/platform';
+import type { AppContextService, TextCaptureService } from '@lipikit/context-engine';
 import type { WindowManager } from '../windows/window-manager.js';
 
 /** Which accelerator fired, and therefore which screen the popup opens on. */

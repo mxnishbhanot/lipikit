@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { REPLY_COMMANDS, type CommandDescriptor } from '@ai-anywhere/prompts';
-import type { ReplyAnalysis } from '@ai-anywhere/shared';
+import { REPLY_COMMANDS, type CommandDescriptor } from '@lipikit/prompts';
+import type { ReplyAnalysis } from '@lipikit/shared';
 
 export interface ClientReplyProps {
   readonly onRun: (command: CommandDescriptor) => void;

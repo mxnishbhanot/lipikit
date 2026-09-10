@@ -1,4 +1,4 @@
-import { BRANDING } from '@ai-anywhere/shared';
+import { BRANDING } from '@lipikit/shared';
 
 export type ReportKind = 'bug' | 'feature';
 

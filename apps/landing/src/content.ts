@@ -1,4 +1,4 @@
-import { BRANDING } from '@ai-anywhere/shared';
+import { BRANDING } from '@lipikit/shared';
 
 /**
  * Every claim the page makes, in one file, so a copy change is never a hunt
@@ -8,13 +8,13 @@ import { BRANDING } from '@ai-anywhere/shared';
  * a marketing bundle for seven labels.
  *
  * Nothing here restates a product name or URL: those come from
- * `@ai-anywhere/shared`'s branding config, which is the one place they live.
+ * `@lipikit/shared`'s branding config, which is the one place they live.
  */
 
 /** The one hotkey that always exists. Rebindable, not removable. */
 export const HOTKEY = 'Ctrl+Space';
 
-export const REPO_URL = 'https://github.com/mxnish-bhanot/ai-anywhere';
+export const REPO_URL = 'https://github.com/mxnishbhanot/lipikit';
 export const RELEASES_URL = `${REPO_URL}/releases/latest`;
 
 /**
@@ -322,25 +322,25 @@ export const DOWNLOADS: readonly Download[] = [
   {
     icon: 'Windows',
     platform: 'Windows',
-    file: `AI-Anywhere-${V}-win-x64.exe`,
+    file: `LipiKit-${V}-win-x64.exe`,
     note: 'NSIS installer. Per-user, no admin prompt.',
   },
   {
     icon: 'Windows',
     platform: 'Windows',
-    file: `AI-Anywhere-${V}-win-x64-portable.exe`,
+    file: `LipiKit-${V}-win-x64-portable.exe`,
     note: 'One file, no installer, no registry writes.',
   },
   {
     icon: 'Linux',
     platform: 'Linux',
-    file: `AI-Anywhere-${V}-linux-x86_64.AppImage`,
+    file: `LipiKit-${V}-linux-x86_64.AppImage`,
     note: 'chmod +x and run. No package manager, no root.',
   },
   {
     icon: 'Linux',
     platform: 'Linux',
-    file: `AI-Anywhere-${V}-linux-amd64.deb`,
+    file: `LipiKit-${V}-linux-amd64.deb`,
     note: 'sudo apt install ./the-file.deb — pulls its deps in.',
   },
 ];
@@ -507,7 +507,7 @@ export interface ComparisonRow {
 }
 
 export const COMPARISON_PRODUCTS: readonly string[] = [
-  'AI Anywhere',
+  'LipiKit',
   'ChatGPT in a browser',
   'Grammarly',
   'Raycast AI',

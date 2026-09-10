@@ -58,7 +58,7 @@ choose **More info**, then **Run anyway**. Signing is the first roadmap item.
 ### Does it update itself?
 
 Not in 1.0 — auto-update waits on code signing. A new version is a download from
-the [releases page](https://github.com/mxnish-bhanot/ai-anywhere/releases).
+the [releases page](https://github.com/mxnishbhanot/lipikit/releases).
 Installing over an existing copy leaves your data alone.
 
 ### Can I change the hotkey?

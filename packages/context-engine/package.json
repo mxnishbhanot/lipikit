@@ -1,5 +1,5 @@
 {
-  "name": "@ai-anywhere/context-engine",
+  "name": "@lipikit/context-engine",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -16,8 +16,8 @@
     "clean": "rm -rf dist *.tsbuildinfo"
   },
   "dependencies": {
-    "@ai-anywhere/shared": "workspace:*",
-    "@ai-anywhere/platform": "workspace:*"
+    "@lipikit/shared": "workspace:*",
+    "@lipikit/platform": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.6.3"

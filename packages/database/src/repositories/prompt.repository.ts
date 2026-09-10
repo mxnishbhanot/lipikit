@@ -1,4 +1,4 @@
-import { appError, err, ok, type CustomPrompt, type KnownAppId } from '@ai-anywhere/shared';
+import { appError, err, ok, type CustomPrompt, type KnownAppId } from '@lipikit/shared';
 import type { DatabaseHandle } from '../connection.js';
 import type { PromptRepository } from '../contracts.js';
 

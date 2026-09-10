@@ -1,5 +1,5 @@
 import { COMMANDS, type CommandDescriptor } from './commands.js';
-import type { AppContext, CustomPrompt } from '@ai-anywhere/shared';
+import type { AppContext, CustomPrompt } from '@lipikit/shared';
 
 /**
  * A palette row is either a built-in command or a user prompt. The only

@@ -1,6 +1,6 @@
 import { join } from 'node:path';
 import { app, Menu, Tray, nativeImage } from 'electron';
-import { BRANDING, type Logger } from '@ai-anywhere/shared';
+import { BRANDING, type Logger } from '@lipikit/shared';
 import type { WindowManager } from '../windows/window-manager.js';
 import type { SelectionFlow } from './selection-flow.js';
 

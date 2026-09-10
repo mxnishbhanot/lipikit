@@ -1,4 +1,4 @@
-import type { ActionId, ReplyStyle, Tone } from '@ai-anywhere/shared';
+import type { ActionId, ReplyStyle, Tone } from '@lipikit/shared';
 
 export type CommandGroup = 'Developer' | 'Communication' | 'Writing' | 'Productivity';
 

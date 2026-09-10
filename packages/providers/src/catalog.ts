@@ -1,4 +1,4 @@
-import type { ProviderDescriptor, ProviderId } from '@ai-anywhere/shared';
+import type { ProviderDescriptor, ProviderId } from '@lipikit/shared';
 
 /**
  * Static metadata: model ids, context sizes, endpoints. No vendor SDK calls,

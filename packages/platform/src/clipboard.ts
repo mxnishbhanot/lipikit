@@ -1,5 +1,5 @@
 import { clipboard } from 'electron';
-import type { Logger } from '@ai-anywhere/shared';
+import type { Logger } from '@lipikit/shared';
 import type { ClipboardBackendId, ClipboardService, PlatformInfo } from './contracts.js';
 import type { CommandRunner } from './command.js';
 

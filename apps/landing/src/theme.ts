@@ -1,7 +1,7 @@
 export type ThemeChoice = 'light' | 'dark';
 
 /** Matches the pre-paint script in index.html; changing one means both. */
-export const THEME_KEY = 'ai-anywhere:theme';
+export const THEME_KEY = 'lipikit:theme';
 
 /**
  * What to paint, given a stored choice and the OS preference. Pure so it can

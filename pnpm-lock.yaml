@@ -93,25 +93,25 @@ importers:
         specifier: ^5.0.0
         version: 5.0.15(@types/react@18.3.31)(react@18.3.1)
     devDependencies:
-      '@ai-anywhere/context-engine':
+      '@lipikit/context-engine':
         specifier: workspace:*
         version: link:../../packages/context-engine
-      '@ai-anywhere/database':
+      '@lipikit/database':
         specifier: workspace:*
         version: link:../../packages/database
-      '@ai-anywhere/platform':
+      '@lipikit/platform':
         specifier: workspace:*
         version: link:../../packages/platform
-      '@ai-anywhere/prompts':
+      '@lipikit/prompts':
         specifier: workspace:*
         version: link:../../packages/prompts
-      '@ai-anywhere/providers':
+      '@lipikit/providers':
         specifier: workspace:*
         version: link:../../packages/providers
-      '@ai-anywhere/shared':
+      '@lipikit/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      '@ai-anywhere/ui':
+      '@lipikit/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@types/better-sqlite3':
@@ -169,10 +169,10 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
     devDependencies:
-      '@ai-anywhere/shared':
+      '@lipikit/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      '@ai-anywhere/ui':
+      '@lipikit/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@types/react':
@@ -202,10 +202,10 @@ importers:
 
   packages/context-engine:
     dependencies:
-      '@ai-anywhere/platform':
+      '@lipikit/platform':
         specifier: workspace:*
         version: link:../platform
-      '@ai-anywhere/shared':
+      '@lipikit/shared':
         specifier: workspace:*
         version: link:../shared
     devDependencies:
@@ -215,7 +215,7 @@ importers:
 
   packages/database:
     dependencies:
-      '@ai-anywhere/shared':
+      '@lipikit/shared':
         specifier: workspace:*
         version: link:../shared
       better-sqlite3:
@@ -234,7 +234,7 @@ importers:
 
   packages/platform:
     dependencies:
-      '@ai-anywhere/shared':
+      '@lipikit/shared':
         specifier: workspace:*
         version: link:../shared
       electron:
@@ -247,7 +247,7 @@ importers:
 
   packages/prompts:
     dependencies:
-      '@ai-anywhere/shared':
+      '@lipikit/shared':
         specifier: workspace:*
         version: link:../shared
     devDependencies:
@@ -257,7 +257,7 @@ importers:
 
   packages/providers:
     dependencies:
-      '@ai-anywhere/shared':
+      '@lipikit/shared':
         specifier: workspace:*
         version: link:../shared
       openai:

@@ -1,4 +1,4 @@
-import { appError, err, ok, type ProviderId, type ProviderSettings } from '@ai-anywhere/shared';
+import { appError, err, ok, type ProviderId, type ProviderSettings } from '@lipikit/shared';
 import type { DatabaseHandle } from '../connection.js';
 import type { ProviderSettingsRepository } from '../contracts.js';
 

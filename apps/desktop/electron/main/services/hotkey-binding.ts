@@ -1,6 +1,6 @@
-import { HOTKEY_SERVICE } from '@ai-anywhere/platform';
-import { customCommandId } from '@ai-anywhere/prompts';
-import { ok, type Container, type CustomPrompt, type OverlayMode, type Result } from '@ai-anywhere/shared';
+import { HOTKEY_SERVICE } from '@lipikit/platform';
+import { customCommandId } from '@lipikit/prompts';
+import { ok, type Container, type CustomPrompt, type OverlayMode, type Result } from '@lipikit/shared';
 import { LOGGER, SELECTION_FLOW } from '../tokens.js';
 
 /**

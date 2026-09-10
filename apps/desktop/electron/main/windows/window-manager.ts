@@ -7,8 +7,8 @@ import {
   type IpcEventContract,
   type IpcEventName,
   type Logger,
-} from '@ai-anywhere/shared';
-import type { SettingsRepository } from '@ai-anywhere/database';
+} from '@lipikit/shared';
+import type { SettingsRepository } from '@lipikit/database';
 import { isTrayActive } from '../services/tray.js';
 import { notify } from '../services/notify.js';
 import { fitToWorkArea } from './bounds.js';

@@ -1,4 +1,4 @@
-import { appError, err, ok, type ClipboardEntry } from '@ai-anywhere/shared';
+import { appError, err, ok, type ClipboardEntry } from '@lipikit/shared';
 import type { DatabaseHandle } from '../connection.js';
 import type { ClipboardRepository } from '../contracts.js';
 

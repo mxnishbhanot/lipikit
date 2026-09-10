@@ -1,4 +1,4 @@
-import { appError, err, ok, type HistoryEntry } from '@ai-anywhere/shared';
+import { appError, err, ok, type HistoryEntry } from '@lipikit/shared';
 import type { DatabaseHandle } from '../connection.js';
 import type { HistoryRepository } from '../contracts.js';
 

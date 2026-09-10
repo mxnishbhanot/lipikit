@@ -1,4 +1,4 @@
-import type { ActionId, Tone } from '@ai-anywhere/shared';
+import type { ActionId, Tone } from '@lipikit/shared';
 
 export interface PromptTemplate {
   readonly action: ActionId;

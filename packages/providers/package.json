@@ -1,5 +1,5 @@
 {
-  "name": "@ai-anywhere/providers",
+  "name": "@lipikit/providers",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -16,7 +16,7 @@
     "clean": "rm -rf dist *.tsbuildinfo"
   },
   "dependencies": {
-    "@ai-anywhere/shared": "workspace:*",
+    "@lipikit/shared": "workspace:*",
     "openai": "^7.9.0"
   },
   "devDependencies": {

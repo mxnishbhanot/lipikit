@@ -69,7 +69,7 @@ const POPUP: readonly ShortcutGroup[] = [
 
 export const SHORTCUTS: Record<ShortcutScope, readonly ShortcutGroup[]> = { main: MAIN, popup: POPUP };
 
-export const SHORTCUT_SHEET_EVENT = 'ai-anywhere:shortcut-sheet';
+export const SHORTCUT_SHEET_EVENT = 'lipikit:shortcut-sheet';
 
 /** Opens the cheatsheet from anywhere in the window that owns a dialog. */
 export const openShortcutSheet = (): void => {

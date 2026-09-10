@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { IPC, type SavePromptRequest } from '@ai-anywhere/shared';
+import { IPC, type SavePromptRequest } from '@lipikit/shared';
 import { ipcInvoke } from '../../../lib/ipc-client.js';
 import { queryKeys } from '../../../lib/query-keys.js';
 

@@ -7,7 +7,7 @@ import {
   type GenerateRequest,
   type ReplyStyle,
   type Tone,
-} from '@ai-anywhere/shared';
+} from '@lipikit/shared';
 import { ipcInvoke, ipcOn } from '../../../lib/ipc-client.js';
 
 export interface RunActionInput {

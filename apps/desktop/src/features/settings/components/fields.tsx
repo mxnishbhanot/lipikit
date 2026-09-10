@@ -1,4 +1,4 @@
-import { Select, Switch, cn } from '@ai-anywhere/ui';
+import { Select, Switch, cn } from '@lipikit/ui';
 import type { ReactNode } from 'react';
 
 /**

@@ -55,7 +55,7 @@ jobs:
 
       - run: pnpm build
       - name: Build installers
-        run: pnpm --filter @ai-anywhere/desktop dist
+        run: pnpm --filter @lipikit/desktop dist
         # Windows artifacts are unsigned. Add the certificate as repository
         # secrets and uncomment these two lines to sign them; electron-builder
         # needs nothing else.

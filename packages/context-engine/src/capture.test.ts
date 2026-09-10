@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'vitest';
-import { appError, err, ok, type CapturedSelection, type Logger } from '@ai-anywhere/shared';
+import { appError, err, ok, type CapturedSelection, type Logger } from '@lipikit/shared';
 import { createTextCaptureService } from './capture.service.js';
 import type { CaptureStrategy } from './contracts.js';
 

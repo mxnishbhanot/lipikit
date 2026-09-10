@@ -1,4 +1,4 @@
-import type { AppContext, KnownAppId, SelectionSource } from '@ai-anywhere/shared';
+import type { AppContext, KnownAppId, SelectionSource } from '@lipikit/shared';
 
 /**
  * How one application is recognised, and what it should offer.

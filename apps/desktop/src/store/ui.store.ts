@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { ActionId, Tone } from '@ai-anywhere/shared';
+import type { ActionId, Tone } from '@lipikit/shared';
 import { isSettingsPageName, type SettingsPageName } from '../features/settings/pages.js';
 
 /**
@@ -7,8 +7,8 @@ import { isSettingsPageName, type SettingsPageName } from '../features/settings/
  * the window, and localStorage is per-app in Electron, so it needs no IPC and
  * no settings row. A read that fails (first run, cleared data) is just 'home'.
  */
-const LAST_VIEW_KEY = 'ai-anywhere:last-view';
-const LAST_PAGE_KEY = 'ai-anywhere:last-settings-page';
+const LAST_VIEW_KEY = 'lipikit:last-view';
+const LAST_PAGE_KEY = 'lipikit:last-settings-page';
 
 const storedView = (): UiState['activeView'] =>
   localStorage.getItem(LAST_VIEW_KEY) === 'settings' ? 'settings' : 'home';

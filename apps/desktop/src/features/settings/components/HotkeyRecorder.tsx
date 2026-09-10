@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button } from '@ai-anywhere/ui';
+import { Button } from '@lipikit/ui';
 
 /** Electron accelerator modifier names, in the order Electron prints them. */
 const modifiers = (event: KeyboardEvent | React.KeyboardEvent): string[] => [

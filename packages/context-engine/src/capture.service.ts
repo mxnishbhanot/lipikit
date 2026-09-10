@@ -1,4 +1,4 @@
-import { appError, err, type Logger } from '@ai-anywhere/shared';
+import { appError, err, type Logger } from '@lipikit/shared';
 import type { CaptureStrategy, TextCaptureService } from './contracts.js';
 
 export function createTextCaptureService(

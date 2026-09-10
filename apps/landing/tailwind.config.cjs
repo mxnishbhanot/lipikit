@@ -1,4 +1,4 @@
-const preset = require('@ai-anywhere/ui/tailwind-preset');
+const preset = require('@lipikit/ui/tailwind-preset');
 
 /**
  * The app's design tokens, plus the two type sizes only a marketing page needs.

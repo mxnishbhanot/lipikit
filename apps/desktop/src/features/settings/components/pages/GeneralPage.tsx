@@ -1,5 +1,5 @@
-import { BRANDING, type AppSettings, type Tone } from '@ai-anywhere/shared';
-import { Button } from '@ai-anywhere/ui';
+import { BRANDING, type AppSettings, type Tone } from '@lipikit/shared';
+import { Button } from '@lipikit/ui';
 import { Group, MutationStatus, NumberRow, Row, SelectRow, SettingsPage, ToggleRow } from '../fields.js';
 import { useExportSettings, useImportSettings } from '../../api/settings.queries.js';
 

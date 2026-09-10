@@ -1,5 +1,5 @@
-import { BRANDING } from '@ai-anywhere/shared';
-import { AppIcon } from '@ai-anywhere/ui';
+import { BRANDING } from '@lipikit/shared';
+import { AppIcon } from '@lipikit/ui';
 
 export interface SplashProps {
   /** The packaged build's version once IPC answers; the config value until. */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { AppContext } from '@ai-anywhere/shared';
+import type { AppContext } from '@lipikit/shared';
 import { examplesFor, tuningFor } from './context-examples.js';
 
 const context = (appId: AppContext['appId']): AppContext => ({

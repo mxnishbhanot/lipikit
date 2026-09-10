@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        The README's [Troubleshooting](https://github.com/mxnish-bhanot/ai-anywhere#troubleshooting)
+        The README's [Troubleshooting](https://github.com/mxnishbhanot/lipikit#troubleshooting)
         table covers the common ones — hotkey not firing, nothing captured,
         replacement doing nothing. Worth a look first.
 

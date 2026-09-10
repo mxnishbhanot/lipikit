@@ -1,5 +1,5 @@
 import { ipcMain, type IpcMainInvokeEvent } from 'electron';
-import { appError, err, type IpcChannel, type IpcHandlerMap, type Logger } from '@ai-anywhere/shared';
+import { appError, err, type IpcChannel, type IpcHandlerMap, type Logger } from '@lipikit/shared';
 
 /**
  * The only place ipcMain.handle is called. Every handler gets:

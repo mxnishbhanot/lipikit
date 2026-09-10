@@ -1,4 +1,4 @@
-const preset = require('@ai-anywhere/ui/tailwind-preset');
+const preset = require('@lipikit/ui/tailwind-preset');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {

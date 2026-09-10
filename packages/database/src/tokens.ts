@@ -1,4 +1,4 @@
-import { token, type Token } from '@ai-anywhere/shared';
+import { token, type Token } from '@lipikit/shared';
 import type {
   ClipboardRepository,
   FavoritesRepository,

@@ -7,7 +7,7 @@ export interface RecentPrompt {
   readonly input: string;
 }
 
-const RECENTS_KEY = 'ai-anywhere.recents';
+const RECENTS_KEY = 'lipikit.recents';
 const MAX_RECENTS = 6;
 
 /**
